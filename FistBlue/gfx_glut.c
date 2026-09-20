@@ -672,7 +672,7 @@ static void draw_scroll2(void) {
 	 * around GroundRow/2 (984), with the visible table beginning at 752.
 	 */
 	for (screenY = 0; screenY < 224; ++screenY) {
-		const int row = (rowScrollBase + screenY + g.CPS.RowScrollOffset) & 0x7ff;
+		const int row = (992 - screenY + g.CPS.RowScrollOffset) & 0x7ff;
 		const int rowScroll = gemu.RowScroll2[row];
 		const int totalScrollX = scr2x + rowScroll;
 		const int fracX = totalScrollX & 0x0f;
@@ -684,8 +684,8 @@ static void draw_scroll2(void) {
 		 * grid. The renderer is Y-flipped, so tile-local row 0 is
 		 * the bottom of the tile.
 		 */
-		const int yloop = 15 - ((screenY + 15) / 16);
-		const int localY = (16 - (screenY & 0x0f)) & 0x0f;
+		const int yloop = 14 - (screenY / 16);
+		const int localY = screenY & 0x0f;
 		const int ty = (yloop + (48 - tilety)) & 0x3f;
 		const float sy = (yloop - 8) * TILE_SIZE_SCR2;
 		const float stripBottom = sy + localY * (TILE_SIZE_SCR2 / 16.0f);
@@ -708,11 +708,11 @@ static void draw_scroll2(void) {
 			const float uLeft = (flip & 1) ? 1.0f : 0.0f;
 			const float uRight = (flip & 1) ? 0.0f : 1.0f;
 			const float vBottom = (flip & 2)
-				? 1.0f - (localY + 1) / 16.0f
-				: localY / 16.0f;
+				? localY / 16.0f
+				: 1.0f - (localY + 1) / 16.0f;
 			const float vTop = (flip & 2)
-				? 1.0f - localY / 16.0f
-				: (localY + 1) / 16.0f;
+				? (localY + 1) / 16.0f
+				: 1.0f - localY / 16.0f;
 
 			glBegin(GL_POLYGON);
 			glTexCoord2f(uRight, vTop);
