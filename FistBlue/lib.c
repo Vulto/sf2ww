@@ -31,7 +31,11 @@
 #import "demo.h"
 #endif
 
-#ifdef __APPLE__
+#if !defined(CPS)
+#include <execinfo.h>
+#endif
+
+#if !defined(CPS)
 #include <execinfo.h>
 #endif
 
@@ -2016,7 +2020,7 @@ void task_playground(void) {
                     const void *location2 = ryuStand + offset2;
                     printf("addr2 = %lx\n", location2 - baseAddr);
                     
-                    RHSetActionList(&g.Player1, ryuStand, 2);
+		    RHSetActionList((Object *)&g.Player1, ryuStand, 2);
                     break;
                 case 2:
 //                    obj = AllocActor();
@@ -2024,7 +2028,7 @@ void task_playground(void) {
 //                    NEXT(g.mode0);
 
 
-                    RHActionTick(&g.Player1);
+		    RHActionTick((Object *)&g.Player1);
                     proc_actions();
                     TMUpdate();
                     DSDrawAllMain();

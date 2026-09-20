@@ -15,7 +15,7 @@ extern struct game g;
 
 // barrel distance calc
 struct UserData_Barrels {
-    Object *barrel[8];		/* 0xb0 */
+    Object_G2 *barrel[8];		/* 0xb0 */
 };
 struct UserData_Barrel {
     short playerdists[2];		//x0098
@@ -35,12 +35,12 @@ short sub_208c8(short d2) {		// 208c8
     UD_Bar *bar;
     
     short d0 = 0x100;
-    Object *a2;
+    Object_G2 *a2;
     short i;
     
     for (i=0;i<8;i++) {
         a2 = ud->barrel[i];
-        bar = (UD_Bar *)&a2->UserData;
+	bar = (UD_Bar *)&a2->UD;
         if (bar->playerdists[d2]<d0) {
             d0 = bar->playerdists[d2];
         }

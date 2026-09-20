@@ -39,7 +39,6 @@ add_executable(glutBasics glutBasics.c
 			FistBlue/task.c
 			FistBlue/text.c
 			FistBlue/ai/ai.c
-			FistBlue/tests/aitests.c
 			FistBlue/tests/testlib.c
 			RedHammer/pthreads.c
 			RedHammer/redhammer.c

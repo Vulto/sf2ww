@@ -78,7 +78,7 @@ static void action_12(Object *obj);
 static void action_13(Object *obj);
 static void action_14(Object *obj);
 static void action_15(Object *obj);
-static void action_16(Object *obj);
+extern void action_16(Object *obj);
 static void action_17(Object *obj);
 static void action_18(Object *obj);
 static void action_19(Object *obj);

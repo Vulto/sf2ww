@@ -25,7 +25,7 @@ extern Game g;
 #include "actions_530a.h"
 
 
-u16 **data_82c16[4] = {
+u16 ***data_82c16[4] = {
 	NULL, NULL, NULL, NULL, 
     // XXX
 };
