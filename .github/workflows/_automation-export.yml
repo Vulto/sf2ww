@@ -1,0 +1,18 @@
+name: Export source
+
+on:
+  push:
+    branches:
+      - "_automation/source-export"
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pack source
+        run: tar -czf sf2ww-source.tar.gz --exclude=.git .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sf2ww-source
+          path: sf2ww-source.tar.gz
