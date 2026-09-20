@@ -658,6 +658,15 @@ static void draw_scroll2(void) {
 	if (!gemu_scroll_enable[2]) {
 		return;
 	}
+	if ((gframecnt % 120) == 0) {
+		int nz = 0;
+		for (int ri = 0; ri < 2048; ++ri) {
+			if (gemu.RowScroll2[ri] != 0) ++nz;
+		}
+		printf("ROWTRACE frame=%d scroll2=%04x,%04x rowoff=%04x base=%04x nz=%d r900=%d r984=%d r1000=%d r1080=%d\\n",
+			gframecnt, g.CPS.Scroll2X, g.CPS.Scroll2Y, g.CPS.RowScrollOffset, g.CPS.RowScrollBase,
+			nz, gemu.RowScroll2[900], gemu.RowScroll2[984], gemu.RowScroll2[1000], gemu.RowScroll2[1080]);
+	}
 	/* Draw Scroll2 */
 	glPushMatrix();
 	scr2x = g.CPS.Scroll2X;
