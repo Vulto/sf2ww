@@ -1,9 +1,9 @@
 name: Export source
 
 on:
-  push:
+  pull_request:
     branches:
-      - "_automation/source-export"
+      - main
 
 jobs:
   export:
