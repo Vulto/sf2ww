@@ -378,6 +378,11 @@ void gemu_readtile(u16 tileid) {          /* read a 16x16 tile */
     unsigned char buf[4];
     int tileaddr = (tileid * TILE_BYTES_16x16) + TILE_OFFSET_OBJECT;
     
+    if (tileid > TILE_VALID_OBJ_MAX) {
+        memset(&tile, PALETTE_TRANSPARENT_ID, sizeof(tile));
+        return;
+    }
+
     memset(&tile, 0, sizeof(tile));   /* Clear the previous tile out */
     
     fseek(gfxrom, tileaddr, SEEK_SET);
@@ -403,6 +408,10 @@ void gemu_readtile_scroll1(u16 tileid) {
     unsigned char buf[4];
 	
     int tileaddr = (tileid * TILE_BYTES_8x8) + TILE_OFFSET_SCROLLS; 
+    if (tileid < TILE_VALID_SCR1_MIN || tileid > TILE_VALID_SCR1_MAX) {
+        memset(&tile, PALETTE_TRANSPARENT_ID, sizeof(tile));
+        return;
+    }
 	    
     memset(&tile, 0, sizeof(tile));
     
@@ -423,6 +432,11 @@ void gemu_readtile_scroll2(u16 tileid) {
     unsigned char buf[4];
 	
     int tileaddr = (tileid * TILE_BYTES_16x16) + TILE_OFFSET_SCROLLS;
+
+    if (tileid < TILE_VALID_SCR2_MIN || tileid > TILE_VALID_SCR2_MAX) {
+        memset(&tile, PALETTE_TRANSPARENT_ID, sizeof(tile));
+        return;
+    }
 
     memset(&tile, 0, sizeof(tile));
     
@@ -452,6 +466,11 @@ void gemu_readtile_scroll3(u16 tileid) {
         tileid = 0x404;
 	
 	int tileaddr = (tileid * TILE_BYTES_32x32) + TILE_OFFSET_SCROLLS;
+
+    if (tileid < TILE_VALID_SCR3_MIN || tileid > TILE_VALID_SCR3_MAX) {
+        memset(&tile, PALETTE_TRANSPARENT_ID, sizeof(tile));
+        return;
+    }
 	
     memset(&tile, 0, sizeof(tile));  
     
