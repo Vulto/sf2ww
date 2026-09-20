@@ -358,7 +358,7 @@ void gfx_glut_init(void) {
 		gemu.Tilemap_Scroll2[i][1] = 0x0;
 		gemu.Tilemap_Scroll3[i][1] = 0x0;
 	}
-	gWorldRotation[0] = 180.0;
+	gWorldRotation[0] = 0.0;
 	gWorldRotation[1] = 0.0;
 	gWorldRotation[2] = -1.0;
 	gWorldRotation[3] = 0.0;
@@ -816,54 +816,35 @@ static void draw_scroll3(void) {
 int dummyScr1 = 0;
 
 void gfx_glut_drawgame(void) {
-	GLfloat gShapeSize = 11.0f;
-	
-	GLdouble xmin, xmax, ymin, ymax;
-	// far frustum plane
-	GLdouble zFar = -gCamera.viewPos.z + 15;		// was 8
-	// near frustum plane clamped at 1.0
-	GLdouble zNear = MIN (-gCamera.viewPos.z - gShapeSize * 0.5, 1.0);
-	// window aspect ratio
-	GLdouble aspect = gCamera.screenWidth / (GLdouble)gCamera.screenHeight;
-	
 	if (gemuCacheClear) {
 		gemu_clear_cache();
 	}
-		
+
+	const GLdouble nativeAspect = 384.0 / 224.0;
+	GLint viewportWidth = (GLint)gCamera.screenWidth;
+	GLint viewportHeight = (GLint)(gCamera.screenWidth / nativeAspect);
+	GLint viewportX = 0;
+	GLint viewportY = ((GLint)gCamera.screenHeight - viewportHeight) / 2;
+
+	if (viewportHeight > (GLint)gCamera.screenHeight) {
+		viewportHeight = (GLint)gCamera.screenHeight;
+		viewportWidth = (GLint)(gCamera.screenHeight * nativeAspect);
+		viewportX = ((GLint)gCamera.screenWidth - viewportWidth) / 2;
+		viewportY = 0;
+	}
+
+	glDisable(GL_SCISSOR_TEST);
+	glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	if (aspect > 1.0) {
-		ymax = zNear * tan (gCamera.aperture * 0.5 * DTOR);
-		ymin = -ymax;
-		xmin = ymin * aspect;
-		xmax = ymax * aspect;
-	} else {
-		xmax = zNear * tan (gCamera.aperture * 0.5 * DTOR);
-		xmin = -xmax;
-		ymin = xmin / aspect;
-		ymax = xmax / aspect;
-	}
-	glFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
-	
-	
+	glOrtho(-6.0, 6.0, -3.5, 3.5, -1.0, 1.0);
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	
-	gluLookAt (gCamera.viewPos.x, gCamera.viewPos.y, gCamera.viewPos.z,
-			   gCamera.viewPos.x + gCamera.viewDir.x,
-			   gCamera.viewPos.y + gCamera.viewDir.y,
-			   gCamera.viewPos.z + gCamera.viewDir.z,
-			   gCamera.viewUp.x, gCamera.viewUp.y ,gCamera.viewUp.z);
-	
-	glRotatef (gTrackBallRotation[0], gTrackBallRotation[1], gTrackBallRotation[2], gTrackBallRotation[3]);
-	glRotatef (gWorldRotation[0], gWorldRotation[1], gWorldRotation[2], gWorldRotation[3]);
-	
-	GLfloat lightPosition[] = {lightX, 1, 3, 0.0};
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-	
-	glEnable(GL_LIGHTING);
-	glEnable(GL_BLEND);
-	
+	glScalef(1.0, -1.0, 1.0);
+	glDisable(GL_LIGHTING);
+
 	gframecnt++;
     finish = clock() ;
 	duration += (double)(finish - start) / CLOCKS_PER_SEC ;
@@ -872,7 +853,6 @@ void gfx_glut_drawgame(void) {
 	start = clock() ;
 	
 
-	glScalef(0.3, -0.3, 0.3);
 	
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);	// clear the surface
 	glClear (GL_COLOR_BUFFER_BIT);
