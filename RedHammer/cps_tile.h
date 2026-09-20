@@ -40,6 +40,15 @@
 
 #define TILE_OBJECT_END_TAG     0xff00
 
+/* CPS1 STF29 tile-code ranges used by SF2:USA 910206. */
+#define TILE_VALID_OBJ_MAX      0x8fff
+#define TILE_VALID_SCR1_MIN     0x4000
+#define TILE_VALID_SCR1_MAX     0x4fff
+#define TILE_VALID_SCR2_MIN     0x2800
+#define TILE_VALID_SCR2_MAX     0x3fff
+#define TILE_VALID_SCR3_MIN     0x0400
+#define TILE_VALID_SCR3_MAX     0x07ff
+
 #define PALETTE_MASK_BRIGHTNESS 0xf000
 #define PALETTE_MASK_COLOR_R    0x0f00
 #define PALETTE_MASK_COLOR_G    0x00f0
