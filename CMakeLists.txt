@@ -111,5 +111,16 @@ if (NOT UNIX)
     message(FATAL_ERROR "Only Unix builds are supported")
 endif()
 
-enable_testing()
-add_subdirectory(FBTests)
+option(BUILD_FBTESTS "Build FistBlue cmocka tests" OFF)
+
+if(BUILD_FBTESTS)
+    find_path(CMOCKA_INCLUDE_DIR cmocka.h)
+    find_library(CMOCKA_LIBRARY NAMES cmocka)
+
+    if(NOT CMOCKA_INCLUDE_DIR OR NOT CMOCKA_LIBRARY)
+        message(FATAL_ERROR "BUILD_FBTESTS=ON requires cmocka (cmocka.h and libcmocka)")
+    endif()
+
+    enable_testing()
+    add_subdirectory(FBTests)
+endif()
