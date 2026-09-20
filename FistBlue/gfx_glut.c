@@ -650,54 +650,87 @@ glEnd();
 }
 
 static void draw_scroll2(void) {
-	int x,y, yloop, flip, tx, ty, tiletx, tilety;
+	int screenY, x, flip, tilety, tiletx;
 	int scr2x;
-	int record;
-	float scrollbot, scrolltop;
+	const int rowScrollBase = 752;
 
 	if (!gemu_scroll_enable[2]) {
 		return;
 	}
-	/* Draw Scroll2 */
-	glPushMatrix();
-	scr2x = g.CPS.Scroll2X;
-	glTranslatef(-(scr2x & 0xf) / 16.0 * TILE_SIZE_SCR2, ((g.CPS.Scroll2Y & 0xf) / 16.0 * TILE_SIZE_SCR2)  , 0);
 
+	glPushMatrix();
+
+	scr2x = g.CPS.Scroll2X;
 	tilety = g.CPS.Scroll2Y / 16;
-	tiletx = scr2x          / 16;
 
 	GLfloat master = (gemu.PalScroll2[0][0] & PALETTE_MASK_BRIGHTNESS) / TILE_BRIGHT_TO_FLOAT;
 	glColor3f(master, master, master);
-	
-	for(yloop=-1;yloop<16;yloop++) {	
-		y = yloop;
-		scrolltop = gemu.RowScroll2[ (yloop + 48) * 16 ] / 16.0;
-		scrollbot = gemu.RowScroll2[ (yloop + 47) * 16 ] / 16.0;
-        for(x=-6;x<39;x++) {
-			ty = (y + (48 - tilety)) & 0x3f;
-			tx = (x + tiletx) & 0x3f;
-            
-			record = SCROLL_DECODE_SCR2(tx,ty);
-			if (gemu.Tilemap_Scroll2[record][0] == TILE_BLANK_SCR2) {
-                // Blank tile in SCR2
+
+	/*
+	 * CPS1 rowscroll is a horizontal offset for each display scanline.
+	 * The SF2 row-scroll builder writes the 256-entry display table
+	 * around GroundRow/2 (984), with the visible table beginning at 752.
+	 */
+	for (screenY = 0; screenY < 224; ++screenY) {
+		const int row = (992 - screenY + g.CPS.RowScrollOffset) & 0x7ff;
+		const int rowScroll = gemu.RowScroll2[row];
+		const int totalScrollX = scr2x + rowScroll;
+		const int fracX = totalScrollX & 0x0f;
+
+		tiletx = (totalScrollX - fracX) / 16;
+
+		/*
+		 * Map the native display line back to the existing 16x16 tile
+		 * grid. The renderer is Y-flipped, so tile-local row 0 is
+		 * the bottom of the tile.
+		 */
+		const int yloop = 14 - (screenY / 16);
+		const int localY = screenY & 0x0f;
+		const int ty = (yloop + (48 - tilety)) & 0x3f;
+		const float sy = (yloop - 8) * TILE_SIZE_SCR2;
+		const float stripBottom = sy + localY * (TILE_SIZE_SCR2 / 16.0f);
+		const float stripTop = stripBottom + (TILE_SIZE_SCR2 / 16.0f);
+
+		for (x = -6; x < 39; ++x) {
+			const int tx = (x + tiletx) & 0x3f;
+			const int record = SCROLL_DECODE_SCR2(tx, ty);
+			const u16 tileId = gemu.Tilemap_Scroll2[record][0];
+			const u16 attr = gemu.Tilemap_Scroll2[record][1];
+
+			if (tileId == TILE_BLANK_SCR2 || ty == 0) {
 				continue;
 			}
-				
-			if(ty == 0) {continue;}
-			gemu_cache_scroll2(gemu.Tilemap_Scroll2[record][0],
-							   gemu.Tilemap_Scroll2[record][1] & TILE_MASK_PALETTE);
-			
-			flip = (gemu.Tilemap_Scroll2[record][1] & TILE_MASK_FLIP) >> 5;
-			
-            draw_gl_tile(x-12, y-8, flip, TILE_SIZE_SCR2);
-        }   
-    }  
-	
+
+			flip = (attr & TILE_MASK_FLIP) >> 5;
+			gemu_cache_scroll2(tileId, attr & TILE_MASK_PALETTE);
+
+			const float sx = (x - 12) * TILE_SIZE_SCR2 - fracX / 32.0f;
+			const float uLeft = (flip & 1) ? 1.0f : 0.0f;
+			const float uRight = (flip & 1) ? 0.0f : 1.0f;
+			const float vBottom = (flip & 2)
+				? localY / 16.0f
+				: 1.0f - (localY + 1) / 16.0f;
+			const float vTop = (flip & 2)
+				? (localY + 1) / 16.0f
+				: 1.0f - localY / 16.0f;
+
+			glBegin(GL_POLYGON);
+			glTexCoord2f(uRight, vTop);
+			glVertex3f((sx + TILE_SIZE_SCR2), stripTop, 0.0f);
+			glTexCoord2f(uLeft, vTop);
+			glVertex3f(sx, stripTop, 0.0f);
+			glTexCoord2f(uLeft, vBottom);
+			glVertex3f(sx, stripBottom, 0.0f);
+			glTexCoord2f(uRight, vBottom);
+			glVertex3f((sx + TILE_SIZE_SCR2), stripBottom, 0.0f);
+			glEnd();
+		}
+	}
+
 	glColor3f(1.0, 1.0, 1.0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glPopMatrix();
 }
-
 static void draw_scroll2_planes(void) {
     int i;
     int bottomRow, topRow;
