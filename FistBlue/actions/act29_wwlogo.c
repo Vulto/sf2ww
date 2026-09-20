@@ -19,7 +19,7 @@
 struct UserData_29 {
 	short XSave;
 	int funky;		// was actually stored in VelX VelY
-};
+} __attribute__((packed, aligned(2)));
 typedef struct UserData_29 * UD;
 
 void action_29(Object *obj) {
