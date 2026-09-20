@@ -2780,9 +2780,9 @@ static void skyskraperanim_08(Object *obj) {		// 1d41a teeth
 					}
 					break;
 				case 4:
-					obj->X.full -= ud->VelX.full;
-					obj->Y.full += ud->VelY.full;
-					ud->VelY.full += ud->Gravity.full;
+					obj->X.full = (int)((u32)obj->X.full - (u32)ud->VelX.full);
+					obj->Y.full = (int)((u32)obj->Y.full + (u32)ud->VelY.full);
+					ud->VelY.full = (int)((u32)ud->VelY.full + (u32)ud->Gravity.full);
 					actiontick(obj);
 					sub_25f8(obj);
 					break;
