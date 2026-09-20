@@ -874,7 +874,7 @@ void gfx_glut_drawgame(void) {
 
 	glScalef(0.3, -0.3, 0.3);
 	
-	glClearColor (0.2f, 0.1f, 0.0f, 1.0f);	// clear the surface
+	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);	// clear the surface
 	glClear (GL_COLOR_BUFFER_BIT);
 	
 	
