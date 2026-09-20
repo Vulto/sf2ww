@@ -24,6 +24,33 @@ jobs:
       - name: Build
         run: cmake --build build --parallel
 
+
+  asan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev
+      - name: Configure ASan/UBSan
+        run: |
+          cmake \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_C_FLAGS="-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined" \
+            -S . -B build-asan
+      - name: Build
+        run: cmake --build build-asan --parallel
+      - name: Upload ASan runtime
+        uses: actions/upload-artifact@v4
+        with:
+          name: crashfix-001-asan
+          path: build-asan/glutBasics
+          if-no-files-found: error
+          retention-days: 1
+
   tests:
     runs-on: ubuntu-latest
     steps:
