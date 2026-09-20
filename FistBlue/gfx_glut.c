@@ -135,7 +135,7 @@ GLboolean gTrackBall;
 
 int gGameInWindow = 0;
 int gShowInfo = 1;
-int gShowHelp = 1;
+int gShowHelp = 0;
 
 
 GLint va_scroll1[65 * 65][3];
