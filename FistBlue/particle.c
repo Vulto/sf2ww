@@ -22,6 +22,7 @@ void RHSetActionList(Object *obj, const void *listaddr, short sel) {
     RHSetAction(obj, (FBAction *)RHOffsetLookup16(listaddr, sel));
 }
 void RHSetAction(Object *obj, const FBAction *act) {
+    obj->ActionScriptType   = ACTIONSCRIPT_ROM;
     obj->ActionScript       = act;
     obj->Timer              = RHSwapWord(act->Delay);
     obj->AnimFlags          = RHSwapWord(act->Flags);
@@ -37,6 +38,20 @@ void RHSetAction(Object *obj, const FBAction *act) {
 #endif
 }
 void RHActionTick(Object *obj) {
+    if (obj->ActionScriptType == ACTIONSCRIPT_NATIVE) {
+        const Action *act = (const Action *)obj->ActionScript;
+
+        if (--obj->Timer == 0) {
+            if (act->Loop & 0x80) {
+                act = (const Action *)act[1].Image;
+            } else {
+                act++;
+            }
+            setaction_direct(obj, act);
+        }
+        return;
+    }
+
     if(--obj->Timer == 0) {
         if(RHSwapWord(obj->ActionScript->Flags) & 0x8000) {
             
@@ -52,7 +67,10 @@ void setaction_list(Object *obj, const Action **list, short sel) {
     FBPanic(99);
 }
 void setaction_direct(Object *obj, const Action *act) {
-    FBPanic(99);
+    obj->ActionScriptType   = ACTIONSCRIPT_NATIVE;
+    obj->ActionScript       = (const FBAction *)act;
+    obj->Timer              = act->Delay;
+    obj->AnimFlags          = act->Loop << 8 | act->Next;
 }
 void actiontick(Object *obj) {
     RHActionTick(obj);

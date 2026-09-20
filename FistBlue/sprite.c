@@ -896,12 +896,67 @@ void drawsprite(Object *obj) {         /* 7edaa */
     int attr;
     const short *coordlist;
     short coordpair[2];
-    
 
-    //if(g.Debug && g.JPCost & JP_DBGSLEEP) {
-    //	dbg_draw_hitboxes((Player *)obj);
-    //}
-    sprite_coords(obj, coordpair);	/* set coords in d0 and d1 to follow scroll X */
+    sprite_coords(obj, coordpair);
+
+    if (obj->ActionScriptType == ACTIONSCRIPT_NATIVE) {
+        const Action *action = (const Action *)obj->ActionScript;
+        u16 native_tiles[16];
+        u16 i;
+
+        image = action->Image;
+        if (image == NULL) {
+            return;
+        }
+
+        tiles_in_image = image->TileCount;
+        if (tiles_in_image == 0 || tiles_in_image > 16) {
+            return;
+        }
+
+        /* Native Action images currently used by the game are normal
+           tile lists (the action_3b score counters). */
+        if (tiles_in_image & IMAGE_ATTR) {
+            return;
+        }
+
+        if (tiles_in_image > g.ObjTileBudget) {
+            return;
+        }
+
+        g.ObjTileBudget -= tiles_in_image;
+        attr = image->Attr;
+        g_tilecount -= tiles_in_image;
+
+        if (attr & 0xff00) {
+            tiles_in_image = 1;
+        }
+
+        coordlist = sub_7f224(image->Dimensions);
+
+        g.DSOffsetX = image->OffsetX;
+        g.DSOffsetY = image->OffsetY;
+
+        if (action->FlipBits & 0x3) {
+            attr ^= ((action->FlipBits & 0x3) << 5);
+            g.DSOffsetY += action->YOffset;
+        }
+
+        g.DSOffsetX -= obj->DSOffsetX;
+
+        /*
+         * _draw_sprite() expects ROM-format tile words because its tile
+         * routines apply RHSwapWord(). Adapt only the native tile words;
+         * the native image header remains host-endian.
+         */
+        for (i = 0; i < tiles_in_image; ++i) {
+            native_tiles[i] = RHSwapWord(image->Tiles[i]);
+        }
+
+        _draw_sprite(obj, native_tiles, coordlist, coordpair[0],
+                     coordpair[1], tiles_in_image, attr);
+        return;
+    }
 
     image = (const struct image *)RHCODE(RHSwapLong(obj->ActionScript->Image));
 
@@ -941,7 +996,7 @@ void drawsprite(Object *obj) {         /* 7edaa */
     g.DSOffsetX -= obj->DSOffsetX;   /* ply->x0052 */
     
     if (obj->Sel == 2 && obj->Sel == 7) {
-        DEBUG_GEN("Sel 0x%x SubSel 0x%x dim 0x%x tiles %d\n", obj->Sel, obj->SubSel, image->Dimensions, tiles_in_image);
+        DEBUG_GEN("Sel 0x%x SubSel 0x%x dim 0x%x tiles %d\\n", obj->Sel, obj->SubSel, image->Dimensions, tiles_in_image);
     }
     _draw_sprite(obj, image->Tiles, coordlist, coordpair[0], coordpair[1], tiles_in_image, attr);
 }

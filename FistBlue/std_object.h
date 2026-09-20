@@ -1,3 +1,6 @@
+#define ACTIONSCRIPT_ROM		0
+#define ACTIONSCRIPT_NATIVE	1
+
     signed char		exists;
     signed char		flag1;					// is Visible
     signed char		mode0;					// 0x02
@@ -23,7 +26,7 @@
     char			x0024;					/* Is threat */
     char			Scroll;					// 0x25
     struct player_t	*Owner;					/* 0x26 this is a 16-bit ptr on CPS */
-    u16				x0028;					/* Unused */
+    u16				ActionScriptType;			/* 0x28: ROM=0, native Action=1 */
     short			Energy;					// 2a
     short			EnergyDash;				// 2c
     char			x002e;

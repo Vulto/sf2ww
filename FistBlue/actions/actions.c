@@ -3307,7 +3307,7 @@ static void action_3b(Object *obj) {	//203ba
 						_act3b_print_counter(g.TimeRemainBCD, d2, &g.TimeBonusSprite[8]);
 					}
 					g.ScoreCountFlags |= ACT3B_TIME_BONUS_BUSY;
-                    RHSetAction(obj, RHCODE(0x2067c));
+                    setaction_direct(obj, &action_time_bonus);
 					break;
 				case 2:												// VITAL
 					ply = g.RoundWinnerSide ? PLAYER2 : PLAYER1;
@@ -3333,11 +3333,11 @@ static void action_3b(Object *obj) {	//203ba
 						_act3b_print_counter(d0, d2, &g.VitalBonusSprite[8]);
 					}
 					g.ScoreCountFlags |= ACT3B_VITAL_BONUS_BUSY;
-                    RHSetAction(obj, RHCODE(0x20694));
+                    setaction_direct(obj, &action_vital_bonus);
 					break;
 				case 4:											// TOTAL
 					ud->x0080 = g.TotalBonusCount;
-                    RHSetAction(obj, RHCODE(0x206ac));
+                    setaction_direct(obj, &action_total_bonus);
 					break;
 				FATALDEFAULT;
 			}
@@ -3386,7 +3386,7 @@ static void action_3b(Object *obj) {	//203ba
 							queuesound(SOUND_SCORE_DING);
 						}
 					}
-                    RHSetAction(obj, RHCODE(0x206ac));
+                    setaction_direct(obj, &action_total_bonus);
 					break;
 				FATALDEFAULT;
 			}
