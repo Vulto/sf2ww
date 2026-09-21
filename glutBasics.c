@@ -48,7 +48,7 @@ extern struct inputs gInputs;
 //#define DEBUG
 
 extern CPSGFXEMU gemu;
-int time_wait=12;
+static const long CPS_FRAME_NS = 16768000L;\nstatic struct timespec gNextFrame;
 
 typedef struct {
    GLdouble x,y,z;
@@ -239,7 +239,16 @@ int main (int argc, const char * argv[])
     glutSpecialUpFunc (specialup);
     glutMouseFunc (mouse);
     glutMotionFunc(mouseMotion);
-    glutTimerFunc(40, timerFunc, 0);
+    if (clock_gettime(CLOCK_MONOTONIC, &gNextFrame) != 0) {
+        perror("clock_gettime");
+        return EXIT_FAILURE;
+    }
+    gNextFrame.tv_nsec += CPS_FRAME_NS;
+    if (gNextFrame.tv_nsec >= 1000000000L) {
+        gNextFrame.tv_nsec -= 1000000000L;
+        ++gNextFrame.tv_sec;
+    }
+    glutTimerFunc((unsigned)((CPS_FRAME_NS + 999999L) / 1000000L), timerFunc, 0);
     glutMainLoop();
     return 0;
 }
