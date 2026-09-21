@@ -13,4 +13,4 @@ void action_2c(Object *obj);
 struct UserData_Act1e {
 	u32 x0080;
 	char	x0084;	
-};
+} __attribute__((packed, aligned(2)));
