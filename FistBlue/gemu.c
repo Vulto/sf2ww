@@ -43,9 +43,9 @@ void gemu_clear_object_first72(void) {		// 5f84
 
 void FBSetPalette(short major, const u16 *palette)
 {
-    int i;
-    for (i=0; i<16; ++i) {
-        gemu.PalObject[major][i] = RHSwapWord(palette[i]);
+    u32 palette_offset = RHCodeOffsetChecked(palette, 16u * sizeof(u16), __FILE__, __LINE__);
+    for (int i = 0; i < 16; ++i) {
+        gemu.PalObject[major][i] = RHWordOffset(palette_offset, i);
     }
 }
 
