@@ -101,7 +101,7 @@ typedef struct game {
 	u8 *x0092,*x0096;		/* pointers to gfx ram (!!) for something funky at 22b0 */
     /* end input vars */
 	const u16		*DemoJoyP1, *DemoJoyP2;				//0092,0096
-	short	DemoJoyP1Timer, DemoJoyP2Timer;		//009a,009c
+	u16	DemoJoyP1Timer, DemoJoyP2Timer;		//009a,009c
 	
     int safetyVariable;         /* deleteme */
 
