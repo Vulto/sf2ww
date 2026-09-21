@@ -9,9 +9,12 @@ on:
   pull_request:
     branches:
       - main
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
 
 jobs:
-  build:
+  build-and-lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +26,6 @@ jobs:
         run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -S . -B build
       - name: Build
         run: cmake --build build --parallel
-
       - name: Validate executable
         run: test -x build/glutBasics
 
@@ -70,3 +72,69 @@ jobs:
           if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
             exit "$status"
           fi
+
+  smoke-compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate state comparator
+        run: |
+          printf '%s\n' 'frame,game_mode,game_tick,stage' '1,2,3,4' '2,2,4,4' > expected.csv
+          cp expected.csv actual.csv
+          bash scripts/compare_state_csv.sh expected.csv actual.csv
+      - name: Report MAME fixture status
+        run: |
+          if [ -z "${SF2_MAME_ROM_ROOT:-}" ]; then
+            echo "MAME_COMPARISON_BLOCKED: no private ROM fixture is mounted on this runner."
+            echo "The job remains green because no original ROM data may be committed or exposed."
+          else
+            echo "MAME_COMPARISON_READY: private fixture root is present."
+            echo "Full execution is reserved for the trusted MAME regression job."
+          fi
+
+  full-mame-regression:
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check private ROM fixture
+        id: fixture
+        run: |
+          if [ -z "${SF2_MAME_ROM_ROOT:-}" ] || [ ! -d "${SF2_MAME_ROM_ROOT}" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "MAME regression blocked: private ROM fixture is not mounted."
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install dependencies
+        if: steps.fixture.outputs.available == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mame freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb
+      - name: Configure and build port
+        if: steps.fixture.outputs.available == 'true'
+        run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_FBTESTS=ON -S . -B build && cmake --build build --parallel
+      - name: Run MAME state probe
+        if: steps.fixture.outputs.available == 'true'
+        env:
+          SF2_MAME_ROMPATH: ${{ env.SF2_MAME_ROM_ROOT }}/roms
+        run: |
+          rm -f mame_state.csv
+          bash scripts/run_mame_state.sh
+      - name: Run port state probe
+        if: steps.fixture.outputs.available == 'true'
+        run: |
+          test -f "${SF2_MAME_ROM_ROOT}/allroms.bin"
+          test -f "${SF2_MAME_ROM_ROOT}/sf2gfx.bin"
+          cp "${SF2_MAME_ROM_ROOT}/allroms.bin" allroms.bin
+          cp "${SF2_MAME_ROM_ROOT}/sf2gfx.bin" sf2gfx.bin
+          set +e
+          SF2_STATE_LOG=port_state.csv timeout 30s xvfb-run -a ./build/glutBasics </dev/null
+          status=$?
+          set -e
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            exit "$status"
+          fi
+      - name: Compare first divergence
+        if: steps.fixture.outputs.available == 'true'
+        run: bash scripts/compare_state_csv.sh mame_state.csv port_state.csv
