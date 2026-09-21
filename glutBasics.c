@@ -265,6 +265,7 @@ void timerFunc(int value) {
     unsigned delay_ms;
 
     task_timer();
+    log_state_frame();
     glutPostRedisplay();
 
     clock_gettime(CLOCK_MONOTONIC, &now);
