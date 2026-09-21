@@ -595,13 +595,13 @@ void sub_4386(short d1, short width_d3, short width_d4, const u16 *a1, u16 **gfx
 		for(;width_d3>=0;width_d3--) {			/* postdecrements */
 			a2 = *gfx_p;
 			for(d2 = width_d4;d2>=0;d2--) {
-				if(RHSwapWord(*a1) & 0x8000) {
+				if(RHReadWordPtr(a1) & 0x8000) {
 					/* 431e */
 					a1+=2;
 					a2+=2;
 				} else {
-					a2[0] = GFXROM_SCROLL2 + RHSwapWord(a1[0]);
-					a2[1] = RHSwapWord(a1[1]);
+					a2[0] = GFXROM_SCROLL2 + RHReadWordPtr(a1);
+					a2[1] = RHReadWordPtr(a1 + 1);
 					a1 +=2;
 					a2 +=2;
 				}
@@ -621,9 +621,9 @@ void sub_4386(short d1, short width_d3, short width_d4, const u16 *a1, u16 **gfx
 		for(; width_d3 >= 0; --width_d3){
 			a2 = *gfx_p;
 			for(d6 = width_d4; d6 >= 0; --d6) {
-				if((RHSwapWord(a1[-2]) & 0x8000) == 0) {
-					a2[-2] = GFXROM_SCROLL2 + RHSwapWord(a1[-2]);
-					a2[-1] = ATTR_X_FLIP ^ RHSwapWord(a1[-1]);
+				if((RHReadWordPtr(a1 - 2) & 0x8000) == 0) {
+					a2[-2] = GFXROM_SCROLL2 + RHReadWordPtr(a1 - 2);
+					a2[-1] = ATTR_X_FLIP ^ RHReadWordPtr(a1 - 1);
 				}
 				a1 -= 2;
 				a2 -= 2;				
@@ -641,7 +641,7 @@ static void drawsimple_scroll1noattr(Object *obj, const u16 *tiles, int width, i
         coord2=coord;
         for(y=0; y<height; y++) {
             /* tile */
-            SCR1_DRAW_TILE_NOATTR(coord2, RHSwapWord(tiles[0]) + GFXROM_SCROLL1);
+            SCR1_DRAW_TILE_NOATTR(coord2, RHReadWordPtr(tiles) + GFXROM_SCROLL1);
 			tiles++;
             SCR1_CURSOR_BUMP(coord2, 0, 1);
         }
@@ -660,7 +660,7 @@ void drawsimple_scroll1attr(Object *obj,  const u16 *tiles, int width, int heigh
         coord2=coord;
         for(y=0; y<height; y++) {
 			/* tile, attr*/
-            SCR1_DRAW_TILE(coord2, RHSwapWord(tiles[0]) + GFXROM_SCROLL1, RHSwapWord(tiles[1]));
+            SCR1_DRAW_TILE(coord2, RHSwapWord(tiles[0]) + GFXROM_SCROLL1, RHReadWordPtr(tiles + 1));
 			tiles++;
 			SCR1_CURSOR_BUMP(coord2, 0, 1);
         }
@@ -770,29 +770,37 @@ void (*DRAW_ATTR_NOCHECK[3])(Object *, const u16 *, int, int)   =
 void actiontickdraw(Object *obj) {		/* 0x41d4 */
     if(--obj->Timer) { return; }
 
-    if (RHSwapWord(obj->ActionScript->Flags) & 0x8000) {
-        u32 *next = (void *)obj->ActionScript + sizeof(FBSimpleAction);
-        obj->ActionScript = (const FBAction *)RHCODE(RHSwapLong(*next));
+    u32 action_offset = RHCODE_OFFSET(obj->ActionScript, sizeof(FBSimpleAction));
+    u16 flags = RHWordOffset(action_offset, offsetof(FBSimpleAction, Flags));
+    if (flags & 0x8000) {
+        u32 target = RHReadLong((int)(action_offset + sizeof(FBSimpleAction)));
+        obj->ActionScript = (const FBAction *)RHCODE(target);
     } else {
-        const void *next = (void *)obj->ActionScript + sizeof(FBSimpleAction);
-        obj->ActionScript = (const FBAction *)next;
+        obj->ActionScript = (const FBAction *)RHCODE(action_offset + sizeof(FBSimpleAction));
     }
-    obj->Timer       = RHSwapWord(obj->ActionScript->Delay);
-    obj->AnimFlags   = RHSwapWord(obj->ActionScript->Flags);
+    obj->Timer = RHWordOffset(RHCODE_OFFSET(obj->ActionScript, sizeof(FBSimpleAction)),
+                              offsetof(FBSimpleAction, Delay));
+    obj->AnimFlags = RHWordOffset(RHCODE_OFFSET(obj->ActionScript, sizeof(FBSimpleAction)),
+                                   offsetof(FBSimpleAction, Flags));
     draw_simple(obj);
 }        
 
 void draw_simple(Object *obj) {             /* 0x4200 */
     unsigned int width, height, palette;
-	const u16 *tiles;
-    
-    struct image2 *im = (struct image2 *)RHCODE(RHSwapLong(obj->ActionScript->Image));
-    
-    width   = RHSwapWord(im->Width);
-    height  = RHSwapWord(im->Height);
-    palette = RHSwapWord(im->Palette);  // not actually a palette: a flag indicating tile, attr pairs
+    const u16 *tiles;
+    u32 action_offset = RHCODE_OFFSET(obj->ActionScript, sizeof(FBSimpleAction));
+    u32 image_offset = RHReadLong((int)(action_offset + offsetof(FBSimpleAction, Image)));
 
-	tiles = im->Tiles;
+    RHCodePtrRange(image_offset, sizeof(u16) * 3u);
+    width = RHWordOffset(image_offset, 0);
+    height = RHWordOffset(image_offset, 1);
+    palette = RHWordOffset(image_offset, 2);  // flag indicating tile, attr pairs
+
+    {
+        size_t tile_words = (size_t)width * (size_t)height * (palette ? 2u : 1u);
+        RHCodePtrRange(image_offset + 6u, tile_words * sizeof(u16));
+    }
+    tiles = (const u16 *)RHCodePtrRange(image_offset + 6u, 1);
     if (palette == 0) {
         if(obj->Pool == 0) {
             DRAW_NOATTR_CHECK[obj->Scroll/2](obj, tiles, width, height);
