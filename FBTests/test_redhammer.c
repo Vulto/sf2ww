@@ -64,3 +64,19 @@ void test_FBAction_layout(void **state) {
     assert_int_equal(20, offsetof(FBAction, YOffset));
     assert_int_equal(24, sizeof(FBAction));
 }
+
+void test_FBSimpleAction_layout(void **state) {
+    assert_int_equal(0, offsetof(FBSimpleAction, Delay));
+    assert_int_equal(2, offsetof(FBSimpleAction, Flags));
+    assert_int_equal(4, offsetof(FBSimpleAction, Image));
+    assert_int_equal(8, sizeof(FBSimpleAction));
+}
+
+void test_FBImage_layout(void **state) {
+    assert_int_equal(0, offsetof(FBImage, TileCount));
+    assert_int_equal(2, offsetof(FBImage, Attr));
+    assert_int_equal(4, offsetof(FBImage, Dimensions));
+    assert_int_equal(6, offsetof(FBImage, OffsetX));
+    assert_int_equal(8, offsetof(FBImage, OffsetY));
+    assert_int_equal(10, offsetof(FBImage, Tiles));
+}
