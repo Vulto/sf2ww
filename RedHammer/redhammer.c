@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #endif
 
@@ -111,17 +112,36 @@ void load_cps_roms()
 }
 
 #endif
-void *RHCodePtr(u32 offset)
+void *RHCodePtrRange(u32 offset, size_t size)
 {
     if (g_code_roms == NULL) {
         fprintf(stderr, "RHCODE: ROM image is not loaded (offset 0x%08x)\n", offset);
         abort();
     }
-    if (offset >= ALL_CODE_SIZE) {
-        fprintf(stderr, "RHCODE: ROM offset 0x%08x outside 0x00000000..0x%08x\n", offset, ALL_CODE_SIZE - 1);
+    if ((size_t)offset > ALL_CODE_SIZE || size > ALL_CODE_SIZE - (size_t)offset) {
+        fprintf(stderr, "RHCODE: ROM range 0x%08x + 0x%zx outside 0x00000000..0x%08x\n", offset, size, ALL_CODE_SIZE - 1);
         abort();
     }
     return g_code_roms + offset;
+}
+
+void *RHCodePtr(u32 offset)
+{
+    return RHCodePtrRange(offset, 1);
+}
+
+static u16 RHReadWordAt(u32 offset)
+{
+    u16 value;
+    memcpy(&value, RHCodePtrRange(offset, sizeof(value)), sizeof(value));
+    return RHSwapWord(value);
+}
+
+static u32 RHReadLongAt(u32 offset)
+{
+    u32 value;
+    memcpy(&value, RHCodePtrRange(offset, sizeof(value)), sizeof(value));
+    return RHSwapLong(value);
 }
 
 /** Print the CPS ROM address of a given pointer to the global data blob */
@@ -137,12 +157,12 @@ const void *RHOffsetLookup16(const u16 *base, int index)
 
 const u16 RHWordOffset(u32 base, int index)
 {
-    return RHSwapWord(*(u16 *)(RHCODE(base + (2 * index))));
+    return RHReadWordAt(base + (u32)(2 * index));
 }
 
 const u8 RHByteOffset(u32 base, int index)
 {
-    return *(u8 *)(RHCODE(base + index));
+    return *(u8 *)RHCodePtrRange(base + (u32)index, sizeof(u8));
 }
 
 const u32 RH3DLong(u32 base, int dim2, int dim3, int i1, int i2, int i3)
