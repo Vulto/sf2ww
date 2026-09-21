@@ -111,7 +111,7 @@ static void blackadder(GPAL *palbase, int *fadebase, int count, short arg) {		//
     for(i=count; i >= 0; --i) {
         adder(&palbase, fadebase, arg, i);
     }
-    es.FadeCounter += *fadebase;
+    es.FadeCounter = (int)((u32)es.FadeCounter + (u32)*fadebase);
 }
 static void whiteadder(GPAL *palbase, int *fadebase, int count, short arg) {			//11c2
 	int d0;
@@ -126,7 +126,7 @@ static void whiteadder(GPAL *palbase, int *fadebase, int count, short arg) {			/
 	} else {
 		d0 &= ~(int)(1u << 31);
 	}
-	es.FadeCounter += d0;
+	es.FadeCounter = (int)((u32)es.FadeCounter + (u32)d0);
 }
 	
 
