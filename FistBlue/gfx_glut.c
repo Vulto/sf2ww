@@ -338,7 +338,7 @@ u16 *ehonda;
 void gfx_glut_init(void) {
 	int i;
 	
-    gfxrom=fopen( "./sf2gfx.bin", "r" );
+    gfxrom=fopen( "./sf2gfx.bin", "rb" );
     if(gfxrom == NULL) {
         printf("fatal: couldn't open graphics ROM in %s", getcwd(NULL, 0));
         exit(EXIT_FAILURE);
@@ -373,136 +373,157 @@ const static unsigned char pixbit[8] = { 128, 64, 32, 16, 8, 4, 2, 1 }; // XXX r
 
 #pragma mark Tile reading / decoding
 
-void gemu_readtile(u16 tileid) {          /* read a 16x16 tile */
+static int gfxrom_read(void *buffer, size_t size) {
+    return fread(buffer, 1, size, gfxrom) == size;
+}
+
+static void gfxrom_transparent_tile(void) {
+    memset(&tile, PALETTE_TRANSPARENT_ID, sizeof(tile));
+}
+
+void gemu_readtile(u16 tileid) {
     int u, v;
     unsigned char buf[4];
     int tileaddr = (tileid * TILE_BYTES_16x16) + TILE_OFFSET_OBJECT;
-    
-    if (tileid > TILE_VALID_OBJ_MAX) {
-        memset(&tile, PALETTE_TRANSPARENT_ID, sizeof(tile));
+
+    if (tileid > TILE_VALID_OBJ_MAX ||
+        fseek(gfxrom, tileaddr, SEEK_SET) != 0) {
+        gfxrom_transparent_tile();
         return;
     }
 
-    memset(&tile, 0, sizeof(tile));   /* Clear the previous tile out */
-    
-    fseek(gfxrom, tileaddr, SEEK_SET);
-    for(u=0; u<16; u++) {
-        GFXROM_READFOUR;
-        for(v=0; v<8; v++) {
+    memset(&tile, 0, sizeof(tile));
+    for (u = 0; u < 16; ++u) {
+        if (!gfxrom_read(buf, sizeof(buf))) {
+            gfxrom_transparent_tile();
+            return;
+        }
+        for (v = 0; v < 8; ++v) {
             if (buf[0] & pixbit[v]) { tile[u][v] += 1; }
             if (buf[1] & pixbit[v]) { tile[u][v] += 2; }
             if (buf[2] & pixbit[v]) { tile[u][v] += 4; }
             if (buf[3] & pixbit[v]) { tile[u][v] += 8; }
         }
-        GFXROM_READFOUR;
-        for(v=0; v<8; v++) {        
-            if (buf[0] & pixbit[v]) { tile[u][v+8] += 1; }
-            if (buf[1] & pixbit[v]) { tile[u][v+8] += 2; }
-            if (buf[2] & pixbit[v]) { tile[u][v+8] += 4; }
-            if (buf[3] & pixbit[v]) { tile[u][v+8] += 8; }
+        if (!gfxrom_read(buf, sizeof(buf))) {
+            gfxrom_transparent_tile();
+            return;
+        }
+        for (v = 0; v < 8; ++v) {
+            if (buf[0] & pixbit[v]) { tile[u][v + 8] += 1; }
+            if (buf[1] & pixbit[v]) { tile[u][v + 8] += 2; }
+            if (buf[2] & pixbit[v]) { tile[u][v + 8] += 4; }
+            if (buf[3] & pixbit[v]) { tile[u][v + 8] += 8; }
         }
     }
 }
+
 void gemu_readtile_scroll1(u16 tileid) {
     int u, v;
     unsigned char buf[4];
-	
-    int tileaddr = (tileid * TILE_BYTES_8x8) + TILE_OFFSET_SCROLLS; 
-    if (tileid < TILE_VALID_SCR1_MIN || tileid > TILE_VALID_SCR1_MAX) {
-        memset(&tile, PALETTE_TRANSPARENT_ID, sizeof(tile));
+    int tileaddr = (tileid * TILE_BYTES_8x8) + TILE_OFFSET_SCROLLS;
+
+    if (tileid < TILE_VALID_SCR1_MIN || tileid > TILE_VALID_SCR1_MAX ||
+        fseek(gfxrom, tileaddr, SEEK_SET) != 0) {
+        gfxrom_transparent_tile();
         return;
     }
-	    
+
     memset(&tile, 0, sizeof(tile));
-    
-    fseek(gfxrom, tileaddr, SEEK_SET);
-    for(u=0; u<8; u++) {
-        GFXROM_READFOUR;
-        for(v=0; v<8; v++) {
+    for (u = 0; u < 8; ++u) {
+        if (!gfxrom_read(buf, sizeof(buf))) {
+            gfxrom_transparent_tile();
+            return;
+        }
+        for (v = 0; v < 8; ++v) {
             if (buf[0] & pixbit[v]) { tile[u][v] += 1; }
             if (buf[1] & pixbit[v]) { tile[u][v] += 2; }
             if (buf[2] & pixbit[v]) { tile[u][v] += 4; }
             if (buf[3] & pixbit[v]) { tile[u][v] += 8; }
         }
-        GFXROM_READFOUR;		/* skip one */
+        if (!gfxrom_read(buf, sizeof(buf))) {
+            gfxrom_transparent_tile();
+            return;
+        }
     }
 }
+
 void gemu_readtile_scroll2(u16 tileid) {
     int u, v;
     unsigned char buf[4];
-	
     int tileaddr = (tileid * TILE_BYTES_16x16) + TILE_OFFSET_SCROLLS;
 
-    if (tileid < TILE_VALID_SCR2_MIN || tileid > TILE_VALID_SCR2_MAX) {
-        memset(&tile, PALETTE_TRANSPARENT_ID, sizeof(tile));
+    if (tileid < TILE_VALID_SCR2_MIN || tileid > TILE_VALID_SCR2_MAX ||
+        fseek(gfxrom, tileaddr, SEEK_SET) != 0) {
+        gfxrom_transparent_tile();
         return;
     }
 
     memset(&tile, 0, sizeof(tile));
-    
-    fseek(gfxrom, tileaddr, SEEK_SET);
-    for(u=0; u<16; u++) {
-        GFXROM_READFOUR;
-        for(v=0; v<8; v++) {
+    for (u = 0; u < 16; ++u) {
+        if (!gfxrom_read(buf, sizeof(buf))) {
+            gfxrom_transparent_tile();
+            return;
+        }
+        for (v = 0; v < 8; ++v) {
             if (buf[0] & pixbit[v]) { tile[u][v] += 1; }
             if (buf[1] & pixbit[v]) { tile[u][v] += 2; }
             if (buf[2] & pixbit[v]) { tile[u][v] += 4; }
             if (buf[3] & pixbit[v]) { tile[u][v] += 8; }
         }
-        GFXROM_READFOUR;
-        for(v=0; v<8; v++) {
-            if (buf[0] & pixbit[v]) { tile[u][v+8] += 1; }
-            if (buf[1] & pixbit[v]) { tile[u][v+8] += 2; }
-            if (buf[2] & pixbit[v]) { tile[u][v+8] += 4; }
-            if (buf[3] & pixbit[v]) { tile[u][v+8] += 8; }
+        if (!gfxrom_read(buf, sizeof(buf))) {
+            gfxrom_transparent_tile();
+            return;
+        }
+        for (v = 0; v < 8; ++v) {
+            if (buf[0] & pixbit[v]) { tile[u][v + 8] += 1; }
+            if (buf[1] & pixbit[v]) { tile[u][v + 8] += 2; }
+            if (buf[2] & pixbit[v]) { tile[u][v + 8] += 4; }
+            if (buf[3] & pixbit[v]) { tile[u][v + 8] += 8; }
         }
     }
 }
+
 void gemu_readtile_scroll3(u16 tileid) {
-    unsigned char pixbit[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
     int u, v;
     unsigned char buf[4];
-    if(tileid == 0x400)     // SF2 CPS makes this tile transparent, even though it has data
-        tileid = 0x404;
-	
-	int tileaddr = (tileid * TILE_BYTES_32x32) + TILE_OFFSET_SCROLLS;
+    int tileaddr;
 
-    if (tileid < TILE_VALID_SCR3_MIN || tileid > TILE_VALID_SCR3_MAX) {
-        memset(&tile, PALETTE_TRANSPARENT_ID, sizeof(tile));
+    if (tileid == 0x400) {
+        tileid = 0x404;
+    }
+    tileaddr = (tileid * TILE_BYTES_32x32) + TILE_OFFSET_SCROLLS;
+
+    if (tileid < TILE_VALID_SCR3_MIN || tileid > TILE_VALID_SCR3_MAX ||
+        fseek(gfxrom, tileaddr, SEEK_SET) != 0) {
+        gfxrom_transparent_tile();
         return;
     }
-	
-    memset(&tile, 0, sizeof(tile));  
-    
-    fseek(gfxrom, tileaddr, SEEK_SET);
-    for(u=0; u<32; u++) {
-        GFXROM_READFOUR;
-        for(v=0; v<8; v++) {
-            if (buf[0] & pixbit[v]) { tile[u][v] += 1; }
-            if (buf[1] & pixbit[v]) { tile[u][v] += 2; }
-            if (buf[2] & pixbit[v]) { tile[u][v] += 4; }
-            if (buf[3] & pixbit[v]) { tile[u][v] += 8; }
-        }
-        GFXROM_READFOUR;
-        for(v=0; v<8; v++) {
-            if (buf[0] & pixbit[v]) { tile[u][v+8] += 1; }
-            if (buf[1] & pixbit[v]) { tile[u][v+8] += 2; }
-            if (buf[2] & pixbit[v]) { tile[u][v+8] += 4; }
-            if (buf[3] & pixbit[v]) { tile[u][v+8] += 8; }
-        }
-		GFXROM_READFOUR;
-        for(v=0; v<8; v++) {
-            if (buf[0] & pixbit[v]) { tile[u][v+16] += 1; }
-            if (buf[1] & pixbit[v]) { tile[u][v+16] += 2; }
-            if (buf[2] & pixbit[v]) { tile[u][v+16] += 4; }
-            if (buf[3] & pixbit[v]) { tile[u][v+16] += 8; }
-        }
-        GFXROM_READFOUR;
-        for(v=0; v<8; v++) {
-            if (buf[0] & pixbit[v]) { tile[u][v+24] += 1; }
-            if (buf[1] & pixbit[v]) { tile[u][v+24] += 2; }
-            if (buf[2] & pixbit[v]) { tile[u][v+24] += 4; }
-            if (buf[3] & pixbit[v]) { tile[u][v+24] += 8; }
+
+    memset(&tile, 0, sizeof(tile));
+    for (u = 0; u < 32; ++u) {
+        for (v = 0; v < 32; v += 8) {
+            if (!gfxrom_read(buf, sizeof(buf))) {
+                gfxrom_transparent_tile();
+                return;
+            }
+            if (v < 24) {
+                int plane = v;
+                int bit;
+                for (bit = 0; bit < 8; ++bit) {
+                    if (buf[0] & pixbit[bit]) { tile[u][plane + bit] += 1; }
+                    if (buf[1] & pixbit[bit]) { tile[u][plane + bit] += 2; }
+                    if (buf[2] & pixbit[bit]) { tile[u][plane + bit] += 4; }
+                    if (buf[3] & pixbit[bit]) { tile[u][plane + bit] += 8; }
+                }
+            } else {
+                int bit;
+                for (bit = 0; bit < 8; ++bit) {
+                    if (buf[0] & pixbit[bit]) { tile[u][24 + bit] += 1; }
+                    if (buf[1] & pixbit[bit]) { tile[u][24 + bit] += 2; }
+                    if (buf[2] & pixbit[bit]) { tile[u][24 + bit] += 4; }
+                    if (buf[3] & pixbit[bit]) { tile[u][24 + bit] += 8; }
+                }
+            }
         }
     }
 }

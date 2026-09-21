@@ -78,13 +78,21 @@ void load_cps_roms()
 {
     if ((g_code_roms = malloc(ALL_CODE_SIZE))) {
 #ifdef REDHAMMER_USE_ALLROMS_BIN
-        FILE *allroms = fopen("allroms.bin", "r");
+        FILE *allroms = fopen("allroms.bin", "rb");
         if (allroms == NULL) {
             puts("Can't open allroms.bin\n");
             exit(EXIT_FAILURE);
         }
-        long bytesread = fread(g_code_roms, 1, ALL_CODE_SIZE, allroms);
-        printf("allroms: read %ld bytes\n", bytesread);
+        size_t bytesread = fread(g_code_roms, 1, ALL_CODE_SIZE, allroms);
+        fclose(allroms);
+        if (bytesread != ALL_CODE_SIZE) {
+            fprintf(stderr, "Invalid allroms.bin: expected %u bytes, read %zu\n",
+                    (unsigned)ALL_CODE_SIZE, bytesread);
+            free(g_code_roms);
+            g_code_roms = NULL;
+            exit(EXIT_FAILURE);
+        }
+        printf("allroms: read %zu bytes\n", bytesread);
 #else
         FILE *rom0;     // even ROM
         FILE *rom1;     // odd ROM
