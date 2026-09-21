@@ -11,6 +11,12 @@ on:
     - cron: "0 3 * * *"
   workflow_dispatch:
 
+# Keep a single active validation run for this workflow. A newer push supersedes
+# an older in-progress run instead of accumulating redundant executions.
+concurrency:
+  group: sf2-validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-lint:
     runs-on: ubuntu-latest
