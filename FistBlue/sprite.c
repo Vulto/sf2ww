@@ -505,7 +505,7 @@ static const short data_81c32[] = {
 static void sub_7ef86(Object *obj, const u16 *tilep, const short *offsets, short x, short y, u16 tiles, u16 attr);     /* 7ee58 obj a1, a0, tilep a2, a3, x d0, y d1, tiles d3 */
 static void sub_7efd8(Object *obj, const u16 *tilep, const short *offsets, short x, short y, u16 tiles, u16 attr) ;    /* 7ee58 obj a1, a0, tilep a2, a3, x d0, y d1, tiles d3 */
 static void sub_7ef2a(Object *obj, const u16 *tilep, const short *offsets, short x, short y, unsigned short tiles, unsigned short attr);    /* 7ee58 obj a1, a0, tilep a2, a3, x d0, y d1, tiles d3 */
-static void sub_7f244 (Object *obj, u16 tiles_in_image, u32 action_offset, u32 image_offset, short x, short y );
+static void sub_7f244(Object *obj, u16 tiles_in_image, u32 action_offset, u32 image_offset, short x, short y);
 static void _draw_sprite(Object *obj, const u16 *tilep, const short *offsets, short x, short y, unsigned short tiles, short attr);
 static void sub_7ee58(Object *obj, const u16 *tilep, const short *offsets, short x, short y, unsigned short tiles, unsigned short attr);     /* 7ee58 obj a1, a0, tilep a2, a3, x d0, y d1, tiles d3 */
 static void swap_object_buffer(void);	/* 7e610 */
