@@ -272,14 +272,13 @@ void showtextbank1(enum libtextgfx_sel sel) {		// 568c draw text in OBJECT
 }
 
 void showtextbank2(enum libtextgfx_sel sel) {		// 574a Winners chants
-	const char *string;
 	u16 *gfx_p;
 	if (sel & 0x80) {
 		// 57ca
-		//string = data_8dbc4[sel & 0x7f];
+		return;
 	} else {
-		//string = data_8dbc4[sel];
-		OBJ_CURSOR_CPS(gfx_p, 0x910000 + string[0]);
+		// The original text bank is not yet represented by native data.
+		return;
 		// todo...
 		
 	}
