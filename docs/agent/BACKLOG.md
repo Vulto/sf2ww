@@ -27,3 +27,7 @@ Prioridade 2 — validação audiovisual
 - [ ] Connect the probes with the external/private ROM fixture and produce the first real lockstep report.
 - [ ] Mount the private ROM fixture on a trusted runner and turn the scheduled full-MAME job from blocked to active.
 - [ ] Resolve the first real state divergence reported by the comparator.
+### Harness acceptance notes
+
+- [x] Full-MAME CI invokes the existing MAME state probe through Xvfb so the scheduled regression does not depend on a physical display.
+- [ ] Mount the private/original ROM fixture on a trusted runner and execute the first real MAME/port lockstep comparison.
