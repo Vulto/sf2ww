@@ -1321,6 +1321,10 @@ void wait_for_ply_PSFinishedParticipating(void) {  /* 0x9048 */
 }
 	
 short sub_2fe6(Player *ply, Object *obj, short yoke) {	
+	/* FighterID indexes a 12-entry CPS table; reject corrupted state before indexing it. */
+	if (ply->FighterID < 0 || ply->FighterID >= 12) {
+		return 0;
+	}
 	/* Yoke is signed in the original action data; only 0..31 are valid table rows. */
 	if (yoke < 0 || yoke >= 32) {
 		return 0;
