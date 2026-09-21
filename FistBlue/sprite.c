@@ -960,7 +960,7 @@ void drawsprite(Object *obj) {
         g.DSOffsetX -= obj->DSOffsetX;
 
         for (i = 0; i < tiles_in_image; ++i) {
-            native_tiles[i] = RHSwapWord(image->Tiles[i]);
+            native_tiles[i] = image->Tiles[i];
         }
 
         _draw_sprite(obj, native_tiles, coordlist, coordpair[0],
