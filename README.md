@@ -33,7 +33,7 @@ sf2gfx.bin - All the tile ROMs, interleaved and concatenated
 ```bash
 mkdir build
 cd build
-cmake ..
+cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
 make
 ```
 
