@@ -3229,8 +3229,8 @@ static void _act3b_print_counter(u32 d0, short d2, u16 *a1) {
 	}
 }
 static void _init_counter_image(Object *obj) {		//20610
-	const u16 *source;
-	u16 *dest;
+	const u16 *source = NULL;
+	u16 *dest = NULL;
 	int i;
 
 	/* all same anyway  sf2ua: 20640  original ROM uses three the same   */
@@ -3241,9 +3241,11 @@ static void _init_counter_image(Object *obj) {		//20610
 			source = blank_counter_image; dest = g.TimeBonusSprite; break;
 		case 2:
 			source = blank_counter_image; dest = g.VitalBonusSprite; break;
-		case 4: 
+		case 4:
 			source = blank_counter_image; dest = g.TotalBonusSprite; break;
-		FATALDEFAULT;
+		default:
+			FBPanic(99);
+			return;
 	}
 	for (i=0; i<10; i++) {
 		dest[i] = source[i];
