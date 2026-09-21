@@ -46,3 +46,12 @@ void test_RHCODE(void **state) {
     assert_ptr_equal(&testRom[8], RHCODE(8));
     assert_ptr_equal(&testRom[-8], RHCODE(-8));
 }
+
+void test_RHCodeOffsetChecked(void **state) {
+    assert_int_equal(8, RHCODE_OFFSET(&testRom[8], 2));
+    assert_int_equal(0, RHCODE_OFFSET(&testRom[0], 1));
+}
+
+void test_RHReadWordPtr(void **state) {
+    assert_int_equal(0x304, RHReadWordPtr(&testRom[2]));
+}
