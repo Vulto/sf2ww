@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #endif
 
@@ -116,6 +117,44 @@ void *RHCodePtr(u32 offset)
     return RHCodePtrRange(offset, 1);
 }
 
+u32 RHCodeOffsetChecked(const void *addr, size_t size, const char *file, int line)
+{
+    uintptr_t base;
+    uintptr_t pointer;
+    uintptr_t end;
+
+    if (g_code_roms == NULL) {
+        fprintf(stderr, "RHCODE: ROM image is not loaded at %s:%d\n", file, line);
+        abort();
+    }
+
+    base = (uintptr_t)(const void *)g_code_roms;
+    pointer = (uintptr_t)addr;
+    end = base + (uintptr_t)ALL_CODE_SIZE;
+
+    if (pointer < base || pointer > end || size > (size_t)(end - pointer)) {
+        fprintf(stderr,
+                "RHCODE: pointer %p + 0x%zx is outside ROM at %s:%d\n",
+                addr, size, file, line);
+        abort();
+    }
+
+    if ((pointer - base) > 0xffffffffu) {
+        fprintf(stderr, "RHCODE: pointer offset does not fit 32 bits at %s:%d\n",
+                file, line);
+        abort();
+    }
+
+    return (u32)(pointer - base);
+}
+
+u16 RHReadWordPtr(const void *addr)
+{
+    u16 value;
+    memcpy(&value, addr, sizeof(value));
+    return RHSwapWord(value);
+}
+
 static u16 RHReadWordAt(u32 offset)
 {
     u16 value;
@@ -132,11 +171,14 @@ static u32 RHReadLongAt(u32 offset)
 
 void print_rom_offset(const char *message, const void *addr)
 {
-    if (addr < (const void *)g_code_roms || addr >= (const void *)(g_code_roms + ALL_CODE_SIZE)) {
+    uintptr_t base = (uintptr_t)(const void *)g_code_roms;
+    uintptr_t pointer = (uintptr_t)addr;
+
+    if (g_code_roms == NULL || pointer < base || pointer >= base + (uintptr_t)ALL_CODE_SIZE) {
         printf("%s: non-ROM pointer %p\n", message, addr);
         return;
     }
-    printf("%s: %08lx\n", message, ((const char *)addr) - g_code_roms);
+    printf("%s: %08lx\n", message, (unsigned long)(pointer - base));
 }
 
 const void *RHOffsetLookup16(const u16 *base, int index)
