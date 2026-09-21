@@ -1071,7 +1071,7 @@ static void _AIGotoNextStrategy(Player *ply) {		/* 2b8da was comp_main_exit */
 		if (Strategies[Index] & 0x80) {
 			_AIDoStrategy(ply, Strategies[Index]);
 		} else {
-			debug_print(3, "side %d @0x%08x[%d]\n",ply->Side,
+			debug_print(3, "side %d @0x%08lx[%d]\n",ply->Side,
 				   (unsigned long)(uintptr_t)Strategies, Index);
 			_AISetStrategy(ply, Strategies[Index]);
 		}
