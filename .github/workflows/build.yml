@@ -45,6 +45,8 @@ jobs:
     env:
       CFLAGS: "-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer"
       LDFLAGS: "-fsanitize=address,undefined"
+      ASAN_OPTIONS: "abort_on_error=1"
+      UBSAN_OPTIONS: "halt_on_error=1:print_stacktrace=1"
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
