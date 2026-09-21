@@ -35,3 +35,9 @@
 - On a GitHub-hosted Linux runner there is no guaranteed graphical display, so the probe could fail before producing the state CSV even when the private ROM fixture is present.
 - The regression step now runs the existing MAME probe through `xvfb-run -a`, keeping the ROM fixture external while making the comparison harness deterministic in headless CI.
 - Acceptance: the full-MAME job must reach the state-dump step without requiring a physical display; actual state equivalence remains blocked until the private ROM fixture is mounted.
+## 2026-09-21 — Smoke must detect premature exit
+
+- The native smoke previously accepted both a 15/30-second timeout and a clean exit status of 0.
+- A crash is normally non-zero, but an early clean exit could therefore be misclassified as a passing runtime test.
+- The smoke gates now require the expected timeout status (124), proving the executable remained alive for the observation window. Any clean early exit or crash fails CI.
+- This strengthens the crash/segfault coverage without changing game behavior.
