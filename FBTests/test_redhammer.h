@@ -15,5 +15,7 @@ void test_RHReadLong(void **state);
 void test_RHReadWord16_negative_offset(void **state);
 void test_RHReadWord16_positive_offset(void **state);
 void test_RHCODE(void **state);
+void test_RHCodeOffsetChecked(void **state);
+void test_RHReadWordPtr(void **state);
 
 #endif /* test_redhammer_h */
