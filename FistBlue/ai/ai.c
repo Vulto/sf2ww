@@ -1072,7 +1072,7 @@ static void _AIGotoNextStrategy(Player *ply) {		/* 2b8da was comp_main_exit */
 			_AIDoStrategy(ply, Strategies[Index]);
 		} else {
 			debug_print(3, "side %d @0x%08x[%d]\n",ply->Side,
-				   (unsigned int)Strategies, Index);
+				   (unsigned long)(uintptr_t)Strategies, Index);
 			_AISetStrategy(ply, Strategies[Index]);
 		}
 	}
@@ -1318,7 +1318,7 @@ static void _AIDoStrategy(Player *ply,  short d0) {			//2b9d6 high bit strategy
 
 void AIPanic(const unsigned char *a2, short d2) {
 	int i;
-	printf("AIPanic 0x%08x %d\n", (unsigned int)a2, d2);
+	printf("AIPanic 0x%08lx %d\n", (unsigned long)(uintptr_t)a2, d2);
 	for (i = 0; i<d2; i++) {
 		printf("%02x ", a2[i]);
 	}
