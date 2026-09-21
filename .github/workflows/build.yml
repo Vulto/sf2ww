@@ -70,11 +70,16 @@ jobs:
           truncate -s 1048576 allroms.bin
           truncate -s 2097152 sf2gfx.bin
           set +e
-          timeout 15s xvfb-run -a ./build/glutBasics </dev/null
+          SF2_STATE_LOG=smoke_state.csv timeout 15s xvfb-run -a ./build/glutBasics </dev/null
           status=$?
           set -e
           if [ "$status" -ne 124 ]; then
             exit "$status"
+          fi
+          frames=$(( $(wc -l < smoke_state.csv) - 1 ))
+          if [ "$frames" -lt 300 ]; then
+            echo "SMOKE_FRAME_PROGRESS_FAILURE: expected at least 300 state frames, got $frames"
+            exit 1
           fi
 
   smoke-compare:
