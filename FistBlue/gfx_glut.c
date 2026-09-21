@@ -257,7 +257,7 @@ void gemu_cache_scroll1(u16 tile, short palette) {
 		gemu_readtile_scroll1(tile);
         gemu_color_tile(TILE_PIXELS_SCR1, palette, (GLubyte *)tempmap, &gemu.PalScroll1);
 		glGenTextures(1, &TC.text_scr1[tile][0]);
-		if (&TC.text_scr1[tile][0]==0) {
+		if (TC.text_scr1[tile][0] == 0) {
 			FBPanic(999);
 		}
 		TC.text_scr1[tile][1] = palette;
@@ -280,7 +280,7 @@ void gemu_cache_scroll2(u16 tile, short palette) {
 		gemu_readtile_scroll2(tile);
         gemu_color_tile(TILE_PIXELS_SCR2, palette, (GLubyte *)tempmap, &gemu.PalScroll2);
 		glGenTextures(1, &TC.text_scr2[tile][0]);
-		if (&TC.text_scr2[tile][0]==0) {
+		if (TC.text_scr2[tile][0] == 0) {
 			FBPanic(999);
 		}
 		TC.text_scr2[tile][1] = palette;
@@ -303,7 +303,7 @@ void gemu_cache_scroll3(u16 tile, short palette) {
 		gemu_readtile_scroll3(tile);
         gemu_color_tile(TILE_PIXELS_SCR3, palette, (GLubyte *)tempmap, &gemu.PalScroll3);
 		glGenTextures(1, &TC.text_scr3[tile][0]);
-		if (&TC.text_scr3[tile][0]==0) {
+		if (TC.text_scr3[tile][0] == 0) {
 			FBPanic(999);
 		}
 		TC.text_scr3[tile][1] = palette;
@@ -326,7 +326,7 @@ void gemu_cache_object(u16 tile, short palette) {
 		gemu_readtile(tile);
         gemu_color_tile(TILE_PIXELS_OBJ, palette, (GLubyte *)tempmap, &gemu.PalObject);
 		glGenTextures(1, &TC.text_obj[tile][0]);
-		if (&TC.text_obj[tile][0]==0) {
+		if (TC.text_obj[tile][0] == 0) {
 			FBPanic(999);
 		}
 		TC.text_obj[tile][1] = palette;
