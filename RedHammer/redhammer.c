@@ -157,7 +157,7 @@ const void *RHOffsetLookup16(const u16 *base, int index)
 
 const u16 RHWordOffset(u32 base, int index)
 {
-    return RHReadWordAt(base + (u32)(2 * index));
+    return RHReadWordAt(base + (u32)index * 2u);
 }
 
 const u8 RHByteOffset(u32 base, int index)
@@ -167,13 +167,13 @@ const u8 RHByteOffset(u32 base, int index)
 
 const u32 RH3DLong(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
-    u32 index = (u32)((i1 * dim2 * dim3) + (i2 * dim3) + i3);
-    return RHReadLongAt(base + (u32)(4 * index));
+    u32 index = (u32)i1 * (u32)dim2 * (u32)dim3 + (u32)i2 * (u32)dim3 + (u32)i3;
+    return RHReadLongAt(base + (u32)index * 4u);
 }
 
 const u32 RH2DLong(u32 base, int dim2, int i1, int i2)
 {
-    u32 index = (u32)((i1 * dim2) + i2);
+    u32 index = (u32)i1 * (u32)dim2 + (u32)i2;
     return RHReadLongAt(base + (u32)(4 * index));
 }
 
@@ -185,7 +185,7 @@ const u32 RH1DLong(u32 base, int index)
 const u16 RH3DWord(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
     u32 index = (u32)((i1 * dim2 * dim3) + (i2 * dim3) + i3);
-    return RHReadWordAt(base + (u32)(2 * index));
+    return RHReadWordAt(base + (u32)index * 2u);
 }
 
 const short RH3DShort(u32 base, int dim2, int dim3, int i1, int i2, int i3)
