@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #endif
 
@@ -126,13 +127,20 @@ void print_rom_offset(const char *message, const void *addr)
 }
 
 const void *RHOffsetLookup16(const u16 *base, int index)
-{    
-    return base + (short)(RHSwapWord(*(base + index))) / 2;
+{
+    u16 raw;
+    int offset;
+
+    memcpy(&raw, base + index, sizeof(raw));
+    offset = (short)RHSwapWord(raw);
+    return (const u8 *)base + offset;
 }
 
 const u16 RHWordOffset(u32 base, int index)
 {
-    return RHSwapWord(*(u16 *)(RHCODE(base + (2 * index))));
+    u16 raw;
+    memcpy(&raw, RHCODE(base + (2 * index)), sizeof(raw));
+    return RHSwapWord(raw);
 }
 
 const u8 RHByteOffset(u32 base, int index)
@@ -142,26 +150,30 @@ const u8 RHByteOffset(u32 base, int index)
 
 const u32 RH3DLong(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
-    u32 *array = RHCODE(base);
-    return RHSwapLong(*(array + (i1 * dim2 * dim3) + (i2 * dim3) + i3));
+    u32 raw;
+    memcpy(&raw, RHCODE(base + 4 * ((i1 * dim2 * dim3) + (i2 * dim3) + i3)), sizeof(raw));
+    return RHSwapLong(raw);
 }
 
 const u32 RH2DLong(u32 base, int dim2, int i1, int i2)
 {
-    u32 *array = RHCODE(base);
-    return RHSwapLong(*(array + (i1 * dim2) + i2));
+    u32 raw;
+    memcpy(&raw, RHCODE(base + 4 * ((i1 * dim2) + i2)), sizeof(raw));
+    return RHSwapLong(raw);
 }
 
 const u32 RH1DLong(u32 base, int index)
 {
-    u32 *array = RHCODE(base);
-    return RHSwapLong(*(array + index));
+    u32 raw;
+    memcpy(&raw, RHCODE(base + 4 * index), sizeof(raw));
+    return RHSwapLong(raw);
 }
 
 const u16 RH3DWord(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
-    u16 *array = RHCODE(base);
-    return RHSwapWord(*(array + (i1 * dim2 * dim3) + (i2 * dim3) + i3));
+    u16 raw;
+    memcpy(&raw, RHCODE(base + 2 * ((i1 * dim2 * dim3) + (i2 * dim3) + i3)), sizeof(raw));
+    return RHSwapWord(raw);
 }
 
 const short RH3DShort(u32 base, int dim2, int dim3, int i1, int i2, int i3)
@@ -172,8 +184,9 @@ const short RH3DShort(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 
 const u16 RH2DWord(u32 base, int dim2, int i1, int i2)
 {
-    u16 *array = RHCODE(base);
-    return RHSwapWord(*(array + (i1 * dim2) + i2));
+    u16 raw;
+    memcpy(&raw, RHCODE(base + 2 * ((i1 * dim2) + i2)), sizeof(raw));
+    return RHSwapWord(raw);
 }
 
 const short RH2DShort(u32 base, int dim2, int i1, int i2) {
@@ -214,13 +227,15 @@ inline u16 RHSwapWord(const u16 num)
 }
 u32 RHReadLong(int romaddr)
 {
-    void *addr = RHCODE(romaddr);
-    return RHSwapLong(*(u32 *)addr);
+    u32 raw;
+    memcpy(&raw, RHCODE(romaddr), sizeof(raw));
+    return RHSwapLong(raw);
 }
 u16 RHReadWord(int romaddr)
 {
-    void *addr = RHCODE(romaddr);
-    return RHSwapWord(*(u16 *)addr);
+    u16 raw;
+    memcpy(&raw, RHCODE(romaddr), sizeof(raw));
+    return RHSwapWord(raw);
 }
 
 void redhammer_run_tests(void) {
