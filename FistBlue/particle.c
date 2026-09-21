@@ -234,12 +234,12 @@ int check_ground_collision(Object *ply) {		//3152
 
 void update_obj_path(Object *ply) {		/* 31b0 */
     if (ply->Flip != FACING_LEFT) { 
-		ply->X.full -= ply->Path[ply->Step ^ ply->Flip].x.full << 8;
+		ply->X.full = (int)((u32)ply->X.full - ((u32)(int)ply->Path[ply->Step ^ ply->Flip].x.full << 8));
 	} 
 	else { 
-		ply->X.full += ply->Path[ply->Step ^ ply->Flip].x.full << 8;
+		ply->X.full = (int)((u32)ply->X.full + ((u32)(int)ply->Path[ply->Step ^ ply->Flip].x.full << 8));
 	}
-	ply->Y.full -= ply->Path[ply->Step ^ ply->Flip].y.full << 8;
+	ply->Y.full = (int)((u32)ply->Y.full - ((u32)(int)ply->Path[ply->Step ^ ply->Flip].y.full << 8));
 }
 
 
