@@ -126,13 +126,18 @@ void print_rom_offset(const char *message, const void *addr)
 }
 
 const void *RHOffsetLookup16(const u16 *base, int index)
-{    
-    return base + (short)(RHSwapWord(*(base + index))) / 2;
+{
+    u16 raw = 0;
+    int offset;
+
+    memcpy(&raw, base + index, sizeof(raw));
+    offset = (short)RHSwapWord(raw);
+    return (const u8 *)base + (offset / 2);
 }
 
 const u16 RHWordOffset(u32 base, int index)
 {
-    return RHSwapWord(*(u16 *)(RHCODE(base + (2 * index))));
+    u16 raw;\n    memcpy(&raw, RHCODE(base + (2 * index)), sizeof(raw));\n    return RHSwapWord(raw);
 }
 
 const u8 RHByteOffset(u32 base, int index)
