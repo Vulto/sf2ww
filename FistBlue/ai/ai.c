@@ -1110,8 +1110,7 @@ static void _AISearchA8IfOppXLessEqual(Player *ply) {				//2bc2e
 }
 // 2bc4e
 static void _AISearchACIfOppJump(Player *ply) {
-	short temp;
-	temp = _AIReadByte(ply);
+	_AIReadByte(ply);
 	if (ply->Opponent->Airborne && ply->Opponent->YPI <= ply->Opponent->OldOldY.part.integer) {
 		if (ply->OppYDist > ply->Opponent->OldOldY.part.integer) {
 			_AIGotoNextStrategy(ply);
@@ -1122,7 +1121,7 @@ static void _AISearchACIfOppJump(Player *ply) {
 }
 // 2bc8a
 static void _AIB_WITHIN(Player *ply) {
-	int found,distance,selector;
+	int found = FALSE, distance, selector;
 	selector = _AIReadByte(ply);
 	distance = _AIReadByte(ply);
 	debug_print(4, "_AIB_WITHIN: %d, %d\n", selector, distance);
