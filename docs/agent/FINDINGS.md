@@ -46,3 +46,10 @@
 - A live process alone is insufficient crash/runtime coverage: a deadlocked or stalled frontend can remain alive until the timeout.
 - The native smoke now enables `SF2_STATE_LOG` and requires at least 300 emitted state frames during the 15-second observation window.
 - Acceptance: the process must stay alive for the full window and advance the game timer callback enough to produce the minimum frame count; premature exit, crash, or scheduler stall fails CI.
+
+## 2026-09-21 — Preserve decoded jumper state
+
+- `decode_params()` used compound `&=` assignments when decoding `JP_FREEPLAY` and `JP_ALLOWCONT`.
+- Those assignments mutated `g.JPParam`, so the subsequent live-jumper decode no longer saw the original jumper bits. Depending on the configured jumper combination, `DemoSound`, `FreezeMachine`, `FlipDisplay`, and `Debug2` could be silently cleared.
+- The decoder now uses non-mutating bit tests and preserves `g.JPParam` as the source-of-truth value read from the ROM/jumper input.
+- Acceptance: decoding Free Play/Continue must not alter `g.JPParam`; subsequent live-jumper fields must reflect the original parameter word.
