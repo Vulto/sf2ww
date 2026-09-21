@@ -56,6 +56,9 @@ void RHActionTick(Object *obj) {
     if(--obj->Timer == 0) {
         u32 action_offset = RHCODE_OFFSET(obj->ActionScript, sizeof(FBAction));
         u16 flags = RHWordOffset(action_offset, offsetof(FBAction, Flags));
+        if (action_offset >= 0x1da80 && action_offset < 0x1db20) {
+            fprintf(stderr, "RHActionTick action=%08x timer=%d flags=%04x\\n", action_offset, obj->Timer, flags);
+        }
         if(flags & 0x8000) {
             u32 next_offset = action_offset + sizeof(FBAction);
             u32 target = RHReadLong((int)next_offset);
