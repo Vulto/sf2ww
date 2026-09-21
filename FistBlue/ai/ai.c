@@ -223,7 +223,9 @@ void AICheckThreats(Player *ply) {		// 2c056 per-frame before comp_frontend
 }
 
 static short comp_ply_difficulty_lookup (Player *ply, const u32 data[][32]) {	//2bf4e
-	return RHSwapLong(data[ply->FighterID][ply->Difficulty]) & (1 << RAND32);
+    u32 base = RHCodeOffsetChecked(data, sizeof(u32), __FILE__, __LINE__);
+    u32 index = (u32)ply->FighterID * 32u + (u32)ply->Difficulty;
+    return RHReadLong((int)(base + index * sizeof(u32))) & (1 << RAND32);
 }
 
 /* 2b768 reset AI modes */
