@@ -1321,6 +1321,10 @@ void wait_for_ply_PSFinishedParticipating(void) {  /* 0x9048 */
 }
 	
 short sub_2fe6(Player *ply, Object *obj, short yoke) {	
+	/* Yoke is signed in the original action data; only 0..31 are valid table rows. */
+	if (yoke < 0 || yoke >= 32) {
+		return 0;
+	}
 	short d0, d1,d4;
 	
 	if(ply->Size + 16 > ABS(ply->XPI - obj->XPI)) { return 1; }
