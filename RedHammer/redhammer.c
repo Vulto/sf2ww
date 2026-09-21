@@ -184,12 +184,21 @@ void print_rom_offset(const char *message, const void *addr)
 const void *RHOffsetLookup16(const u16 *base, int index)
 {
     u32 base_offset = RHCodeOffsetChecked(base, sizeof(u16), __FILE__, __LINE__);
-    u32 entry_offset = base_offset + (u32)((int64_t)index * (int64_t)sizeof(u16));
-    u16 offset = RHReadWord((int)entry_offset);
+    int64_t entry = (int64_t)base_offset + (int64_t)index * (int64_t)sizeof(u16);
+    if (entry < 0 || entry > (int64_t)ALL_CODE_SIZE - (int64_t)sizeof(u16)) {
+        fprintf(stderr, "RHCODE: relative table entry outside ROM (base 0x%08x index %d)\n",
+                base_offset, index);
+        abort();
+    }
+    u16 offset = RHReadWord((int)entry);
     int16_t relative = (int16_t)offset;
-    u32 target_offset = (u32)((int64_t)base_offset + (int64_t)relative);
-    RHCodePtrRange(target_offset, 1);
-    return RHCodePtr(target_offset);
+    int64_t target = (int64_t)base_offset + (int64_t)relative;
+    if (target < 0 || target >= (int64_t)ALL_CODE_SIZE) {
+        fprintf(stderr, "RHCODE: relative table target outside ROM (base 0x%08x index %d)\n",
+                base_offset, index);
+        abort();
+    }
+    return RHCodePtr((u32)target);
 }
 
 const u16 RHWordOffset(u32 base, int index) { return RHReadWordAt(base + (u32)index * 2u); }
