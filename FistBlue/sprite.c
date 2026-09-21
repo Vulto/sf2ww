@@ -839,10 +839,14 @@ void draw_shadow(Player *ply, Object *obj) {    //7bc14
     obj->XPI   = ply->XPI;
     obj->YPI   = 40;  
     obj->Flip  = ply->Flip;
-    if (ply->ActionScript->Shadow == 0) {
-        obj->exists = FALSE;
+    {
+        u32 action_offset = sprite_rom_action_offset((const Object *)ply);
+        u8 shadow = RHByteOffset(action_offset, offsetof(FBAction, Shadow));
+        if (shadow == 0) {
+            obj->exists = FALSE;
+        }
+        RHSetActionList(obj, RHCODE(0x7bc66), shadow & 0x7f);
     }
-    RHSetActionList(obj, RHCODE(0x7bc66), ply->ActionScript->Shadow & 0x7f);
 }
 
 #pragma mark DrawSprite et al.
