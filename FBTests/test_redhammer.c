@@ -13,6 +13,7 @@
 #include "test_redhammer.h"
 
 #include "redhammer.h"
+#include "particle.h"
 
 char testRom[] = {
     0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
@@ -54,4 +55,12 @@ void test_RHCodeOffsetChecked(void **state) {
 
 void test_RHReadWordPtr(void **state) {
     assert_int_equal(0x304, RHReadWordPtr(&testRom[2]));
+}
+
+void test_FBAction_layout(void **state) {
+    assert_int_equal(4, offsetof(FBAction, Image));
+    assert_int_equal(14, offsetof(FBAction, Shadow));
+    assert_int_equal(19, offsetof(FBAction, FlipBits));
+    assert_int_equal(20, offsetof(FBAction, YOffset));
+    assert_int_equal(24, sizeof(FBAction));
 }
