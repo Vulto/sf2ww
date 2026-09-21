@@ -266,8 +266,7 @@ void redhammer_run_tests(void) {
         for (int j=0; j<8; ++j) {
             for (int k=0; k<4; ++k) {
                 if (data_13b06[i][j][k] != RH3DWord(0x13b06, 8, 4, i, j, k)) {
-                    printf("incorrect
-");
+                    printf("incorrect\\n");
                 }
             }
         }
