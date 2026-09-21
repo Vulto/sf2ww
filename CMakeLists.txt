@@ -98,6 +98,10 @@ target_include_directories(glutBasics PUBLIC
 
 target_link_libraries(glutBasics PRIVATE m OpenGL::GL OpenGL::GLU GLUT::GLUT Threads::Threads)
 
+if (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(glutBasics PRIVATE -Wall -Wextra -Wno-unused-parameter)
+endif()
+
 if (APPLE)
     message(STATUS "Designed by Apple in California")
     add_compile_definitions(GL_SILENCE_DEPRECATION=1)
