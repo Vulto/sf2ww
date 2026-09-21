@@ -2015,16 +2015,21 @@ void task_playground(void) {
                     g.Player1.exists = TRUE;
                     g.Player1.flag1 = TRUE;
 
-                    void *baseAddr = RHCODE(0);
                     const void *ryuStand = RHOffsetLookup16(RHCODE(0x37f1e), 0);
+                    u32 ryu_offset = RHCodeOffsetChecked(ryuStand, sizeof(u16), __FILE__, __LINE__);
                     
-                    printf("Ryu offset = %lx\n", ryuStand - baseAddr);
+                    printf("Ryu offset = %x\n", ryu_offset);
                     
-                    int offset2 = RHSwapWord(*(u16 *)ryuStand);
-                    printf("offset2 = %x\n", offset2);
+                    int16_t offset2 = (int16_t)RHReadWord((int)ryu_offset);
+                    printf("offset2 = %x\n", (unsigned short)offset2);
                     
-                    const void *location2 = ryuStand + offset2;
-                    printf("addr2 = %lx\n", location2 - baseAddr);
+                    {
+                        int64_t location_offset = (int64_t)ryu_offset + (int64_t)offset2;
+                        if (location_offset < 0 || location_offset >= 0x100000) {
+                            FBPanic(0x37f1e);
+                        }
+                        printf("addr2 = %x\n", (unsigned int)location_offset);
+                    }
                     
 		    RHSetActionList((Object *)&g.Player1, ryuStand, 2);
                     break;
