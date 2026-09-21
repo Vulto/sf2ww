@@ -18,7 +18,5 @@ void test_RHCODE(void **state);
 void test_RHCodeOffsetChecked(void **state);
 void test_RHReadWordPtr(void **state);
 void test_FBAction_layout(void **state);
-void test_FBSimpleAction_layout(void **state);
-void test_FBImage_layout(void **state);
 
 #endif /* test_redhammer_h */
