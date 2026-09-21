@@ -1322,7 +1322,7 @@ void wait_for_ply_PSFinishedParticipating(void) {  /* 0x9048 */
 	
 short sub_2fe6(Player *ply, Object *obj, short yoke) {	
 #ifndef CPS
-	fprintf(stderr, "AI threat fighter=%d yoke=%d table=%p\\n", (int)ply->FighterID, (int)yoke, (void *)data_995de[ply->FighterID & 0xff]);
+	fprintf(stderr, "AI threat fighter=%d yoke=%d table=%p\\n", (int)ply->FighterID, (int)yoke, (ply->FighterID >= 0 && ply->FighterID < 12) ? (void *)data_995de[ply->FighterID] : NULL);
 #endif
 	/* FighterID indexes a 12-entry CPS table; reject corrupted state before indexing it. */
 	if (ply->FighterID < 0 || ply->FighterID >= 12) {
