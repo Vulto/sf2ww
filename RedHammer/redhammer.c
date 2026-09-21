@@ -87,7 +87,7 @@ void load_cps_roms()
         size_t bytesread = fread(g_code_roms, 1, ALL_CODE_SIZE, allroms);
         fclose(allroms);
         if (bytesread != ALL_CODE_SIZE) {
-            fprintf(stderr, "Invalid allroms.bin: expected %u bytes, read %zu\\n",
+            fprintf(stderr, "Invalid allroms.bin: expected %u bytes, read %zu\n",
                     (unsigned)ALL_CODE_SIZE, bytesread);
             free(g_code_roms);
             g_code_roms = NULL;
