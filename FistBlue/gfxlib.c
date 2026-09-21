@@ -660,7 +660,7 @@ void drawsimple_scroll1attr(Object *obj,  const u16 *tiles, int width, int heigh
         coord2=coord;
         for(y=0; y<height; y++) {
 			/* tile, attr*/
-            SCR1_DRAW_TILE(coord2, RHSwapWord(tiles[0]) + GFXROM_SCROLL1, RHReadWordPtr(tiles + 1));
+            SCR1_DRAW_TILE(coord2, RHReadWordPtr(tiles) + GFXROM_SCROLL1, RHReadWordPtr(tiles + 1));
 			tiles++;
 			SCR1_CURSOR_BUMP(coord2, 0, 1);
         }
@@ -683,7 +683,7 @@ static void drawsimple_scroll2noattr(Object *obj, const u16 *tiles, int width, i
         coord2=coord;
         for(y=0; y<height; y++) {
 			/* tile, attr*/
-            SCR2_DRAW_TILE_NOATTR(coord2, RHSwapWord(tiles[0]) + GFXROM_SCROLL2);
+            SCR2_DRAW_TILE_NOATTR(coord2, RHReadWordPtr(tiles) + GFXROM_SCROLL2);
 			tiles++;
 			SCR2_CURSOR_BUMP(coord2, 0, 1);
 		}
@@ -698,8 +698,8 @@ static void drawsimple_scroll2attr(Object *obj, const u16 *tiles, int width, int
 	for(x=0; x<width; x++) {
         coord2=coord;
         for(y=0; y<height; y++) {
-			if ((RHSwapWord(tiles[0]) & 0x8000) == 0) {
-				SCR2_DRAW_TILE(coord2, RHSwapWord(tiles[0]) + GFXROM_SCROLL2, RHSwapWord(tiles[1]));
+			if ((RHReadWordPtr(tiles) & 0x8000) == 0) {
+				SCR2_DRAW_TILE(coord2, RHReadWordPtr(tiles) + GFXROM_SCROLL2, RHReadWordPtr(tiles + 1));
 			}
 			tiles+=2;
 			SCR2_CURSOR_BUMP(coord2, 0, 1);
@@ -720,7 +720,7 @@ static void drawsimple_scroll3noattr(Object *obj, const u16 *tiles, int width, i
         coord2=coord;
         for(y=0; y<height; y++) {
 			/* tile, attr*/
-            SCR3_DRAW_TILE_NOATTR(coord2, RHSwapWord(tiles[0]) + GFXROM_SCROLL3);
+            SCR3_DRAW_TILE_NOATTR(coord2, RHReadWordPtr(tiles) + GFXROM_SCROLL3);
 			tiles++;
 			SCR3_CURSOR_BUMP(coord2, 0, 1);
         }
@@ -740,7 +740,7 @@ static void drawsimple_scroll3attr(Object *obj, const u16 *tiles, int width, int
         coord2=coord;
         for(y=0; y<height; y++) {
 			if ((tiles[0] & 0x8000) == 0) {
-				SCR3_DRAW_TILE(coord2, RHSwapWord(tiles[0]) + GFXROM_SCROLL3, RHSwapWord(tiles[1]));
+				SCR3_DRAW_TILE(coord2, RHReadWordPtr(tiles) + GFXROM_SCROLL3, RHReadWordPtr(tiles + 1));
 			}
 			tiles += 2;
             SCR3_CURSOR_BUMP(coord2, 0, 1);
