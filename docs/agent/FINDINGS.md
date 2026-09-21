@@ -29,3 +29,9 @@
 - These were replaced with memcpy-based word reads while preserving the original byte offsets and endian conversion.
 - CI for the correction passed build, tests, smoke-compare, and ASan/UBSan; the full-MAME job remains conditional on the private ROM fixture.
 - A secondary audit found draw_scroll2_planes could form a negative SCR2 tilemap index from its display-loop coordinates; the mapping now masks tx/ty to the CPS1 6-bit tilemap domain before indexing.
+## 2026-09-21 — MAME probe headless execution
+
+- The scheduled full-MAME job installed Xvfb but launched the MAME state probe directly with OpenGL.
+- On a GitHub-hosted Linux runner there is no guaranteed graphical display, so the probe could fail before producing the state CSV even when the private ROM fixture is present.
+- The regression step now runs the existing MAME probe through `xvfb-run -a`, keeping the ROM fixture external while making the comparison harness deterministic in headless CI.
+- Acceptance: the full-MAME job must reach the state-dump step without requiring a physical display; actual state equivalence remains blocked until the private ROM fixture is mounted.
