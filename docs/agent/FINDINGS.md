@@ -22,3 +22,10 @@
 - Foi criado `scripts/run_mame_state.sh` para executar o MAME contra um diretório de ROM externo/privado.
 - O port emite o mesmo formato de CSV quando `SF2_STATE_LOG` está definido.
 - Os offsets lógicos de jogador ainda são candidatos baseados no layout documentado no repositório. Eles só podem virar mapa autoritativo após uma execução real contra a ROM e comparação frame a frame.
+
+## 2026-09-21 — Remaining ROM alignment audit
+
+- The initial alignment cleanup still left RH3DShort and RH2DShort using typed u16 dereferences into the byte-oriented ROM blob.
+- These were replaced with memcpy-based word reads while preserving the original byte offsets and endian conversion.
+- CI for the correction passed build, tests, smoke-compare, and ASan/UBSan; the full-MAME job remains conditional on the private ROM fixture.
+- A secondary audit found draw_scroll2_planes could form a negative SCR2 tilemap index from its display-loop coordinates; the mapping now masks tx/ty to the CPS1 6-bit tilemap domain before indexing.
