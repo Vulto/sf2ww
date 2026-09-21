@@ -338,7 +338,7 @@ u16 *ehonda;
 void gfx_glut_init(void) {
 	int i;
 	
-    gfxrom=fopen( "./sf2gfx.bin", "r" );
+    gfxrom=fopen( "./sf2gfx.bin", "rb" );
     if(gfxrom == NULL) {
         printf("fatal: couldn't open graphics ROM in %s", getcwd(NULL, 0));
         exit(EXIT_FAILURE);
@@ -373,7 +373,7 @@ const static unsigned char pixbit[8] = { 128, 64, 32, 16, 8, 4, 2, 1 }; // XXX r
 
 #pragma mark Tile reading / decoding
 
-void gemu_readtile(u16 tileid) {          /* read a 16x16 tile */
+static int gfxrom_read(void *buffer, size_t size) {\n    return fread(buffer, 1, size, gfxrom) == size;\n}\n\nstatic void gfxrom_transparent_tile(void) {\n    memset(&tile, PALETTE_TRANSPARENT_ID, sizeof(tile));\n}\n\nvoid gemu_readtile(u16 tileid) {          /* read a 16x16 tile */
     int u, v;
     unsigned char buf[4];
     int tileaddr = (tileid * TILE_BYTES_16x16) + TILE_OFFSET_OBJECT;
