@@ -62,63 +62,63 @@ struct UserData_Act09 {
 	short	h0080s;
 	char	h0082c;
 	char	h0083c;
-};
+} __attribute__((packed));
 
 struct UserData_Act11 {
 	u32	h0080l;
 	u32 h0084l;
-};
+} __attribute__((packed));
 struct UserData_Act12 {
 	char h0080c;
-};
+} __attribute__((packed));
 
 struct UserData_Act0B {
 	short	h0080s;
 	short	h0082s;
-};
+} __attribute__((packed));
 
 struct UserData_Act0E {
 	short	h0080s;	
-};
+} __attribute__((packed));
 
 struct UserData_Act1d {
 	char	h0080c;	//BattleLoser
 	char	h0084c;
 	Player *x0088;
-};
+} __attribute__((packed));
 	
 struct UserData_Act2f {
 	short	OldY;
 	FIXED16_16	VelX, VelY, Gravity;
-};
+} __attribute__((packed));
 
 struct UserData_Act32 {
     const short *x0080;
-};
+} __attribute__((packed));
 
 struct UserData_Act35 {
 	short	x0080;	
 	short	x0082;
 	const char    *x0084;
-};
+} __attribute__((packed));
 
 struct UserData_Act36 {		/* ScreenWobble */
 	short Save_Scroll1Y;
 	short Save_Scroll2Y;
 	short Save_Scroll3Y;
-};
+} __attribute__((packed));
 
 struct UserData_Act3b {
     u16 x0080;
     u16 x0082;
-};
+} __attribute__((packed));
 struct UserData_Act44 {
 	char x0080;
 	//char x0081;
-};
+} __attribute__((packed));
 
 struct UserData_Act48 {
 	char x0080;
 	char x0081;
-};
+} __attribute__((packed));
 
