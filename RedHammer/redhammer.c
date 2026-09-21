@@ -133,7 +133,7 @@ const void *RHOffsetLookup16(const u16 *base, int index)
 
     memcpy(&raw, base + index, sizeof(raw));
     offset = (short)RHSwapWord(raw);
-    return (const u8 *)base + (offset / 2);
+    return (const u8 *)base + offset;
 }
 
 const u16 RHWordOffset(u32 base, int index)
