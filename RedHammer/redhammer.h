@@ -22,6 +22,7 @@ struct fistblue_tile_plane {
 typedef struct fistblue_tile_plane RHTilePlane;
 
 void load_cps_roms(void);
+void *RHCodePtr(u32 offset);
 
 const void *RHOffsetLookup16(const u16 *base, int index);
 
