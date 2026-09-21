@@ -758,12 +758,19 @@ static void draw_player_extrasprite(Player *ply) {	/* 7ed04 */
 			tiles_in_image = 1;
 		}
 		coordpointer=sub_7f224(ply->Image2->Dimensions);
-		if (ply->ActionScript->FlipBits & 0x3) {
-			attr ^= ((ply->ActionScript->FlipBits & 0x3) << 5);
-			g.DSOffsetY += (ply->ActionScript->YOffset & 0x00ff);
+		{
+			u32 action_offset = sprite_rom_action_offset((const Object *)ply);
+			u32 image_offset = RHReadLong((int)(action_offset + offsetof(FBAction, Image)));
+			u8 flip_bits = RHByteOffset(action_offset, offsetof(FBAction, FlipBits));
+			char y_offset = (char)RHByteOffset(action_offset, offsetof(FBAction, YOffset));
+			if (flip_bits & 0x3) {
+				attr ^= (flip_bits & 0x3) << 5;
+				g.DSOffsetY += y_offset;
+			}
+			g.DSOffsetX -= ply->DSOffsetX;
+			RHCodePtrRange(image_offset, 4);
+			attr ^= ((RHWordOffset(image_offset, 1) & 3) << 5);
 		}
-		g.DSOffsetX -= ply->DSOffsetX;
-        attr ^= ((((struct image *)RHCODE16(ply->ActionScript->Image))->Attr & 3) << 5);
         
 		_draw_sprite((Object *)ply, ply->Image2->Tiles, coordpointer, coordpair[0], coordpair[1], tiles_in_image, attr);
 
