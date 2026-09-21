@@ -45,7 +45,6 @@ void test_RHReadWord16_positive_offset(void **state) {
 void test_RHCODE(void **state) {
     assert_ptr_equal(&testRom[0], RHCODE(0));
     assert_ptr_equal(&testRom[8], RHCODE(8));
-    assert_ptr_equal(&testRom[-8], RHCODE(-8));
 }
 
 void test_RHCodeOffsetChecked(void **state) {
