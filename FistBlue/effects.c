@@ -94,9 +94,9 @@ static void adder(u16 **palbase, int *a1, short arg, char d7) {		//11ea
 	} else {
 		// 120a
 		if (arg < 0) {
-			*a1 |= (1 << d7);
+			*a1 |= (int)(1u << d7);
 		} else {
-			*a1 &= ~(1 << d7);
+			*a1 &= (int)~(1u << d7);
 		}
 	}
 	*palbase += 16;
