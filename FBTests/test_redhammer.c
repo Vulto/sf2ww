@@ -42,7 +42,12 @@ void test_RHReadWord16_positive_offset(void **state) {
 }
 
 void test_RHCODE(void **state) {
-    assert_ptr_equal(&testRom[0], RHCODE(0));
-    assert_ptr_equal(&testRom[8], RHCODE(8));
-    assert_ptr_equal(&testRom[-8], RHCODE(-8));
+    char *saved_code_roms = g_code_roms;
+
+    g_code_roms = &testRom[8];
+    assert_ptr_equal(&testRom[8], RHCODE(0));
+    assert_ptr_equal(&testRom[16], RHCODE(8));
+    assert_ptr_equal(&testRom[0], RHCODE(-8));
+
+    g_code_roms = saved_code_roms;
 }
