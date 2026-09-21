@@ -1087,7 +1087,7 @@ static void sub_7f244 (Object *obj, u16 tiles_in_image, u32 action_offset, u32 i
 		attr &= 0xffe0;
 		attr |= obj->Draw2.part.integer;
 	}
-	tilep = (const u16 *)RHCodePtrRange(image_offset + 10u, (size_t)tiles_in_image * 2u * sizeof(u16));
+	tilep = (const u16 *)RHCodePtrRange(image_offset + 10u, (size_t)tiles_in_image * sizeof(u16));
 	
 	attr ^= ((obj->Flip & 0x3) << 5);
 	if (attr & ATTR_X_FLIP) {
