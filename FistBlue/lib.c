@@ -210,8 +210,8 @@ static void _get_live_jumpers(void) {		//1e32
     if(g.Debug2) { g.Debug = g.Debug2; }
 }
 void decode_params(void) {
-    g.FreePlay      = g.JPParam &= JP_FREEPLAY  ? TRUE : FALSE;
-    g.AllowContinue = g.JPParam &= JP_ALLOWCONT ? TRUE : FALSE;
+    g.FreePlay      = (g.JPParam & JP_FREEPLAY)  ? TRUE : FALSE;
+    g.AllowContinue = (g.JPParam & JP_ALLOWCONT) ? TRUE : FALSE;
 	_get_live_jumpers();
 }
 static void intmaths(void) {
