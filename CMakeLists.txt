@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0.0)
 project(mt2-glut VERSION 0.1.0 LANGUAGES C)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
+option(ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 find_package(GLUT REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Threads REQUIRED)
@@ -97,6 +98,11 @@ target_include_directories(glutBasics PUBLIC
 )
 
 target_link_libraries(glutBasics PRIVATE m OpenGL::GL OpenGL::GLU GLUT::GLUT Threads::Threads)
+
+if(ENABLE_SANITIZERS)
+    target_compile_options(glutBasics PRIVATE -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer)
+    target_link_options(glutBasics PRIVATE -fsanitize=address,undefined)
+endif()
 
 if (APPLE)
     message(STATUS "Designed by Apple in California")
