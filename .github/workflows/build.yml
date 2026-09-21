@@ -65,6 +65,6 @@ jobs:
           timeout 15s xvfb-run -a ./build/glutBasics </dev/null
           status=$?
           set -e
-          if [ "$status" -ne 124 ]; then
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
             exit "$status"
           fi
