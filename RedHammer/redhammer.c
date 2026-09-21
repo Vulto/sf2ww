@@ -130,6 +130,20 @@ void *RHCodePtrRange(u32 offset, size_t size)
     return g_code_roms + offset;
 }
 
+void *RHCodePtrChecked(u32 offset, const char *file, int line)
+{
+    if (g_code_roms == NULL) {
+        fprintf(stderr, "RHCODE: ROM image is not loaded at %s:%d (offset 0x%08x)\n", file, line, offset);
+        abort();
+    }
+    if (offset >= ALL_CODE_SIZE) {
+        fprintf(stderr, "RHCODE: invalid ROM offset at %s:%d: 0x%08x (range 0x00000000..0x%08x)\n",
+                file, line, offset, ALL_CODE_SIZE - 1);
+        abort();
+    }
+    return g_code_roms + offset;
+}
+
 void *RHCodePtr(u32 offset)
 {
     return RHCodePtrRange(offset, 1);
