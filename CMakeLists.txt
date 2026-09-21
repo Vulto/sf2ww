@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(mt2-glut VERSION 0.1.0 LANGUAGES C)
 
+# Validate the current runtime safety baseline.
+
 # Keep sanitizer validation reproducible across runners.
 
 # CI validation keeps sanitizer diagnostics actionable.
