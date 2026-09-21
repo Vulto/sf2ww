@@ -24,6 +24,7 @@ typedef struct fistblue_tile_plane RHTilePlane;
 
 void load_cps_roms(void);
 void *RHCodePtr(u32 offset);
+void *RHCodePtrChecked(u32 offset, const char *file, int line);
 void *RHCodePtrRange(u32 offset, size_t size);
 
 const void *RHOffsetLookup16(const u16 *base, int index);
@@ -53,11 +54,11 @@ void print_rom_offset(const char *message, const void *addr);
 typedef u32 RHROMPtr;
 typedef u16 RHShortPtr;
 
-#define RHCODE(x) RHCodePtr((u32)(x))
+#define RHCODE(x) RHCodePtrChecked((u32)(x), __FILE__, __LINE__)
 
-#define RHCODE16(x) ((u16 *)RHCodePtr((u32)(x)))
+#define RHCODE16(x) ((u16 *)RHCodePtrChecked((u32)(x), __FILE__, __LINE__))
 
-#define RHCODE16_ARRAY(base, stride, index) ((u16 *)RHCodePtr((u32)((base) + (2 * (stride) * (index)))))
+#define RHCODE16_ARRAY(base, stride, index) ((u16 *)RHCodePtrChecked((u32)((base) + (2 * (stride) * (index))), __FILE__, __LINE__))
 
 void redhammer_run_tests(void);
 
