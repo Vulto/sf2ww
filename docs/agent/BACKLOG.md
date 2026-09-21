@@ -25,3 +25,5 @@ Prioridade 2 — validação audiovisual
 - [x] Added a current-MAME Lua frame probe for the original machine state.
 - [x] Added a launcher that keeps MAME ROMs outside the repository.
 - [ ] Connect the probes with the external/private ROM fixture and produce the first real lockstep report.
+- [ ] Mount the private ROM fixture on a trusted runner and turn the scheduled full-MAME job from blocked to active.
+- [ ] Resolve the first real state divergence reported by the comparator.
