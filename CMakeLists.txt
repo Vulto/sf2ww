@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(mt2-glut VERSION 0.1.0 LANGUAGES C)
 
+if (POLICY CMP0072)
+    cmake_policy(SET CMP0072 NEW)
+endif()
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(GLUT REQUIRED)
 find_package(OpenGL REQUIRED)
