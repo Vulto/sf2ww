@@ -50,6 +50,8 @@ extern struct inputs gInputs;
 extern CPSGFXEMU gemu;
 static const long CPS_FRAME_NS = 16768000L;
 static struct timespec gNextFrame;
+static FILE *gStateLog;
+static unsigned long gStateFrame;
 
 typedef struct {
    GLdouble x,y,z;
@@ -211,6 +213,47 @@ void key(unsigned char inkey, int px, int py){
             
     }
 }
+static void log_state_frame(void) {
+    if (gStateLog == NULL) {
+        return;
+    }
+
+    ++gStateFrame;
+    fprintf(gStateLog,
+            "%lu,%u,%u,%u,%u,%u,%u,%u,%u,%u,"
+            "%d,%d,%d,%d,%d,%u,%d,%d,%d,"
+            "%d,%d,%d,%d,%d,%u,%d,%d,%d\n",
+            gStateFrame,
+            g.mode0,
+            g.tick,
+            (unsigned)g.Stage,
+            (unsigned)g.RoundCnt,
+            (unsigned)g.TimeRemainBCD,
+            (unsigned)g.TimeRemainTicks,
+            (unsigned)g.FightOver,
+            (unsigned)g.randSeed1,
+            (unsigned)g.randSeed2,
+            g.Player1.X.full,
+            g.Player1.Y.full,
+            g.Player1.mode0,
+            g.Player1.mode1,
+            g.Player1.mode2,
+            (unsigned)g.Player1.AnimFlags,
+            g.Player1.Energy,
+            g.Player1.Move,
+            g.Player1.StandSquat,
+            g.Player2.X.full,
+            g.Player2.Y.full,
+            g.Player2.mode0,
+            g.Player2.mode1,
+            g.Player2.mode2,
+            (unsigned)g.Player2.AnimFlags,
+            g.Player2.Energy,
+            g.Player2.Move,
+            g.Player2.StandSquat);
+    fflush(gStateLog);
+}
+
 static long timespec_diff_ns(const struct timespec *end, const struct timespec *start) {
     return (end->tv_sec - start->tv_sec) * 1000000000L +
            (end->tv_nsec - start->tv_nsec);
@@ -243,6 +286,21 @@ void timerFunc(int value) {
 int main (int argc, const char * argv[])
 {
     load_cps_roms();
+
+    {
+        const char *state_path = getenv("SF2_STATE_LOG");
+        if (state_path != NULL && state_path[0] != '\0') {
+            gStateLog = fopen(state_path, "w");
+            if (gStateLog == NULL) {
+                perror("SF2_STATE_LOG");
+                return EXIT_FAILURE;
+            }
+            fprintf(gStateLog,
+                    "frame,game_mode,game_tick,stage,round_cnt,time_bcd,time_ticks,fight_over,rng1,rng2,"
+                    "p1_x,p1_y,p1_mode0,p1_mode1,p1_mode2,p1_anim,p1_energy,p1_move,p1_stand_squat,"
+                    "p2_x,p2_y,p2_mode0,p2_mode1,p2_mode2,p2_anim,p2_energy,p2_move,p2_stand_squat\n");
+        }
+    }
 
     glutInit(&argc, (char **)argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); 
