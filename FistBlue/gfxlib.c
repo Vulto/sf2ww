@@ -523,8 +523,8 @@ void sub_41c2(Object *obj, const FBSimpleAction *act) {		//41c2
 void RHSetScrollAction(Object *obj, const FBSimpleAction *act) {
     u32 action_offset = RHCODE_OFFSET(act, sizeof(FBSimpleAction));
     obj->ActionScript = (FBAction *)act;
-    obj->Timer = RHWordOffset(action_offset, offsetof(FBSimpleAction, Delay));
-    obj->AnimFlags = RHWordOffset(action_offset, offsetof(FBSimpleAction, Flags));
+    obj->Timer = RHWordOffset(action_offset, offsetof(FBSimpleAction, Delay) / sizeof(u16));
+    obj->AnimFlags = RHWordOffset(action_offset, offsetof(FBSimpleAction, Flags) / sizeof(u16));
 }
 
 void RHSetScrollActionList(Object *obj, void *act, int step) {
@@ -772,7 +772,7 @@ void actiontickdraw(Object *obj) {		/* 0x41d4 */
     if(--obj->Timer) { return; }
 
     u32 action_offset = RHCODE_OFFSET(obj->ActionScript, sizeof(FBSimpleAction));
-    u16 flags = RHWordOffset(action_offset, offsetof(FBSimpleAction, Flags));
+    u16 flags = RHWordOffset(action_offset, offsetof(FBSimpleAction, Flags) / sizeof(u16));
     if (flags & 0x8000) {
         u32 target = RHReadLong((int)(action_offset + sizeof(FBSimpleAction)));
         obj->ActionScript = (const FBAction *)RHCODE(target);
