@@ -38,8 +38,7 @@ jobs:
           cmake \
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_C_FLAGS="-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer" \
-            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined" \
+            -DENABLE_SANITIZERS=ON \
             -S . -B build-asan
       - name: Build
         run: cmake --build build-asan --parallel
