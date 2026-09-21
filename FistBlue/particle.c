@@ -22,10 +22,11 @@ void RHSetActionList(Object *obj, const void *listaddr, short sel) {
     RHSetAction(obj, (FBAction *)RHOffsetLookup16(listaddr, sel));
 }
 void RHSetAction(Object *obj, const FBAction *act) {
+    u32 action_offset = RHCODE_OFFSET(act, sizeof(FBAction));
     obj->ActionScriptType   = ACTIONSCRIPT_ROM;
     obj->ActionScript       = act;
-    obj->Timer              = RHSwapWord(act->Delay);
-    obj->AnimFlags          = RHSwapWord(act->Flags);
+    obj->Timer              = RHWordOffset(action_offset, offsetof(FBAction, Delay));
+    obj->AnimFlags          = RHWordOffset(action_offset, offsetof(FBAction, Flags));
 
 #if 0
     const struct image *image = (const struct image *)RHCODE(RHSwapLong(obj->ActionScript->Image));
@@ -53,12 +54,14 @@ void RHActionTick(Object *obj) {
     }
 
     if(--obj->Timer == 0) {
-        if(RHSwapWord(obj->ActionScript->Flags) & 0x8000) {
-            
-            u32 *next = (void *)obj->ActionScript + sizeof(FBAction);
-            obj->ActionScript = (FBAction *)RHCODE(RHSwapLong(*next));
+        u32 action_offset = RHCODE_OFFSET(obj->ActionScript, sizeof(FBAction));
+        u16 flags = RHWordOffset(action_offset, offsetof(FBAction, Flags));
+        if(flags & 0x8000) {
+            u32 next_offset = action_offset + sizeof(FBAction);
+            u32 target = RHReadLong((int)next_offset);
+            obj->ActionScript = (FBAction *)RHCODE(target);
         } else {
-            obj->ActionScript++;
+            obj->ActionScript = (FBAction *)RHCODE(action_offset + sizeof(FBAction));
         }
         RHSetAction(obj, obj->ActionScript);
     }
