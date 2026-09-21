@@ -13,6 +13,15 @@ Prioridade 1 — cobertura funcional
 - [ ] IA da CPU, timer, round/match decisions e câmera.
 
 Prioridade 2 — validação audiovisual
+- [ ] Captura de frame do port e do MAME em resolução interna comum.
 - [ ] Diff de frames normalizados contra MAME.
 - [ ] Validação de eventos de áudio por frame.
 - [ ] Definir e documentar limiar de similaridade.
+
+## Progress since initialization
+
+- [x] Confirmed CPS1 timing from MAME and changed the native frontend scheduler to approximately 59.6374 Hz.
+- [x] Added a per-frame port state CSV probe.
+- [x] Added a current-MAME Lua frame probe for the original machine state.
+- [x] Added a launcher that keeps MAME ROMs outside the repository.
+- [ ] Connect the probes with the external/private ROM fixture and produce the first real lockstep report.
