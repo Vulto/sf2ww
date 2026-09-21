@@ -28,6 +28,7 @@ int main(int argc, const char * argv[]) {
         cmocka_unit_test(test_RHReadWord16_negative_offset),
         cmocka_unit_test(test_RHCodeOffsetChecked),
         cmocka_unit_test(test_RHReadWordPtr),
+        cmocka_unit_test(test_FBAction_layout),
         cmocka_unit_test(test_FIXED16_16_carry),
         cmocka_unit_test(test_FIXED8_8_carry),
         cmocka_unit_test(test_SET_VECTFP16),
