@@ -39,6 +39,7 @@ jobs:
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
             -DCMAKE_BUILD_TYPE=Debug \
             -DENABLE_SANITIZERS=ON \
+            -DBUILD_FBTESTS=ON \
             -S . -B build-asan
       - name: Build and test
         run: cmake --build build-asan --parallel && ctest --test-dir build-asan --output-on-failure
