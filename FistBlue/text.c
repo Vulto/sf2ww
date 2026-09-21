@@ -59,7 +59,7 @@ void sub_54bc(u16 **gfx_p, short x, short y, u8 *string) {		// 54bc
 void showtextbank4(enum libtextgfx_sel sel) {
 	u16			*gfx_p;
 	const u16	*data;
-	const u8	*data2;
+	const u16		*data2;
 	u32			cp;
 	short		palette;
 	
