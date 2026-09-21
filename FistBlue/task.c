@@ -194,6 +194,10 @@ void task_die(void) {
 
 void task_kill(unsigned short id) {
 	printf("Task_kill %d\n", id);
+	if (id >= MAX_TASKS) {
+		printf("Task_kill: invalid task id %u\n", id);
+		return;
+	}
 	Exec.Tasks[id].status = TASK_EMPTY;
 #ifdef REDHAMMER
 	RHKill(&Exec.Tasks[id]);
@@ -227,6 +231,10 @@ void die_top8(void) {
 }
 
 void create_task(void *task, short taskid, u16 param, u8 param1, u8 param2) {
+	if (taskid < 0 || taskid >= MAX_TASKS) {
+		printf("create_task: invalid task id %d\n", taskid);
+		return;
+	}
 #ifdef SF2_UCONTEXT
     if (getcontext(&Tasks[taskid].UC) == -1)
         handle_error("getcontext");

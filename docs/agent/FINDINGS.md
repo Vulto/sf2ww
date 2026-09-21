@@ -53,3 +53,10 @@
 - Those assignments mutated `g.JPParam`, so the subsequent live-jumper decode no longer saw the original jumper bits. Depending on the configured jumper combination, `DemoSound`, `FreezeMachine`, `FlipDisplay`, and `Debug2` could be silently cleared.
 - The decoder now uses non-mutating bit tests and preserves `g.JPParam` as the source-of-truth value read from the ROM/jumper input.
 - Acceptance: decoding Free Play/Continue must not alter `g.JPParam`; subsequent live-jumper fields must reflect the original parameter word.
+
+## 2026-09-21 — Guard task table indices
+
+- `task_kill()` indexed `Exec.Tasks[id]` without validating the caller-provided task id, and `create_task()` accepted a signed task id without bounds checking.
+- A corrupted or invalid task id could therefore turn a runtime scheduling error into an out-of-bounds write/read against the task table and potentially crash the native process.
+- Both entry points now reject ids outside `0..MAX_TASKS-1` before touching the task table.
+- Acceptance: invalid task ids must not access `Exec.Tasks` or invoke the pthread backend; valid task ids retain the existing behavior.
