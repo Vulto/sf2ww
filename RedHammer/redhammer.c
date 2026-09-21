@@ -81,19 +81,22 @@ void load_cps_roms()
 #ifdef REDHAMMER_USE_ALLROMS_BIN
         FILE *allroms = fopen("allroms.bin", "rb");
         if (allroms == NULL) {
-            puts("Can't open allroms.bin\n");
+            puts("Can't open allroms.bin
+");
             exit(EXIT_FAILURE);
         }
         size_t bytesread = fread(g_code_roms, 1, ALL_CODE_SIZE, allroms);
         fclose(allroms);
         if (bytesread != ALL_CODE_SIZE) {
-            fprintf(stderr, "Invalid allroms.bin: expected %u bytes, read %zu\n",
+            fprintf(stderr, "Invalid allroms.bin: expected %u bytes, read %zu
+",
                     (unsigned)ALL_CODE_SIZE, bytesread);
             free(g_code_roms);
             g_code_roms = NULL;
             exit(EXIT_FAILURE);
         }
-        printf("allroms: read %zu bytes\n", bytesread);
+        printf("allroms: read %zu bytes
+", bytesread);
 #else
         FILE *rom0;     // even ROM
         FILE *rom1;     // odd ROM
@@ -101,7 +104,8 @@ void load_cps_roms()
         printf("opening from %s", getcwd(NULL, 0));
         
         for (int i=0; i<4; ++i) {
-            printf("opening %s and %s\n", code_rom_names[2*i + 0], code_rom_names[2*i + 1]);
+            printf("opening %s and %s
+", code_rom_names[2*i + 0], code_rom_names[2*i + 1]);
             rom0 = fopen(code_rom_names[2*i + 0], "r");
             rom1 = fopen(code_rom_names[2*i + 1], "r");
             for (int j=0; j<CODE_ROM_SIZE; ++j) {
@@ -123,7 +127,8 @@ void load_cps_roms()
 /** Print the CPS ROM address of a given pointer to the global data blob */
 void print_rom_offset(const char *message, const void *addr)
 {
-    printf("%s: %08lx\n", message, ((char *)addr) - g_code_roms);
+    printf("%s: %08lx
+", message, ((char *)addr) - g_code_roms);
 }
 
 const void *RHOffsetLookup16(const u16 *base, int index)
@@ -138,7 +143,9 @@ const void *RHOffsetLookup16(const u16 *base, int index)
 
 const u16 RHWordOffset(u32 base, int index)
 {
-    u16 raw;\n    memcpy(&raw, RHCODE(base + (2 * index)), sizeof(raw));\n    return RHSwapWord(raw);
+    u16 raw;
+    memcpy(&raw, RHCODE(base + (2 * index)), sizeof(raw));
+    return RHSwapWord(raw);
 }
 
 const u8 RHByteOffset(u32 base, int index)
@@ -264,7 +271,8 @@ void redhammer_run_tests(void) {
         for (int j=0; j<8; ++j) {
             for (int k=0; k<4; ++k) {
                 if (data_13b06[i][j][k] != RH3DWord(0x13b06, 8, 4, i, j, k)) {
-                    printf("incorrect\n");
+                    printf("incorrect
+");
                 }
             }
         }
