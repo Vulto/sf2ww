@@ -41,3 +41,8 @@
 - A crash is normally non-zero, but an early clean exit could therefore be misclassified as a passing runtime test.
 - The smoke gates now require the expected timeout status (124), proving the executable remained alive for the observation window. Any clean early exit or crash fails CI.
 - This strengthens the crash/segfault coverage without changing game behavior.
+## 2026-09-21 — Smoke verifies forward frame progress
+
+- A live process alone is insufficient crash/runtime coverage: a deadlocked or stalled frontend can remain alive until the timeout.
+- The native smoke now enables `SF2_STATE_LOG` and requires at least 300 emitted state frames during the 15-second observation window.
+- Acceptance: the process must stay alive for the full window and advance the game timer callback enough to produce the minimum frame count; premature exit, crash, or scheduler stall fails CI.
