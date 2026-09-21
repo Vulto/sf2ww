@@ -362,6 +362,9 @@ static void _controlscript_P1(void) {	// 225c fetch controls from script instead
 	const u16 *data;
 	if(--g.DemoJoyP1Timer != 0) {
 		data = g.DemoJoyP1;
+		if (data[1] == 0xffff) {
+			return;
+		}
 		if (data[1]==0) {
 			data += 2;
 		}
@@ -374,6 +377,9 @@ static void _controlscript_P2(void) {	// 2282 fetch controls from script instead
 	const u16 *data;
 	if(--g.DemoJoyP2Timer != 0) {
 		data = g.DemoJoyP2;
+		if (data[1] == 0xffff) {
+			return;
+		}
 		if (data[1]==0) {
 			data += 2;
 		}
