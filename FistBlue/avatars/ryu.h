@@ -81,7 +81,7 @@ struct UserData_RyuKen {
 struct KenRyuInputs {
 	u16 buttons; // %d0
 	u16 stick; // %d6
-};
+} __attribute__((packed));
 
 #define STATUS_HADOUKEN     0x4c
 #define STATUS_SHORYUKEN	0x4e
