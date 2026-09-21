@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev
+          sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev
       - name: Configure ASan/UBSan
         run: |
           cmake \
@@ -40,8 +40,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=Debug \
             -DENABLE_SANITIZERS=ON \
             -S . -B build-asan
-      - name: Build
-        run: cmake --build build-asan --parallel
+      - name: Build and test
+        run: cmake --build build-asan --parallel && ctest --test-dir build-asan --output-on-failure
       - name: Upload ASan runtime
         uses: actions/upload-artifact@v4
         with:
@@ -49,16 +49,3 @@ jobs:
           path: build-asan/glutBasics
           if-no-files-found: error
           retention-days: 1
-
-  tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev
-      - name: Configure
-        run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_FBTESTS=ON -S . -B build
-      - name: Build and test
-        run: cmake --build build --parallel && ctest --test-dir build --output-on-failure
