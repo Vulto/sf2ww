@@ -787,7 +787,9 @@ static void draw_scroll2_planes(void) {
             float zTop    = (zBottom + 16 * zDepth) / 30.0;
             
             for (tx = -6; tx<39 ; ++tx) {
-                record = SCROLL_DECODE_SCR2(tx,ty);
+                int mapTx = tx & 0x3f;
+                int mapTy = ty & 0x3f;
+                record = SCROLL_DECODE_SCR2(mapTx, mapTy);
                 if (gemu.Tilemap_Scroll2[record][0] == TILE_BLANK_SCR2) {
                     // Blank tile in SCR2
                     continue;
