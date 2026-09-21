@@ -175,8 +175,8 @@ Object *alloc_action_by_type(short type) {
 
 void update_motion(Object *obj) {		/* 2416 */
     /* fixed precision arithmetic */	
-    obj->X.full += (obj->Path[obj->Step].x.full << 8);
-    obj->Y.full += (obj->Path[obj->Step].y.full << 8);
+    obj->X.full = (int)((u32)obj->X.full + ((u32)(int)obj->Path[obj->Step].x.full << 8));
+    obj->Y.full = (int)((u32)obj->Y.full + ((u32)(int)obj->Path[obj->Step].y.full << 8));
 }
 
 
