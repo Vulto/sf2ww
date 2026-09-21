@@ -48,7 +48,8 @@ extern struct inputs gInputs;
 //#define DEBUG
 
 extern CPSGFXEMU gemu;
-static const long CPS_FRAME_NS = 16768000L;\nstatic struct timespec gNextFrame;
+static const long CPS_FRAME_NS = 16768000L;
+static struct timespec gNextFrame;
 
 typedef struct {
    GLdouble x,y,z;
@@ -210,11 +211,34 @@ void key(unsigned char inkey, int px, int py){
             
     }
 }
+static long timespec_diff_ns(const struct timespec *end, const struct timespec *start) {
+    return (end->tv_sec - start->tv_sec) * 1000000000L +
+           (end->tv_nsec - start->tv_nsec);
+}
+
 void timerFunc(int value) {
+    struct timespec now;
+    long delay_ns;
+    unsigned delay_ms;
+
     task_timer();
-  
     glutPostRedisplay();
-    glutTimerFunc(time_wait, timerFunc, 0);
+
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    do {
+        gNextFrame.tv_nsec += CPS_FRAME_NS;
+        if (gNextFrame.tv_nsec >= 1000000000L) {
+            gNextFrame.tv_nsec -= 1000000000L;
+            ++gNextFrame.tv_sec;
+        }
+    } while (timespec_diff_ns(&gNextFrame, &now) <= 0);
+
+    delay_ns = timespec_diff_ns(&gNextFrame, &now);
+    delay_ms = (unsigned)((delay_ns + 999999L) / 1000000L);
+    if (delay_ms == 0) {
+        delay_ms = 1;
+    }
+    glutTimerFunc(delay_ms, timerFunc, 0);
 }
 int main (int argc, const char * argv[])
 {
