@@ -86,10 +86,8 @@ jobs:
         run: |
           if [ -z "${SF2_MAME_ROM_ROOT:-}" ]; then
             echo "MAME_COMPARISON_BLOCKED: no private ROM fixture is mounted on this runner."
-            echo "The job remains green because no original ROM data may be committed or exposed."
           else
             echo "MAME_COMPARISON_READY: private fixture root is present."
-            echo "Full execution is reserved for the trusted MAME regression job."
           fi
 
   full-mame-regression:
