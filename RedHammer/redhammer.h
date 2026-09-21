@@ -51,11 +51,11 @@ void print_rom_offset(const char *message, const void *addr);
 typedef u32 RHROMPtr;
 typedef u16 RHShortPtr;
 
-#define RHCODE(x) (void *)&g_code_roms[(x)]
+#define RHCODE(x) RHCodePtr((u32)(x))
 
-#define RHCODE16(x) (u16 *)&g_code_roms[(x)]
+#define RHCODE16(x) ((u16 *)RHCodePtr((u32)(x)))
 
-#define RHCODE16_ARRAY(base, stride, index) (u16 *)&g_code_roms[(base)+(2 * (stride) * (index))]
+#define RHCODE16_ARRAY(base, stride, index) ((u16 *)RHCodePtr((u32)((base) + (2 * (stride) * (index)))))
 
 void redhammer_run_tests(void);
 
