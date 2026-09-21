@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(mt2-glut VERSION 0.1.0 LANGUAGES C)
 
+# CI validation keeps sanitizer diagnostics actionable.
+
 if (POLICY CMP0072)
     cmake_policy(SET CMP0072 NEW)
 endif()
