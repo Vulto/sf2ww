@@ -521,9 +521,10 @@ void sub_41c2(Object *obj, const FBSimpleAction *act) {		//41c2
 }
 
 void RHSetScrollAction(Object *obj, const FBSimpleAction *act) {
+    u32 action_offset = RHCODE_OFFSET(act, sizeof(FBSimpleAction));
     obj->ActionScript = (FBAction *)act;
-    obj->Timer        = RHSwapWord(obj->ActionScript->Delay);
-    obj->AnimFlags    = RHSwapWord(obj->ActionScript->Flags);
+    obj->Timer = RHWordOffset(action_offset, offsetof(FBSimpleAction, Delay));
+    obj->AnimFlags = RHWordOffset(action_offset, offsetof(FBSimpleAction, Flags));
 }
 
 void RHSetScrollActionList(Object *obj, void *act, int step) {
