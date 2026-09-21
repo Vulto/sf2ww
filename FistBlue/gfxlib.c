@@ -233,16 +233,16 @@ void FBDrawTileLine(u16 *gfx_p, const u16 *source, int x, int y) {	//5de2
     // regs: %a0, %a2, %d5, %d6
     u16 attr;
     u32 cp = MakePointObj(x, y);
-    
-    int i=0;
-    attr = RHSwapWord(source[0]);
-    source++;
-    
-    while(RHSwapWord(source[i])) {
-        OBJECT_DRAW(gfx_p, CP_X , CP_Y, RHSwapWord(source[i]), attr);
+    u32 source_offset = RHCodeOffsetChecked(source, sizeof(u16), __FILE__, __LINE__);
+    int i = 0;
+
+    attr = RHWordOffset(source_offset, 0);
+    while (RHWordOffset(source_offset, (int)(i + 1))) {
+        OBJECT_DRAW(gfx_p, CP_X, CP_Y,
+                    RHWordOffset(source_offset, (int)(i + 1)), attr);
         OBJ_CURSOR_BUMP(gfx_p);
         COORDS_OFFSET(&cp, 16, 0);
-        i++;
+        ++i;
     }
 }           
 
