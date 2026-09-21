@@ -78,4 +78,4 @@ struct UserDataComp_ChunLi {
 	u8	    comp_volley;
 	char	comp_didairthrow;			//0091
 	char	x0092;		
-};
+} __attribute__((packed));
