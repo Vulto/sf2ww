@@ -1674,9 +1674,9 @@ static void ply_calc_draw_order(void) {		/* 28414 */
 	} else {
 		g.PlyDrawOrder = 0;
 		if (g.Player1.exists && g.Player2.exists) {
-			if (g.Player2.ActionScript->Priority > g.Player1.ActionScript->Priority) {	/* priority */
+			if (player_action_priority(&g.Player2) > player_action_priority(&g.Player1)) {	/* priority */
 				g.PlyDrawOrder = 1;	
-			} else if (g.Player2.ActionScript->Priority == g.Player1.ActionScript->Priority) {
+			} else if (player_action_priority(&g.Player2) == player_action_priority(&g.Player1)) {
 				g.PlyDrawOrder = g.LastDrawOrder;
 				return;
 			}
