@@ -88,7 +88,7 @@ void showtextbank4(enum libtextgfx_sel sel) {
 		palette = data[4];
 		format = data[5];
 		offsets = sub_7f224(format);
-		data2 += 6;
+		data2 = data + 6;
 		for (;count >= 0; count--) {
 			ch = data2[0];
 			if (ch == 0) {
