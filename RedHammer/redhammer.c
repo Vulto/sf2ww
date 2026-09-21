@@ -167,55 +167,55 @@ const u8 RHByteOffset(u32 base, int index)
 
 const u32 RH3DLong(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
-    u32 *array = RHCODE(base);
-    return RHSwapLong(*(array + (i1 * dim2 * dim3) + (i2 * dim3) + i3));
+    u32 index = (u32)((i1 * dim2 * dim3) + (i2 * dim3) + i3);
+    return RHReadLongAt(base + (u32)(4 * index));
 }
 
 const u32 RH2DLong(u32 base, int dim2, int i1, int i2)
 {
-    u32 *array = RHCODE(base);
-    return RHSwapLong(*(array + (i1 * dim2) + i2));
+    u32 index = (u32)((i1 * dim2) + i2);
+    return RHReadLongAt(base + (u32)(4 * index));
 }
 
 const u32 RH1DLong(u32 base, int index)
 {
-    u32 *array = RHCODE(base);
-    return RHSwapLong(*(array + index));
+    return RHReadLongAt(base + (u32)(4 * index));
 }
 
 const u16 RH3DWord(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
-    u16 *array = RHCODE(base);
-    return RHSwapWord(*(array + (i1 * dim2 * dim3) + (i2 * dim3) + i3));
+    u32 index = (u32)((i1 * dim2 * dim3) + (i2 * dim3) + i3);
+    return RHReadWordAt(base + (u32)(2 * index));
 }
 
 const short RH3DShort(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
-    u16 *array = RHCODE(base);
-    return RHSwapWord(*(array + (i1 * dim2 * dim3) + (i2 * dim3) + i3));
+    u32 index = (u32)((i1 * dim2 * dim3) + (i2 * dim3) + i3);
+    return (short)RHReadWordAt(base + (u32)(2 * index));
 }
 
 const u16 RH2DWord(u32 base, int dim2, int i1, int i2)
 {
-    u16 *array = RHCODE(base);
-    return RHSwapWord(*(array + (i1 * dim2) + i2));
+    u32 index = (u32)((i1 * dim2) + i2);
+    return RHReadWordAt(base + (u32)(2 * index));
 }
 
-const short RH2DShort(u32 base, int dim2, int i1, int i2) {
-    u16 *array = RHCODE(base);
-    return RHSwapWord(*(array + (i1 * dim2) + i2));
+const short RH2DShort(u32 base, int dim2, int i1, int i2)
+{
+    u32 index = (u32)((i1 * dim2) + i2);
+    return (short)RHReadWordAt(base + (u32)(2 * index));
 }
 
 const u8 RH3DByte(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
-    u8 *array = RHCODE(base);
-    return *(array + (i1 * dim2 * dim3) + (i2 * dim3) + i3);
+    u32 index = (u32)((i1 * dim2 * dim3) + (i2 * dim3) + i3);
+    return *(u8 *)RHCodePtrRange(base + index, sizeof(u8));
 }
 
 const u8 RH2DByte(u32 base, int dim2, int i1, int i2)
 {
-    u8 *array = RHCODE(base);
-    return *(array + (i1 * dim2) + i2);
+    u32 index = (u32)((i1 * dim2) + i2);
+    return *(u8 *)RHCodePtrRange(base + index, sizeof(u8));
 }
 
 inline u32 RHSwapLong(const u32 num)
@@ -239,13 +239,11 @@ inline u16 RHSwapWord(const u16 num)
 }
 u32 RHReadLong(int romaddr)
 {
-    void *addr = RHCODE(romaddr);
-    return RHSwapLong(*(u32 *)addr);
+    return RHReadLongAt((u32)romaddr);
 }
 u16 RHReadWord(int romaddr)
 {
-    void *addr = RHCODE(romaddr);
-    return RHSwapWord(*(u16 *)addr);
+    return RHReadWordAt((u32)romaddr);
 }
 
 void redhammer_run_tests(void) {
