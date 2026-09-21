@@ -178,8 +178,9 @@ const u16 RH3DWord(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 
 const short RH3DShort(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
-    u16 *array = RHCODE(base);
-    return RHSwapWord(*(array + (i1 * dim2 * dim3) + (i2 * dim3) + i3));
+    u16 raw;
+    memcpy(&raw, RHCODE(base + 2 * ((i1 * dim2 * dim3) + (i2 * dim3) + i3)), sizeof(raw));
+    return (short)RHSwapWord(raw);
 }
 
 const u16 RH2DWord(u32 base, int dim2, int i1, int i2)
@@ -190,8 +191,9 @@ const u16 RH2DWord(u32 base, int dim2, int i1, int i2)
 }
 
 const short RH2DShort(u32 base, int dim2, int i1, int i2) {
-    u16 *array = RHCODE(base);
-    return RHSwapWord(*(array + (i1 * dim2) + i2));
+    u16 raw;
+    memcpy(&raw, RHCODE(base + 2 * ((i1 * dim2) + i2)), sizeof(raw));
+    return (short)RHSwapWord(raw);
 }
 
 const u8 RH3DByte(u32 base, int dim2, int dim3, int i1, int i2, int i3)
