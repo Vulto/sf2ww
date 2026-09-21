@@ -114,11 +114,11 @@ void load_cps_roms()
 void *RHCodePtr(u32 offset)
 {
     if (g_code_roms == NULL) {
-        fprintf(stderr, "RHCODE: ROM image is not loaded (offset 0x%08x)\\n", offset);
+        fprintf(stderr, "RHCODE: ROM image is not loaded (offset 0x%08x)\n", offset);
         abort();
     }
     if (offset >= ALL_CODE_SIZE) {
-        fprintf(stderr, "RHCODE: ROM offset 0x%08x outside 0x00000000..0x%08x\\n", offset, ALL_CODE_SIZE - 1);
+        fprintf(stderr, "RHCODE: ROM offset 0x%08x outside 0x00000000..0x%08x\n", offset, ALL_CODE_SIZE - 1);
         abort();
     }
     return g_code_roms + offset;
