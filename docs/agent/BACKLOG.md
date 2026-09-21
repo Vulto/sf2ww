@@ -31,3 +31,4 @@ Prioridade 2 — validação audiovisual
 
 - [x] Full-MAME CI invokes the existing MAME state probe through Xvfb so the scheduled regression does not depend on a physical display.
 - [ ] Mount the private/original ROM fixture on a trusted runner and execute the first real MAME/port lockstep comparison.
+- [x] Smoke gates reject premature clean exits and crashes by requiring the expected timeout status.
