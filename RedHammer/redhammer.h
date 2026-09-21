@@ -58,7 +58,7 @@ typedef u16 RHShortPtr;
 
 #define RHCODE16(x) ((u16 *)RHCodePtrChecked((u32)(x), __FILE__, __LINE__))
 
-#define RHCODE16_ARRAY(base, stride, index) ((u16 *)RHCodePtrChecked((u32)((base) + (2 * (stride) * (index))), __FILE__, __LINE__))
+#define RHCODE16_ARRAY(base, stride, index) ((u16 *)RHCodePtrChecked((u32)(base) + 2u * (u32)(stride) * (u32)(index), __FILE__, __LINE__))
 
 void redhammer_run_tests(void);
 
