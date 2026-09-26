@@ -49,8 +49,6 @@ jobs:
   sanitizers:
     runs-on: ubuntu-latest
     env:
-      CFLAGS: "-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer"
-      LDFLAGS: "-fsanitize=address,undefined"
       ASAN_OPTIONS: "abort_on_error=1"
       UBSAN_OPTIONS: "halt_on_error=1:print_stacktrace=1"
     steps:
@@ -60,7 +58,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb
       - name: Configure
-        run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Debug -DBUILD_FBTESTS=ON -S . -B build
+        run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Debug -DBUILD_FBTESTS=ON -DENABLE_SANITIZERS=ON -S . -B build
       - name: Build
         run: cmake --build build --parallel
       - name: Run unit tests under sanitizers
