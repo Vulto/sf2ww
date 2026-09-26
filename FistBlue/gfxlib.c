@@ -785,6 +785,11 @@ void actiontickdraw(Object *obj) {		/* 0x41d4 */
 void draw_simple(Object *obj) {             /* 0x4200 */
     unsigned int width, height, palette;
 	const u16 *tiles;
+
+    /* Scroll selects one of the three CPS tilemap planes; reject corrupt values before indexing callback tables. */
+    if (obj == NULL || obj->Scroll < 0 || obj->Scroll > 4 || (obj->Scroll & 1)) {
+        return;
+    }
     
     struct image2 *im = (struct image2 *)RHCODE(RHSwapLong(obj->ActionScript->Image));
     
