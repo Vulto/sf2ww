@@ -111,7 +111,7 @@ target_link_libraries(glutBasics PRIVATE m OpenGL::GL OpenGL::GLU GLUT::GLUT Thr
 option(ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 
 if (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(glutBasics PRIVATE -Wall -Wextra -Werror -Wno-unused-parameter)
+    target_compile_options(glutBasics PRIVATE -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unknown-pragmas -Wno-error=implicit-fallthrough -Wno-error=unused-function -Wno-error=ignored-qualifiers)
 
     if (ENABLE_SANITIZERS)
         target_compile_options(glutBasics PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
