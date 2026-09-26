@@ -135,19 +135,29 @@ int _EnergyDamageAdjust(Player *ply, int damage) {
 }
 
 void LBGetDamage(Player *ply, Player *opp, int index) {
-    if((index & 0x7f) < 0x20) {
-        dr.damage = data_99324[index/2][ply->Difficulty];
-        dr.d5 = data_99544[index/2];
-    } else {
-        index -= 0x20;
-        dr.d5=data_995a6[index/2];
+    const u8 damageIndex = index & 0x7f;
 
-        if(opp->Energy <= data_99566[index/2][1]) { dr.damage = data_99566[index/2][2];
-        } else if (opp->Energy >= data_99566[index/2][3]) { dr.damage = data_99566[index/2][4];
-        } else { dr.damage = opp->Energy-(opp->Energy >> data_99566[index/2][0]);
+    if(damageIndex < 0x20) {
+        const u8 tableIndex = damageIndex / 2;
+        dr.damage = data_99324[tableIndex][ply->Difficulty];
+        dr.d5 = data_99544[tableIndex];
+    } else if(damageIndex < 0x28) {
+        const u8 specialIndex = (damageIndex - 0x20) / 2;
+        dr.d5 = data_995a6[specialIndex];
+
+        if(opp->Energy <= data_99566[specialIndex][1]) {
+            dr.damage = data_99566[specialIndex][2];
+        } else if (opp->Energy >= data_99566[specialIndex][3]) {
+            dr.damage = data_99566[specialIndex][4];
+        } else {
+            dr.damage = opp->Energy - (opp->Energy >> data_99566[specialIndex][0]);
         }
+    } else {
+        dr.damage = 0;
+        dr.d5 = 0;
     }
-    dr.damage=_EnergyDamageAdjust(ply, dr.damage);
+
+    dr.damage = _EnergyDamageAdjust(ply, dr.damage);
 }
 
 void set_throw_trajectory(Player *ply, int trajectory, int direction, short damage) {
