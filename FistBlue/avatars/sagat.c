@@ -79,6 +79,7 @@ static void sub_36caa(Player *ply) {
 	}
 }
 inline static void sub_36cfc(Player *ply) {
+	(void)ply;
 	/* does nothing */
 }
 static void sub_36d20(Player *ply) {
