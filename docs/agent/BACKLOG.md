@@ -3,7 +3,7 @@
 Prioridade 0 — segurança/runtime
 - [ ] Substituir o smoke com ROMs zeradas por execução com ROM válida externa ao repositório.
 - [ ] Construir harness MAME/port em lockstep e registrar o primeiro frame divergente.
-- [ ] Mapear o vetor de estado lógico no MAME e no port.
+- [x] Mapear o vetor de estado lógico no MAME e no port.
 - [ ] Cobrir crashes/segfaults e UB em todos os caminhos de jogo acessíveis.
 - [ ] Auditar índices de tilemap e acesso a ROM em todos os caminhos gráficos, incluindo rotinas atualmente desativadas.
 
@@ -44,3 +44,8 @@ Prioridade 2 — validação audiovisual
 - [x] GitHub Actions installs MAME from the Ubuntu runner package.
 - [x] CI validates the installed MAME version and the `sf2ua` driver.
 - [ ] Mount the private `sf2ua` ROM fixture on a trusted runner and execute the real MAME/native lockstep.
+
+## 2026-09-26 — Lockstep vector correction
+
+- Corrected the MAME fighter position probe to read the documented fighter struct X/Y fields at offsets `$06/$08` from P1 `$FF83C6` and P2 `$FF86C6`. The previous probe incorrectly sampled `$28/$2C`, which are action-script/energy fields in the native struct model.
+- Updated the comparator to compare the complete fixed MAME prefix while allowing the native process to emit additional frames before timeout; fewer native frames still fail.
