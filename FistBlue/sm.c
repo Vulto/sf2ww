@@ -141,6 +141,7 @@ static void sub_7c50(void) {
 
 static void game_mode_28(void) {	// 7af0
 	Object *obj;
+	Player *ply;
 	
 	switch (g.mode2) {
 		case 0:
@@ -178,6 +179,7 @@ static void game_mode_28(void) {	// 7af0
 				}
 
 			}
+			__attribute__((fallthrough));
 		case 4:
 			if (g.x02e0==0) {
 				NEXT(g.mode2)
@@ -227,6 +229,7 @@ static void game_mode_28(void) {	// 7af0
 					sub_7c50();
 				}
 			}
+			__attribute__((fallthrough));
 		case 10:
 			if (g.ContinueBits & 1 << g.PlyLostToComp ) {
 				NEXT(g.mode2)
