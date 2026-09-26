@@ -78,12 +78,12 @@ struct UserData_Blanka {
 	
 	
 	u8	x00a1;
-};
+} __attribute__((packed));
 struct UserDataComp_Blanka  {
 	BLANKA_USER_COMMON
 	u8		x008a;
 	int		x0090;
 	u8		x0092;
-};
+} __attribute__((packed));
 
 
