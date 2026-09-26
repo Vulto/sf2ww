@@ -54,7 +54,7 @@ Nunca parar após um item. Se o backlog esvaziar, criar trabalho de expansão at
 
 ## 6. Branches e commits
 
-`main` deve sempre compilar e passar no smoke. Usar branches curtas `explore/*`, `fix/*` e `feature/*`. Integrar avanços validados por PR e apagar branches concluídas quando possível. Nunca reescrever ou force-push `main`.
+`main` deve sempre compilar e passar no smoke. Trabalhar exclusivamente no branch `main`. Não criar, usar, integrar ou apagar branches de trabalho. Nunca reescrever ou force-push `main`.
 
 Commits devem referenciar evidência de validação, causa raiz e regressão. Não commitar tentativas não validadas como progresso.
 
@@ -66,7 +66,7 @@ Manter um pipeline central, preferencialmente `.github/workflows/ci.yml`, conten
 - `full-mame-regression` em merge para `main` e cron noturno;
 - action composta reutilizável para lógica comum MAME + port + diff.
 
-Novas dimensões de teste devem ser steps/jobs desse pipeline, não workflows paralelos. A ROM do MAME deve vir de secret/cache privado do runner e nunca de artefato público.
+Novas dimensões de teste devem ser steps/jobs desse pipeline, não workflows paralelos. A ROM do MAME é fixture obrigatória do CI/CD. Deve ser disponibilizada ao runner por armazenamento privado e referenciada por `SF2_MAME_ROM_URL` como secret; nunca por conteúdo versionado ou artefato público.
 
 ## 8. Renderização
 
@@ -86,7 +86,7 @@ Esses arquivos são o estado operacional persistente do agente.
 
 - Não reescrever histórico de `main` nem force-push.
 - Não mesclar sem CI relevante verde.
-- Não versionar ROMs ou assets/dados protegidos extraídos do original.
+- A ROM deve existir no CI/CD em armazenamento privado; nunca publicar ROM ou assets protegidos no repositório ou em artefatos públicos.
 - Não declarar exceções sem evidência.
 - Não declarar conclusão com cobertura parcial.
 - Não trocar fixed-point/inteiros por float sem validação explícita.
