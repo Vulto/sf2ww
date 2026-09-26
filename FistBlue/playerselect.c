@@ -35,7 +35,7 @@ extern ScrollState gstate_Scroll2;
 extern ScrollState gstate_Scroll3;
 
 
-#pragma mark Player Select
+
 static void check_for_new_players(void) {		// 843e
 	Player *a3, *a4;
 	short new_fighter_id;
