@@ -31,7 +31,6 @@ extern Game g;
 static void guile_attack_bison(Player *ply);
 
 
-static void sub_2f1b0(Player *ply);
 
 typedef struct UserData_Guile UD;
 
