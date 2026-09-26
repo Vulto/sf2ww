@@ -14,4 +14,4 @@ struct UserData_17 {
 	char	h0082c;
 	
 	char	h0085c;
-};
+} __attribute__((packed));
