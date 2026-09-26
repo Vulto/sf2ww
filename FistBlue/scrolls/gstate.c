@@ -31,7 +31,7 @@ static void gstate_update_scroll3(ScrollState *gs);
 
 static void _GSDrawScroll3A(ScrollState *gs, u16 *gfx_p, const u16 *tilep, CP cp);
 
-#pragma mark ---- Layer Initialisers ----
+
 
 void GSInitUpdateMethods(void) {
 	static const char data_83900[16][6] = {	// Scroll update methods
@@ -276,7 +276,7 @@ static void gstate_update_scroll3 (ScrollState *gs) {		//83d06
     }
 }
     
-#pragma mark Publics
+
 
 /**
  @brief Update the tilemaps
