@@ -21,8 +21,7 @@ for expected in "$goldenDir"/*.csv; do
         prevTick >= 0 && $3 < prevTick { exit 25 }
         prevFrame = $1
         prevTick = $3
-        rows++
-        END { if (rows == 0) exit 26 }
+        END { if (NR < 2) exit 26 }
     ' "$expected"
     rm -f "$actual"
     trap - EXIT
