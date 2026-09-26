@@ -2474,7 +2474,8 @@ static void _draw_portrait_beaten(u16 **scr_p, char d2, char d3) {		//15cf2
 
 
 
-void action_1286e(Object *obj, short d0) {	
+void action_1286e(Object *obj, short d0) {
+	(void)obj;
 	g.x8a62[d0]=60;
 	add_bcd_8(1, &g.x8a60[d0]);
 }
