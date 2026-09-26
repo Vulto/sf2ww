@@ -272,7 +272,6 @@ void showtextbank1(enum libtextgfx_sel sel) {		// 568c draw text in OBJECT
 }
 
 void showtextbank2(enum libtextgfx_sel sel) {		// 574a Winners chants
-	u16 *gfx_p;
 	if (sel & 0x80) {
 		// 57ca
 		return;
