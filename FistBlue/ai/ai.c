@@ -81,7 +81,7 @@ struct ai_aggressive_pointer {
 
 static const char data_2b8a4[16] = { 1,2,1,0,1,2,1,0,2,1,2,1,1,1,2,1 };
 
-#pragma mark ---- AI Init ----
+
 void _AILookupStrategy(Player *ply, struct ai_aggressive_pointer *agg_struct) {		// 2b78e
     agg_struct->a1 = dataAIAggressive[ply->FighterID]->a1[ply->OpponentID];
     agg_struct->a2 = dataAIAggressive[ply->FighterID]->a2[ply->OpponentID];
@@ -366,7 +366,7 @@ static void sub_2adee(Player *ply) {		/* 2adee not ForceDefensive */
 	_AIBeginStrategy(ply);
 }
 
-#pragma mark ---- ENTRY ----
+
 
 /* _AIBeginAgain, recursive, so be careful   2b6ca */
 static void _AIBeginAgain(Player *ply) {	
@@ -460,7 +460,7 @@ void AIBeginDef(Player *ply) {
 }
 
 
-#pragma mark ---- _AIFinish ----
+
 
 static void _AIFinish(Player *ply) {		// 2b6c6 was _AINew201
 	ply->AIMode1 = 0;
@@ -530,7 +530,7 @@ static void _AINewIfHeadHittable(Player *ply) {		// 2af96
 }
 
 
-#pragma mark ---- AI STRATEGIES ----
+
 
 // STRAT_STANDSTILL
 static void _AIStratStandStill(Player *ply) {		/* 2ae50 standing still*/
@@ -946,7 +946,7 @@ static void _AICheckUpdate(Player *ply) {	/* 2b8b4 checked */
 	}
 }
 
-#pragma mark ---- AI PARSER ----
+
 
 
 void AIInitDefensive(Player *ply) {				// 2b82a
@@ -1257,7 +1257,7 @@ static void _AIStrategyHighBit(Player *ply, u8 d0) {	//2b92a
 	}
 }
 
-#pragma mark ---- AIExits ----
+
 /* all callers should _AIGotoNextStrategy afterward */
 
 static void _AIExit1(Player *ply) {	/* 2b8d2 */
@@ -1304,7 +1304,7 @@ static void _AIExit5(Player *ply) {	/* 2bb14 */
 	debug_print(2, "0x%02x\n",ply->x0276);
 }
 
-#pragma mark ========
+
 
 
 static void _AIDoStrategy(Player *ply,  short d0) {			//2b9d6 high bit strategy
