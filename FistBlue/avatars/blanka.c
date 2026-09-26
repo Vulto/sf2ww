@@ -84,7 +84,7 @@ void _BlankaCatchLU(Player *ply) {		//2e886
 		0xf0, 0x00, 0x20, 0x02, 0xe0, 0x19, 0x20, 0x05, 0x16, 0x25, 0x00, 0x0f,  };
 	/* next address 00093a7c */
 	
-	const static char *data_93488[12]={
+	static const char *data_93488[12]={
 		data_939a0, data_939b4, data_939c8, data_939cc, 
 		data_939a0, data_939e0, data_939f4, data_93a08, 
 		data_93a1c, data_93a30, data_93a44, data_93a58, 
@@ -191,4 +191,3 @@ void PSCBVictoryBlanka(Player *ply) {
 }
 
 
-#pragma mark Computer CBs
