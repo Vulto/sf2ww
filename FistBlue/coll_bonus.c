@@ -28,7 +28,7 @@ extern struct game g;
 
 #include "coll_bonus.h"
 
-static void _CDBonus3(Object_G2 *a6) {			// 7d20a
+(Object_G2 *a6) {			// 7d20a
 	
 	
 }
@@ -191,7 +191,7 @@ void CDCheckDecor (Object_G2 *a6) {		/* 7e340 check if collision with player */
 }
 
 
-#pragma mark BONUS0 - The car
+
 
 static void _CDSplashBonus0(Object_G2 *obja2) {		// 7db9c
 	Object *nobj;
@@ -214,7 +214,7 @@ static void _CDSoundBonus0(Object_G2 *obja2) {						// 7dafc
 }
 
 static void sub_7db12 (Object *obja6, Object_G2 *obja2) {
-	const static short data_7db7e[] = {
+	static const short data_7db7e[] = {
 		6, 6, 6, 8, 8, 8, 8, 8, 8, 10, 10, 34, 34, 34, 34
 	};
 	
@@ -347,7 +347,7 @@ void _CDCheckBonus0(Player *plya6, Object_G2 *obja2) {		// 7d9f6
 }
 
 
-#pragma mark BONUS1
+
 static void _CDSoundBonus1(Object *obja2, const HitBoxAct *hba3) {		// 7dcba
 	if (obja2->Energy < 0) {
 		queuesound(0x32);
@@ -454,7 +454,7 @@ void _CDBonus1(Object_G2 *a6) {		// 7dbc2
 }
 
 
-#pragma mark BONUS2
+
 static void _CDCheckObjBonus2(Object_G2 *obj, Player *ply) {			// 7d2ae
 	const HitBoxAct *hb;
 	if (g.PlayersThrowing || g.DebugNoCollide) {
@@ -592,7 +592,7 @@ static void _CDBonus2(Object_G2 *a6) {		// 7dd0c
 }
 void CDBonusCollisionCheck(Object_G2 *a6) {		// 7dd9a - entry for Bonus objects
 	// disable collision detection for most objects
-	const static char data_7d9ba[]={-1, -1, -1, -1, 6, 4, 0, -1, -1, 2, -1, -1, -1, -1, -1, -1};
+	static const signed char data_7d9ba[]={-1, -1, -1, -1, 6, 4, 0, -1, -1, 2, -1, -1, -1, -1, -1, -1};
 	
 	// Subsel    BonusX
 	//  4			3
