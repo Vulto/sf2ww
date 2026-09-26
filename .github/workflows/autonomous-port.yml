@@ -205,6 +205,16 @@ jobs:
         run: |
           set -euo pipefail
           set +e
+          if [ -f .agent/rom/roms/allroms.bin ] && [ -f .agent/rom/roms/sf2gfx.bin ]; then
+            cp .agent/rom/roms/allroms.bin allroms.bin
+            cp .agent/rom/roms/sf2gfx.bin sf2gfx.bin
+          else
+            # Crash/UB smoke is independent of ROM equivalence. Use deterministic
+            # placeholders when the private fixture is unavailable; real MAME
+            # lockstep remains gated on the private fixture.
+            dd if=/dev/zero of=allroms.bin bs=1M count=1 status=none
+            dd if=/dev/zero of=sf2gfx.bin bs=1M count=6 status=none
+          fi
           SF2_STATE_LOG=agent_smoke.csv timeout 15s xvfb-run -a ./build/glutBasics </dev/null
           status=$?
           set -e
