@@ -86,13 +86,6 @@ static void sub_34dea(Player *ply) {
 	ply->AIVolley    = FALSE;
 	exit_to_compdisp1(ply);
 }
-static void sub_34dd2(Player *ply) {
-	if (ply->ActionScript->Crouch) {
-		sub_34dea(ply);
-	} else {
-		sub_34ddc(ply);
-	}
-}
 static void sub_34874(Player *ply) {
 	PLAYERTICK;
 	if (AF2 < 0) {
@@ -376,7 +369,8 @@ static void sub_34e0e(Player *ply) {
 			}
 			break;
 		case 10:
-			if (--ply->LocalTimer < 0) {
+			--ply->LocalTimer;
+			if ((signed char)ply->LocalTimer < 0) {
 				if (PLAYERGROUND) {
 					NEXT(ply->mode2);
 					CASetAnim1(ply, 0x56);
