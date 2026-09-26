@@ -70,7 +70,7 @@ gfx_p += x * 8 * 2;
 // OBJECT, sprites are in X, Y, tile, attr format, each u16
 
 
-//#define OBJ_CURSOR_SET(gfx_p, id) \
+
 
 
 
