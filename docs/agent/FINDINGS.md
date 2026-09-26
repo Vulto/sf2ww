@@ -102,3 +102,10 @@
 - This can select the wrong target box and can read outside the intended target hitbox table when the two action scripts use different indices.
 - Corrected the access to `a6->ActionScript->HB_Push`, preserving the original table and overlap algorithm.
 - Acceptance: build, unit tests, ASan/UBSan and native smoke must remain green; real MAME lockstep is still required to confirm behavioral equivalence during push-box interactions.
+
+## 2026-09-26 — Throw damage energy source correction
+
+- `_EnergyDamageAdjust()` was indexing the damage-diminishing table with the attacker's energy even though the adjustment is applied to the victim's throw damage.
+- Using attacker energy could select the wrong damage factor and could index the 31-entry table with an invalid value when attacker state is outside the expected range.
+- Corrected the index to `ply->Opponent->Energy`, matching the victim-based adjustment used by the regular collision damage path.
+- Acceptance: build, unit tests, ASan/UBSan and native smoke must remain green; real MAME lockstep must validate throw damage and KO behavior.
