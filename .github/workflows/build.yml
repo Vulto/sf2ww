@@ -97,14 +97,6 @@ jobs:
           printf '%s\n' 'frame,game_mode,game_tick,stage' '1,2,3,4' '2,2,4,4' > expected.csv
           cp expected.csv actual.csv
           bash scripts/compare_state_csv.sh expected.csv actual.csv
-      - name: Report MAME fixture status
-        run: |
-          if [ -z "${{ secrets.SF2_MAME_ROM_URL }}" ]; then
-            echo "MAME_COMPARISON_BLOCKED: SF2_MAME_ROM_URL is not configured."
-          else
-            echo "MAME_COMPARISON_READY: private ROM source is configured."
-          fi
-
   full-mame-regression:
     if: ${{ github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
@@ -116,41 +108,35 @@ jobs:
           sudo apt-get install -y mame freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb unzip curl perl
           mame -version
           mame -listfull sf2ua | grep -q '^sf2ua '
-      - name: Check private ROM source
-        id: fixture
+      - name: Materialize private ROM fixture
         env:
-          RomUrl: ${{ secrets.SF2_MAME_ROM_URL }}
-        run: |
-          if [ -z "$RomUrl" ]; then
-            echo "available=false" >> "$GITHUB_OUTPUT"
-            echo "MAME regression blocked: SF2_MAME_ROM_URL is not configured."
-          else
-            echo "available=true" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Prepare private ROM fixture
-        if: steps.fixture.outputs.available == 'true'
-        env:
+          SF2_MAME_ROM_BASE64: ${{ secrets.SF2_MAME_ROM_BASE64 }}
           SF2_MAME_ROM_URL: ${{ secrets.SF2_MAME_ROM_URL }}
           SF2_MAME_ROM_SHA256: ${{ secrets.SF2_MAME_ROM_SHA256 }}
         run: |
           rm -rf .private-mame
           mkdir -p .private-mame
-          curl --fail --location --retry 3 --output .private-mame/sf2ua.zip "$SF2_MAME_ROM_URL"
+          if [ -n "$SF2_MAME_ROM_BASE64" ]; then
+            printf '%s' "$SF2_MAME_ROM_BASE64" | base64 --decode > .private-mame/sf2ua.zip
+          elif [ -n "$SF2_MAME_ROM_URL" ]; then
+            curl --fail --location --retry 3 --output .private-mame/sf2ua.zip "$SF2_MAME_ROM_URL"
+          else
+            echo "MAME_REGRESSION_BLOCKED: configure SF2_MAME_ROM_BASE64 or SF2_MAME_ROM_URL." >&2
+            exit 1
+          fi
           if [ -n "$SF2_MAME_ROM_SHA256" ]; then
             echo "$SF2_MAME_ROM_SHA256  .private-mame/sf2ua.zip" | sha256sum -c -
           fi
+          test -s .private-mame/sf2ua.zip
           bash scripts/validate_sf2ua_fixture.sh .private-mame/sf2ua.zip
           bash scripts/prepare_mame_fixture.sh .private-mame .private-mame/sf2ua.zip
       - name: Install port dependencies
-        if: steps.fixture.outputs.available == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb
       - name: Configure and build port
-        if: steps.fixture.outputs.available == 'true'
         run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_FBTESTS=ON -S . -B build && cmake --build build --parallel
       - name: Run MAME + native port lockstep
-        if: steps.fixture.outputs.available == 'true'
         uses: ./.github/actions/mame-lockstep
         with:
           rom-root: .private-mame
