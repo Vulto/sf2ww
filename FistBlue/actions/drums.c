@@ -135,23 +135,6 @@ static void sub_2581a(Object *obj) {
 }
 
 
-static void sub_2525a(Object_G2 *obj) {
-	if (obj->YPI >= 48) {
-		obj->Pool = 2;
-	} else {
-		obj->Pool = 0;
-	}
-	obj->mode1 = 0;
-	obj->mode2 = 2;
-	obj->UD.UDbonus2.h0084c = 0;
-	obj->VelX.full = 0;
-	obj->VelY.full = 0;
-	obj->AclX.full = 0;
-	obj->AclY.full = 0;
-	sub_2581a((Object *)obj);
-	queuesound(0x3b);
-	check_rect_queue_draw((Object *)obj);
-}
 static void sub_257d8 (Object *obj) {			// 257d8 random force
 	static const short data_257fa[] = {
 		-32, -16, -16, 0, 0, 16, 16, 32,
