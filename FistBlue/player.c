@@ -363,59 +363,72 @@ void proc_player_actions(void) {
 
 
 
+static void PLCBPowerChunLiVoid(Player *ply) { (void)PLCBPowerChunLi(ply); }
+static void PLCBPowerZangeifVoid(Player *ply) { (void)PLCBPowerZangeif(ply); }
+static void PLCBPowerDhalsimVoid(Player *ply) { (void)PLCBPowerDhalsim(ply); }
+static short PLCBStandChunLiShort(Player *ply) { return (short)PLCBStandChunLi(ply); }
+static short PLCBStandZangeifShort(Player *ply) { return (short)PLCBStandZangeif(ply); }
+static short PLCBStandDhalsimShort(Player *ply) { return (short)PLCBStandDhalsim(ply); }
+static short PLCBCrouchChunLiShort(Player *ply) { return (short)PLCBCrouchChunLi(ply); }
+static short PLCBCrouchZangeifShort(Player *ply) { return (short)PLCBCrouchZangeif(ply); }
+static short PLCBCrouchDhalsimShort(Player *ply) { return (short)PLCBCrouchDhalsim(ply); }
+static short PLCBJumpChunLiShort(Player *ply) { return (short)PLCBJumpChunLi(ply); }
+static short PLCBJumpZangeifShort(Player *ply) { return (short)PLCBJumpZangeif(ply); }
+static short PLCBJumpDhalsimShort(Player *ply) { return (short)PLCBJumpDhalsim(ply); }
+
 void check_powermove_input(Player *ply) {
-    static int (* const data_2a7fa[])(Player *)={
+    static void (* const data_2a7fa[])(Player *)={
         PLCBPowerRyu,
         PLCBPowerEHonda,
         PLCBPowerBlanka,
         PLCBPowerGuile,
         PLCBPowerRyu,
-        PLCBPowerChunLi,
-        PLCBPowerZangeif,
-        PLCBPowerDhalsim
+        PLCBPowerChunLiVoid,
+        PLCBPowerZangeifVoid,
+        PLCBPowerDhalsimVoid
     };
     (void)data_2a7fa[ply->FighterID](ply);
 }
 
 short ply_cb_standmove(Player *ply) {
-    static int (* const data_2a82a[])(Player *)={
+    static short (* const data_2a82a[])(Player *)={
         PLCBStandRyu,
         PLCBStandEHonda,
         PLCBStandBlanka,
         PLCBStandGuile,
         PLCBStandRyu,
-        PLCBStandChunLi,
-        PLCBStandZangeif,
-        PLCBStandDhalsim,
+        PLCBStandChunLiShort,
+        PLCBStandZangeifShort,
+        PLCBStandDhalsimShort,
     };
     return data_2a82a[ply->FighterID](ply);
 }
 
 short ply_cb_crouchmove(Player *ply) {
-    static int (* const data_2a85a[])(Player *)={
+    static short (* const data_2a85a[])(Player *)={
         PLCBCrouchRyu,
         PLCBCrouchEHonda,
         PLCBCrouchBlanka,
         PLCBCrouchGuile,
         PLCBCrouchRyu,
-        PLCBCrouchChunLi,
-        PLCBCrouchZangeif,
-        PLCBCrouchDhalsim,
+        PLCBCrouchChunLiShort,
+        PLCBCrouchZangeifShort,
+        PLCBCrouchDhalsimShort,
     };
     
     return data_2a85a[ply->FighterID](ply);
 }
 
 short ply_cb_jumpmove(Player *ply) {
-    static int (* const data_2a88a[])(Player *)={
+    static short (* const data_2a88a[])(Player *)={
         PLCBJumpRyu,
         PLCBJumpEHonda,
         PLCBJumpBlanka,
         PLCBJumpGuile,
         PLCBJumpRyu,
-        PLCBJumpChunLi,
-        PLCBJumpZangeif,
-        PLCBJumpDhalsim,
+        PLCBJumpChunLiShort,
+        PLCBJumpZangeifShort,
+        PLCBJumpDhalsimShort,
     };
     
     return data_2a88a[ply->FighterID](ply);
