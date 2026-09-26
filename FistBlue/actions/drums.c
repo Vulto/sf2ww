@@ -117,6 +117,9 @@ void _SMAct04(Object_G2 *obj) {		// 27ea2 ID4 BONUS3
 		case 4:
 		case 6:
 			clearpush_1174(obj);
+#if defined(__GNUC__)
+			__attribute__((fallthrough));
+#endif
 			FATALDEFAULT;
 	}
 }
@@ -231,7 +234,9 @@ static void sub_25476(Object_G2 *obj) {
 	}
 }
 
-static int sub_254da (Object_G2 *obj) {		// sets %d0 and %d3
+static int sub_254da (Object_G2 *obj) {
+	(void)obj;
+	// sets %d0 and %d3
 	//todo
     return -1;
 }
