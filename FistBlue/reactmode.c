@@ -556,7 +556,7 @@ void RMFireball(Player *ply) { /* 29460 */
 			} else if (ply->ReactMode == RM_FIREBALLHIT) {
 				ply->ProjHit = PROJHIT_ICY;  
 			}
-			/* FALLTHRU */
+			__attribute__((fallthrough));
 			M_TUMBLE_POST
 			FATALDEFAULT;
     }
@@ -572,8 +572,8 @@ void RMTumble32(Player *ply)  {		/* 295fa */
 							 0x100, 0x15,   0x0,  0x0);
 			ply->TumbleStatus = STATUS_TUMBLE_32;
 			ply->VelX.full = 0;
-			/* FALLTHRU */
-		M_TUMBLE_POST
+			__attribute__((fallthrough));
+			M_TUMBLE_POST
 		FATALDEFAULT;
 	}
 }
