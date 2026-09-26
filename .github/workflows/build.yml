@@ -141,3 +141,10 @@ jobs:
             echo "MAME_REAL_ROM_RUN_FAILED: exit status $status"
             exit "$status"
           fi
+      - name: Run MAME/native lockstep comparison
+        uses: ./.github/actions/mame-lockstep
+        with:
+          rom-root: .private-mame
+          port-executable: build/glutBasics
+          mame-bin: mame
+          mame-set: sf2ua
