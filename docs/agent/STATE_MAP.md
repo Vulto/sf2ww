@@ -30,18 +30,22 @@ Hardware clocks reported by the MAME machine description for World Warrior are 6
 
 These hardware-level entries are evidence-backed and are not yet a logical-state equivalence map.
 
-## Logical state — pending lockstep confirmation
+## Logical state — field addresses confirmed, equivalence pending
 
-The following fields remain pending direct MAME debugger/Lua extraction and frame-by-frame comparison:
-- player X/Y;
-- player state machine state;
-- animation frame;
-- active hitboxes/hurtboxes;
-- life;
-- round timer;
-- RNG state;
-- CPU AI decision;
-- camera/scroll state;
-- audio events.
+The MAME/ROM field addresses below are now confirmed against the World Warrior fighter layout; byte-for-byte semantic equivalence with the native port remains pending real lockstep execution.
+- P1 base: `0xFF83C6`; P2 base: `0xFF86C6`;
+- player X/Y: offsets `0x06/0x08` (32-bit fixed-point);
+- player state machine: offsets `0x02/0x03/0x04`;
+- animation control: offset `0x14`;
+- life/energy: offset `0x2A`;
+- move: offset `0x180`;
+- stand/crouch/jump classification: offset `0x188`;
+- round timer: `0xFF0ACE/0xFF0ACF`;
+- round count: `0xFF0A4C`;
+- stage: `0xFF09E4`;
+- fight-over flag: `0xFF0AE1`;
+- RNG seeds: `0xFF02C4/0xFF02C5`;
+- frame counter: `0xFF001C`;
+- CPU AI decision, hitboxes/hurtboxes, camera/scroll state and audio events remain pending direct lockstep validation.
 
 The repository's existing `Game` layout contains candidate offsets for several of these fields, but those candidates are not promoted to the authoritative comparison map until lockstep instrumentation confirms them against MAME.
