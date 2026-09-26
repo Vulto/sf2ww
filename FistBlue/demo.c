@@ -253,7 +253,8 @@ static void setupdemofight(void) {		// 69e2
 
 static void sub_6a54(void) {
 	NEXT(g.mode0);
-	g.mode1 = g.mode2 = g.mode2 = 0;
+	g.mode1 = 0;
+	g.mode2 = 0;
 	g.x0302 = FALSE;
 	sound_cq_f0f7();
 	die_top8();
@@ -293,6 +294,7 @@ static void sub_6964(void) {			// 6964 demo fight sm
 					NEXT(g.mode4);
 					palettes_nextlevel();
 					set_shadow_pen();
+					/* fall through */
 				case 4:
 					NEXT(g.mode4);
 					g.TimeRemainBCD = 0x99;
