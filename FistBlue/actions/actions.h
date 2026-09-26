@@ -90,7 +90,7 @@ struct UserData_Act1d {
 struct UserData_Act2f {
 	short	OldY;
 	FIXED16_16	VelX, VelY, Gravity;
-} __attribute__((packed));
+} __attribute__((packed, aligned(2)));
 
 struct UserData_Act32 {
     const short *x0080;
