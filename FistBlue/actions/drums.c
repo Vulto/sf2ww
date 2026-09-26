@@ -31,7 +31,6 @@
 
 extern Game g;
 
-#pragma mark ActB04 Fires on top of the drums
 
 const HitBoxAct hitb_28290[] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
@@ -44,7 +43,6 @@ const struct hitboxes hitboxes_28284 = {
 	(HitBox *)hitb_28290,
 };
 
-#pragma mark ActB05 Burning Drums
 
 const HitBox hitb_25964[] = {{0,0,0,0}, {0, 37, 29, 32}};
 const HitBoxAct hitb_2596c[] = {
@@ -63,8 +61,8 @@ const struct hitboxes hitboxes_25958 = {
 
 void _SMAct04(Object_G2 *obj) {		// 27ea2 ID4 BONUS3
 	// Fires on top of drums
-	const static char data_27f3e[]={1,1,2,2,3,3,3,3,3,3,3,3,3,3,2,2,1,1,-1,0};
-	const static short data_27f72[]={
+	static const char data_27f3e[]={1,1,2,2,3,3,3,3,3,3,3,3,3,3,2,2,1,1,-1,0};
+	static const short data_27f72[]={
 		0x64, 0x78, 0x8c, 0x78, 0x64, 0x78, 0x8c, 0x64,
 		0x64, 0x78, 0x8c, 0x78, 0x8c, 0x78, 0x8c, 0x64
 	};
@@ -125,7 +123,6 @@ void _SMAct04(Object_G2 *obj) {		// 27ea2 ID4 BONUS3
 
 
 
-#pragma mark ActB05 BONUS2 Burning drums
 static void sub_2581a(Object *obj) {
 	if (((obj->YPI & 0xc0) >> 5) != 6) {
 		obj->Pool = (obj->YPI >> 5);
@@ -166,16 +163,8 @@ static void sub_25220(Object_G2 *obj) {
 	queuesound(0x3b);
 	check_rect_queue_draw((Object *)obj);
 }
-static void sub_25252(Object_G2 *obj) {
-	if (obj->VelY.full > -0x500) {
-		sub_2525a(obj);
-	} else {
-		sub_25220(obj);
-	}
-}
-
 static void sub_257d8 (Object *obj) {			// 257d8 random force
-	const static short data_257fa[] = {
+	static const short data_257fa[] = {
 		-32, -16, -16, 0, 0, 16, 16, 32,
 		-32, -32, -16, 0, 0, 16, 32, 32
 	};
@@ -248,18 +237,22 @@ static int sub_254da (Object_G2 *obj) {		// sets %d0 and %d3
 }
 
 static void sub_25670 (Object_G2 *obj) {
+	(void)obj;
 	//todo
 }
 
 static int sub_2529a (Object_G2 *obj) {
+	(void)obj;
 	//todo
     return -1;
 }
 static int sub_255b2(Object_G2 *obj) {
+	(void)obj;
 	//todo
     return -1;
 }
 static Object *sub_24fc2(Object_G2 *obj) {
+	(void)obj;
 	//	if (obj->UD.UDunknown.h0097c) {
 	//		sub_24fcc(obj->UD.UDunknown.h0098p, obj);
 	//	} else {
@@ -270,12 +263,11 @@ static Object *sub_24fc2(Object_G2 *obj) {
 
 void _SMAct05(Object_G2 *obj) {				// 24ff6 Act05 Bonus2
 	int temp;
-	int d1;
 	switch (obj->mode0) {
 		case 0:
 			NEXT(obj->mode0);
 			obj->mode2 = 0;
-			d1 = sub_255b2(obj);
+			(void)sub_255b2(obj);
 			// redundant btst
 			obj->HitBoxes = &hitboxes_25958;
 			obj->Pool = 2;
@@ -298,7 +290,9 @@ void _SMAct05(Object_G2 *obj) {				// 24ff6 Act05 Bonus2
 								NEXT(obj->mode2);
 							}
 							actiontick((Object *)obj);
-							/* FALLTHRU */
+#if defined(__GNUC__)
+							__attribute__((fallthrough));
+#endif
 						case 2:
 							sub_25476(obj);
 							if(sub_2529a(obj)<0) {
