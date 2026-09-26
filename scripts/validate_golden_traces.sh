@@ -4,14 +4,14 @@ set -eu
 goldenDir="tests/golden"
 comparator="scripts/compare_state_csv.sh"
 
-test -x "$comparator"
+test -f "$comparator"
 
 for expected in "$goldenDir"/*.csv; do
     [ -f "$expected" ] || continue
     actual="$(mktemp)"
     trap 'rm -f "$actual"' EXIT
     cp "$expected" "$actual"
-    "$comparator" "$expected" "$actual"
+    bash "$comparator" "$expected" "$actual"
     rm -f "$actual"
     trap - EXIT
 done
