@@ -66,12 +66,12 @@ gfx_p += ((y) * 2);               \
 gfx_p += x * 8 * 2;				  
 
 
-#pragma mark Object
+
 // OBJECT, sprites are in X, Y, tile, attr format, each u16
 
 
 //#define OBJ_CURSOR_SET(gfx_p, id) \
-//gfx_p = gemuObjCursorSet(id);
+
 
 
 #ifdef CPS
