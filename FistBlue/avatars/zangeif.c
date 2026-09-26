@@ -126,7 +126,6 @@ static void sub_315a4(Player *ply) {
 	}
 }
 
-#pragma mark Standing moves
 static int sub_30f9e(Player *ply) {
 	int buttons = PLY_NEWBUTTONS & BUTTON_MASK;
 	if (buttons) {
@@ -311,7 +310,6 @@ int PLCBStandZangeif(Player *ply) {
 		return FALSE;
 	}
 }
-#pragma mark Crouching moves
 static void sub_312bc(Player *ply) {			// zang crouch punch little
 	UD *ud = (UD*)&ply->UserData;
 	quirkysound(0);
@@ -395,7 +393,6 @@ int PLCBCrouchZangeif(Player *ply) {			// 30f7a
 		return 0;
 	}
 }
-#pragma mark Jumping moves
 static void sub_3145c(Player *ply) {		// zang jump punch little
 	quirkysound(0);
 	ply->Move = (ply->VelX.full == 0 ? 0 : 7);
@@ -477,7 +474,6 @@ int PLCBJumpZangeif(Player *ply) {			// 30f8c
 		return 0;
 	}	
 }
-#pragma mark Power checkers
 inline static void sub_31f18(Player *ply) {
 	UD *ud = (UD*)&ply->UserData;
 	
@@ -497,13 +493,13 @@ static void sub_31c84(Player *ply, int d1) {
 
 int PLCBPowerZangeif(Player *ply) {			// 31c40
 	UD *ud = (UD*)&ply->UserData;
-	const static char data_31cd0[] = {
+	static const char data_31cd0[] = {
 		8, 4, 8, 4, 1, 2, 1, 2
 	};
-	const static char data_31cfc[] = {
+	static const char data_31cfc[] = {
 		2, 2, 1, 1, 4, 4, 8, 8,
 	};
-	const static char data_31d2e[] = {
+	static const char data_31d2e[] = {
 		4, 8, 4, 8, 2, 1, 2, 1
 	};
 	switch (ud->mode_power) {
@@ -599,11 +595,11 @@ static void sub_31654(Player *ply) {		// lariat punch
 }
 static void sub_31696(Player *ply) {
 	UD *ud = (UD*)&ply->UserData;
-	const static short data_316f4[] = {0xb4, 0x96, 0xb4, 0xb4, };
-	const static char data_316fc[] = { 1, 2, 1, 2, };
-	const static char data_31700[] = {0xab, 0xd6, 0xb1, 0xb1};
-	const static char data_31704[] = {0x55, 0x52, 0x48, 0x48};
-	const static char data_31708[] = {0x46, 0x2c, 0x47, 0x47};
+	static const short data_316f4[] = {0xb4, 0x96, 0xb4, 0xb4, };
+	static const char data_316fc[] = { 1, 2, 1, 2, };
+	static const char data_31700[] = {0xab, 0xd6, 0xb1, 0xb1};
+	static const char data_31704[] = {0x55, 0x52, 0x48, 0x48};
+	static const char data_31708[] = {0x46, 0x2c, 0x47, 0x47};
 	
 	switch (ply->mode2) {
 		case 0:
@@ -1105,7 +1101,9 @@ void PSCBVictoryZangeif(Player *ply) {		// 31f48
 							break;
 						case 4:
 							PLAYERTICK;
-							
+#if defined(__GNUC__)
+							__attribute__((fallthrough));
+#endif
 						FATALDEFAULT;
 					}
 				}
@@ -1118,7 +1116,6 @@ void PSCBVictoryZangeif(Player *ply) {		// 31f48
 }
 
 /////////////////////
-#pragma mark COMPUTER 
 /////////////////////
 
 
@@ -1332,7 +1329,7 @@ static void sub_3513e(Player *ply) {
 	}
 }
 static void sub_35240(Player *ply) {
-	const static short data_3527a[] = {0xb4, 0x96, 0xb4, 0xb4, };	// 316f4  
+	static const short data_3527a[] = {0xb4, 0x96, 0xb4, 0xb4, };	// 316f4  
 	UDCOMP *ud = (UDCOMP *)&ply->UserData;
 	NEXT(ply->mode2);
 	random_damage_adjust_2(ply, 0x23);
@@ -1340,10 +1337,10 @@ static void sub_35240(Player *ply) {
 	ud->x0088 = data_3527a[ud->x008e];
 }
 static void sub_3529a(Player *ply) {
-	const static char data_3528a[] = { 1, 2, 1, 2, };				// 316fc   
-	const static char data_3528e[] = {0xab, 0xd6, 0xb1, 0xb1};		// 31700   
-	const static char data_35292[] = {0x55, 0x52, 0x48, 0x48};		// 31704   
-	const static char data_35296[] = {0x46, 0x2c, 0x47, 0x47};		// 31708   
+	static const char data_3528a[] = { 1, 2, 1, 2, };				// 316fc   
+	static const char data_3528e[] = {0xab, 0xd6, 0xb1, 0xb1};		// 31700   
+	static const char data_35292[] = {0x55, 0x52, 0x48, 0x48};		// 31704   
+	static const char data_35296[] = {0x46, 0x2c, 0x47, 0x47};		// 31708   
 	UDCOMP *ud = (UDCOMP *)&ply->UserData;
 	if (--ud->x0088 == 0) {
 		ply_grip_release(ply, ply->Flip);
@@ -1670,7 +1667,6 @@ static void sub_356a0(Player *ply) {
 			FATALDEFAULT;
 	}
 }
-#pragma mark Computer Crouching
 static void sub_357c6(Player *ply) {
 	UDCOMP *ud = (UDCOMP *)&ply->UserData;
 	switch (ply->mode2) {
