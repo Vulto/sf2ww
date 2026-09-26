@@ -205,73 +205,73 @@ const void *RHOffsetLookup16(const u16 *base, int index)
     return (const u8 *)base + offset;
 }
 
-const u16 RHWordOffset(u32 base, int index)
+u16 RHWordOffset(u32 base, int index)
 {
     u16 raw;
     memcpy(&raw, RHCodePtrRange(base + (u32)(2 * index), sizeof(raw)), sizeof(raw));
     return RHSwapWord(raw);
 }
 
-const u8 RHByteOffset(u32 base, int index)
+u8 RHByteOffset(u32 base, int index)
 {
     return *(u8 *)(RHCODE(base + index));
 }
 
-const u32 RH3DLong(u32 base, int dim2, int dim3, int i1, int i2, int i3)
+u32 RH3DLong(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
     u32 raw;
     memcpy(&raw, RHCODE(base + 4 * ((i1 * dim2 * dim3) + (i2 * dim3) + i3)), sizeof(raw));
     return RHSwapLong(raw);
 }
 
-const u32 RH2DLong(u32 base, int dim2, int i1, int i2)
+u32 RH2DLong(u32 base, int dim2, int i1, int i2)
 {
     u32 raw;
     memcpy(&raw, RHCODE(base + 4 * ((i1 * dim2) + i2)), sizeof(raw));
     return RHSwapLong(raw);
 }
 
-const u32 RH1DLong(u32 base, int index)
+u32 RH1DLong(u32 base, int index)
 {
     u32 raw;
     memcpy(&raw, RHCODE(base + 4 * index), sizeof(raw));
     return RHSwapLong(raw);
 }
 
-const u16 RH3DWord(u32 base, int dim2, int dim3, int i1, int i2, int i3)
+u16 RH3DWord(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
     u16 raw;
     memcpy(&raw, RHCODE(base + 2 * ((i1 * dim2 * dim3) + (i2 * dim3) + i3)), sizeof(raw));
     return RHSwapWord(raw);
 }
 
-const short RH3DShort(u32 base, int dim2, int dim3, int i1, int i2, int i3)
+short RH3DShort(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
     u16 raw;
     memcpy(&raw, RHCODE(base + 2 * ((i1 * dim2 * dim3) + (i2 * dim3) + i3)), sizeof(raw));
     return (short)RHSwapWord(raw);
 }
 
-const u16 RH2DWord(u32 base, int dim2, int i1, int i2)
+u16 RH2DWord(u32 base, int dim2, int i1, int i2)
 {
     u16 raw;
     memcpy(&raw, RHCODE(base + 2 * ((i1 * dim2) + i2)), sizeof(raw));
     return RHSwapWord(raw);
 }
 
-const short RH2DShort(u32 base, int dim2, int i1, int i2) {
+short RH2DShort(u32 base, int dim2, int i1, int i2) {
     u16 raw;
     memcpy(&raw, RHCODE(base + 2 * ((i1 * dim2) + i2)), sizeof(raw));
     return (short)RHSwapWord(raw);
 }
 
-const u8 RH3DByte(u32 base, int dim2, int dim3, int i1, int i2, int i3)
+u8 RH3DByte(u32 base, int dim2, int dim3, int i1, int i2, int i3)
 {
     u8 *array = RHCODE(base);
     return *(array + (i1 * dim2 * dim3) + (i2 * dim3) + i3);
 }
 
-const u8 RH2DByte(u32 base, int dim2, int i1, int i2)
+u8 RH2DByte(u32 base, int dim2, int i1, int i2)
 {
     u8 *array = RHCODE(base);
     return *(array + (i1 * dim2) + i2);
