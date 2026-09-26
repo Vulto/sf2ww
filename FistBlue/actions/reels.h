@@ -19,7 +19,7 @@ struct UserData_Act23 {
 	char	x0093;		// side of player
 };
 
-const static POINT8 data_1e804[12][3] = {
+static const POINT8 data_1e804[12][3] = {
 	{ { 35, 84, },	{  1, 66,  },	{  0, 87,  },},
 	{ { 46, 84, },	{-17, 57,  },	{  3, 88,  },},
 	{ { 54, 92, },	{-13, 51,  },	{  6, 96,  },},
