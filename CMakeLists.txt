@@ -89,27 +89,34 @@ add_executable(glutBasics glutBasics.c
 			FistBlue/avatars/chunli_human.c
 			FistBlue/avatars/ehonda_human.c
 			FistBlue/avatars/guile_human.c
-			FistBlue/avatars/ryuken_human.c				
+			FistBlue/avatars/ryuken_human.c
 )
 
-target_include_directories(glutBasics PUBLIC 
+target_include_directories(glutBasics PUBLIC
     .
     SiennaBird
-    RedHammer 
-    FistBlue 
+    RedHammer
+    FistBlue
     FistBlue/ai
-    FistBlue/actions 
-    FistBlue/avatars 
+    FistBlue/actions
+    FistBlue/avatars
     FistBlue/gfxdata
-    FistBlue/scrolls 
+    FistBlue/scrolls
     FistBlue/tests
     SwiftBeam
 )
 
 target_link_libraries(glutBasics PRIVATE m OpenGL::GL OpenGL::GLU GLUT::GLUT Threads::Threads)
 
+option(ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+
 if (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(glutBasics PRIVATE -Wall -Wextra -Wno-unused-parameter)
+
+    if (ENABLE_SANITIZERS)
+        target_compile_options(glutBasics PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
+        target_link_options(glutBasics PRIVATE -fsanitize=address,undefined)
+    endif()
 endif()
 
 if (APPLE)
