@@ -32,11 +32,9 @@ static void guile_attack_bison(Player *ply);
 
 
 static void sub_2f1b0(Player *ply);
-static short GuileButtons(Player *ply);
 
 typedef struct UserData_Guile UD;
 
-#pragma mark Animation Callbacks
 
 void pl_cb_setstatus2_guile(Player *ply, short status, int argd0) {
     RHSetActionList((Object *)ply, RHOffsetLookup16(RHCODE(0x4abac), status / 2), argd0);
@@ -64,7 +62,6 @@ void _GuileExitJump(Player *ply) {		/* 2f0a0 */
 	ply_exit_air(ply);
 }
 
-#pragma mark Attack Callback
 
 // Powermove Callback
 // Victory Callback
@@ -109,7 +106,7 @@ void sub_2ff6e(Player *ply) {			// 2ff6e
 
 static void guile_attack_bison(Player *ply) {
 	Object *obj;
-	const static VECT16 data_3003c[] = {{0xfca0, 0x0}, {0x360, 0x0}};
+	static const VECT16 data_3003c[] = {{ .x.full = 0xfca0, .y.full = 0x0 }, { .x.full = 0x360, .y.full = 0x0 }};
 	
 	if (g.Pause_9e1 == 2) {
 		switch (ply->UserData[5]) {
