@@ -26,6 +26,11 @@ extern ScrollState gstate_Scroll3;
 static void sprite_coords(Object *obj, short *coordpair);
 
 
+static u32 sprite_rom_action_offset(const Object *obj)
+{
+    return RHCODE_OFFSET(obj->ActionScript, sizeof(FBAction));
+}
+
 /* globals for sprite lib */
 u16 *DSObjCur_g;			/* number of next object tile to draw to */
 short g_tilecount;	/* tile budget */
@@ -499,7 +504,7 @@ static const short data_81c32[] = {
 static void sub_7ef86(Object *obj, const u16 *tilep, const short *offsets, short x, short y, u16 tiles, u16 attr);     /* 7ee58 obj a1, a0, tilep a2, a3, x d0, y d1, tiles d3 */
 static void sub_7efd8(Object *obj, const u16 *tilep, const short *offsets, short x, short y, u16 tiles, u16 attr) ;    /* 7ee58 obj a1, a0, tilep a2, a3, x d0, y d1, tiles d3 */
 static void sub_7ef2a(Object *obj, const u16 *tilep, const short *offsets, short x, short y, unsigned short tiles, unsigned short attr);    /* 7ee58 obj a1, a0, tilep a2, a3, x d0, y d1, tiles d3 */
-static void sub_7f244 (Object *obj, const u16 tiles_in_image, const Image *image, short x, short y );
+static void sub_7f244(Object *obj, u16 tiles_in_image, u32 action_offset, u32 image_offset, short x, short y);
 static void _draw_sprite(Object *obj, const u16 *tilep, const short *offsets, short x, short y, unsigned short tiles, short attr);
 static void sub_7ee58(Object *obj, const u16 *tilep, const short *offsets, short x, short y, unsigned short tiles, unsigned short attr);     /* 7ee58 obj a1, a0, tilep a2, a3, x d0, y d1, tiles d3 */
 static void swap_object_buffer(void);	/* 7e610 */
@@ -890,7 +895,7 @@ static void sprite_coords(Object *obj, short *coordpair) {		// 7f160
     coordpair[1] ^= 0xff;
     coordpair[1] += 1;
 }
-void drawsprite(Object *obj) {         /* 7edaa */
+void drawsprite(Object *obj) {
     const struct image *image;
     u16 tiles_in_image;
     int attr;
@@ -914,8 +919,6 @@ void drawsprite(Object *obj) {         /* 7edaa */
             return;
         }
 
-        /* Native Action images currently used by the game are normal
-           tile lists (the action_3b score counters). */
         if (tiles_in_image & IMAGE_ATTR) {
             return;
         }
@@ -944,11 +947,6 @@ void drawsprite(Object *obj) {         /* 7edaa */
 
         g.DSOffsetX -= obj->DSOffsetX;
 
-        /*
-         * _draw_sprite() expects ROM-format tile words because its tile
-         * routines apply RHSwapWord(). Adapt only the native tile words;
-         * the native image header remains host-endian.
-         */
         for (i = 0; i < tiles_in_image; ++i) {
             native_tiles[i] = RHSwapWord(image->Tiles[i]);
         }
@@ -958,47 +956,60 @@ void drawsprite(Object *obj) {         /* 7edaa */
         return;
     }
 
-    image = (const struct image *)RHCODE(RHSwapLong(obj->ActionScript->Image));
+    /*
+     * ROM actions are packed 68k data. Validate the action and image ranges
+     * before reading them; never dereference ROM data as a host struct.
+     */
+    u32 action_offset = sprite_rom_action_offset(obj);
+    u32 image_offset = RHReadLong((int)(action_offset + offsetof(FBAction, Image)));
 
-    if (image == NULL) {
+    RHCodePtrRange(image_offset, 10);
+    tiles_in_image = RHWordOffset(image_offset, 0);
+
+    if (tiles_in_image == 0) {
         return;
     }
-    tiles_in_image = RHSwapWord(image->TileCount);
-    
-    if (tiles_in_image == 0) { return; }
+
     if (tiles_in_image & IMAGE_ATTR) {
-        sub_7f244(obj, tiles_in_image, image, coordpair[0], coordpair[1]);
-        /* tiles are in tile,attr pairs */
+        sub_7f244(obj, tiles_in_image, action_offset, image_offset,
+                  coordpair[0], coordpair[1]);
         return;
     }
+
     if (tiles_in_image > g.ObjTileBudget) {
-        //printf("Over Tile Budget!\n");
         return;
     }
+
     g.ObjTileBudget -= tiles_in_image;
-    attr = RHSwapWord(image->Attr);
-    
-    /* this used to be after the Block image check but we do the Block sprites in software now */
+    attr = RHWordOffset(image_offset, 1);
     g_tilecount -= tiles_in_image;
-    
+
     if (attr & 0xff00) {
         tiles_in_image = 1;
     }
-    coordlist = sub_7f224(RHSwapWord(image->Dimensions));        /* set a3 from Image->Dimensions */
-    
-    g.DSOffsetX = RHSwapWord(image->OffsetX);
-    g.DSOffsetY = RHSwapWord(image->OffsetY);
-    
-    if (obj->ActionScript->FlipBits & 0x3) {
-        attr ^= ((obj->ActionScript->FlipBits & 0x3) << 5);      /* apply flips */
-        g.DSOffsetY += obj->ActionScript->YOffset;
+
+    coordlist = sub_7f224(RHWordOffset(image_offset, 2));
+    g.DSOffsetX = (short)RHWordOffset(image_offset, 3);
+    g.DSOffsetY = (short)RHWordOffset(image_offset, 4);
+
+    {
+        u8 flip_bits = RHByteOffset(action_offset, offsetof(FBAction, FlipBits));
+        char y_offset = (char)RHByteOffset(action_offset, offsetof(FBAction, YOffset));
+
+        if (flip_bits & 0x3) {
+            attr ^= ((flip_bits & 0x3) << 5);
+            g.DSOffsetY += y_offset;
+        }
     }
-    g.DSOffsetX -= obj->DSOffsetX;   /* ply->x0052 */
-    
-    if (obj->Sel == 2 && obj->Sel == 7) {
-        DEBUG_GEN("Sel 0x%x SubSel 0x%x dim 0x%x tiles %d\\n", obj->Sel, obj->SubSel, image->Dimensions, tiles_in_image);
+
+    g.DSOffsetX -= obj->DSOffsetX;
+
+    {
+        const u16 *tilep = (const u16 *)RHCodePtrRange(
+            image_offset + 10u, (size_t)tiles_in_image * sizeof(u16));
+        _draw_sprite(obj, tilep, coordlist, coordpair[0],
+                     coordpair[1], tiles_in_image, attr);
     }
-    _draw_sprite(obj, image->Tiles, coordlist, coordpair[0], coordpair[1], tiles_in_image, attr);
 }
 /*!
  @abstract draw an object
