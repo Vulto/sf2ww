@@ -141,7 +141,6 @@ static void sub_7c50(void) {
 
 static void game_mode_28(void) {	// 7af0
 	Object *obj;
-	Player *ply;
 	
 	switch (g.mode2) {
 		case 0:
@@ -260,9 +259,7 @@ static void game_mode_28(void) {	// 7af0
 			break;
 		case 14:
 			if (g.PlyLostToComp) {
-				ply = PLAYER2;		// XXX never read
 			} else {
-				ply = PLAYER1;
 			}
 			if (g.ContinueBits ) {
 				// 7d56
