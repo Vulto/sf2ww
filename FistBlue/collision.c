@@ -59,8 +59,6 @@ static const HitBox *_CDGetHitBoxBody(Object *obj);
 static const HitBox *_CDGetHitBoxFoot(Object *obj);
 static const HitBox *_CDGetHitBoxWeak(Object *obj);
 
-static void mac_stun2005(Player *ply, Player *opp);
-static void sub_7e314(void);
 static void set_reel_react(Player *vict);
 static void start_timewarp_action (Player *vict);
 
