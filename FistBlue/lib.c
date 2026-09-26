@@ -20,6 +20,7 @@
 
 #include "gemu.h"
 #include "gfxlib.h"
+#include "fightgfx.h"
 
 #include "actions_198a.h"
 #include "projectiles.h"
