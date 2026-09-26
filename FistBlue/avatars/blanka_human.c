@@ -254,7 +254,6 @@ static void sub_2e496(Player *ply) {
 	sub_2e4fe(ply);
 }
 
-#pragma mark PL Callbacks
 
 void PLCBPowerBlanka(Player *ply) {
 	Object *obj;	// only used for suicide
@@ -353,7 +352,7 @@ static void _BlankaCheckMoves(Player *ply, u16 d0, short initial_d2) {		//2ee5c
 	const char *data, *data2;
 	short d2;
 	struct blankathrow BT;
-	const static char data_2eecc[4][6][4] = {		// same as 33a58
+	static const char data_2eecc[4][6][4] = {		// same as 33a58
 		{ 
 			{ 0x28, 0x01, 0x04, 0x0a,  },
 			{ 0x28, 0x02, 0x02, 0x08,  },
@@ -477,7 +476,6 @@ short PLCBJumpBlanka(Player *ply) {
 	return FALSE;
 }
 
-#pragma mark Blanka Attacks
 static void sub_2e57a(Player *ply) {
 	UD *ud=(UD *)&ply->UserData;
 	if (AF2) {
@@ -642,7 +640,7 @@ static int _IDFromButton(Player *ply) {		//2efa6
 }
 static void _BlankaSMElectric(Player *ply) {		// 2e6f0
 	UD *ud=(UD *)&ply->UserData;
-	const static unsigned char data_2e79e[] = {
+	static const unsigned char data_2e79e[] = {
 		255, 0, 5, 10, 255, 255, 255, 255, 255, 255
 	};
 	u16 d0;
