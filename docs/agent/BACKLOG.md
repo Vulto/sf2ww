@@ -6,6 +6,7 @@ Prioridade 0 — segurança/runtime
 - [ ] Mapear o vetor de estado lógico no MAME e no port.
 - [ ] Cobrir crashes/segfaults e UB em todos os caminhos de jogo acessíveis.
 - [ ] Auditar índices de tilemap e acesso a ROM em todos os caminhos gráficos, incluindo rotinas atualmente desativadas.
+- [x] Eliminada divisão por zero no rowscroll quando um plano tem y1 == y2.
 
 Prioridade 1 — cobertura funcional
 - [ ] Attract/demo determinístico.
