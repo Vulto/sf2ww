@@ -126,6 +126,7 @@ void SMdemo_fade_and_clear(void) {		// 6618
     case 0:
         g.mode1 +=2;
         start_effect(0,3);
+        /* fall through */
     case 2:
         if (Exec.FadeOutComplete) {
             g.mode0 += 2;
