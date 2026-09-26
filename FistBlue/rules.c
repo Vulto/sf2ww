@@ -256,7 +256,7 @@ short ply_opp_apply_grip_damage(Player *ply,
 		ply->x0150 = -1;
 	}
 	LBGetDamage(ply, ply->Opponent, d2);
-	d4 = _EnergyDamageAdjust(ply, dr.damage);		// XXX never read
+	(void)_EnergyDamageAdjust(ply, dr.damage);		// XXX result is intentionally discarded
 	QueueEffect(dr.d5, ply->Side);
 	if (g.FastEndingFight == 0) {
 		ply->Energy     -= dr.damage;
