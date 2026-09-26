@@ -1,0 +1,213 @@
+name: Autonomous SF2 Port Agent
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+concurrency:
+  group: sf2-autonomous-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+env:
+  DEBIAN_FRONTEND: noninteractive
+  JTCPS_REPO: https://github.com/jotego/jtcps.git
+  MAME_REPO: https://github.com/mamedev/mame.git
+
+jobs:
+  agent:
+    name: Autonomous diagnose-fix-validate loop
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    if: ${{ github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Install toolchain and reference runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb mame mame-tools git unzip curl jq
+          gcc --version
+          cmake --version
+          mame -version
+          mame -listxml sf2ua >/dev/null
+
+      - name: Materialize reference sources
+        run: |
+          set -euo pipefail
+          rm -rf .agent/reference
+          mkdir -p .agent/reference
+          git clone --depth 1 "$JTCPS_REPO" .agent/reference/jtcps
+          git clone --depth 1 "$MAME_REPO" .agent/reference/mame
+          git -C .agent/reference/jtcps rev-parse HEAD | tee .agent/reference/JTCPS_COMMIT
+          git -C .agent/reference/mame rev-parse HEAD | tee .agent/reference/MAME_COMMIT
+          test -d .agent/reference/mame/docs
+
+      - name: Materialize private MAME fixture when configured
+        env:
+          SF2_MAME_ROM_URL: ${{ secrets.SF2_MAME_ROM_URL }}
+        run: |
+          set -euo pipefail
+          rm -rf .agent/rom
+          if [ -z "$SF2_MAME_ROM_URL" ]; then
+            echo "SF2_MAME_ROM_URL is not configured; real-ROM lockstep is unavailable in this iteration."
+            exit 0
+          fi
+          mkdir -p .agent/rom/roms
+          curl --fail --location --retry 3 --silent --show-error "$SF2_MAME_ROM_URL" -o .agent/rom/sf2ua.zip
+          unzip -q -o .agent/rom/sf2ua.zip -d .agent/rom/roms
+          rm -f allroms.bin sf2gfx.bin
+          ./bin/prepare-rom.sh .agent/rom/sf2ua.zip
+          cp allroms.bin .agent/rom/allroms.bin
+          cp sf2gfx.bin .agent/rom/sf2gfx.bin
+          sha1sum .agent/rom/allroms.bin .agent/rom/sf2gfx.bin
+          rm -f allroms.bin sf2gfx.bin .agent/rom/sf2ua.zip
+
+      - name: Run Codex agent
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          permission-profile: ":workspace"
+          safety-strategy: drop-sudo
+          effort: high
+          prompt: |
+            You are the autonomous engineering agent for Vulto/sf2ww.
+
+            Mission: continue working on main until the native PC port of Street Fighter II World Warrior is actually complete. Do not stop because the project builds or because CI is green.
+
+            Read first:
+              AGENTS.md
+              docs/agent/BACKLOG.md
+              docs/agent/FINDINGS.md
+              docs/agent/STATE_MAP.md
+              docs/agent/ARCHITECTURE_EXCEPTIONS.md
+              docs/agent/RENDER_VALIDATION.md
+
+            References:
+              .agent/reference/jtcps
+              .agent/reference/mame
+            If .agent/rom exists, it contains the private sf2ua fixture.
+
+            Loop:
+              1. Inspect git state and backlog.
+              2. Run the strongest available validation.
+              3. Find the highest-value concrete crash, UB, divergence or coverage gap.
+              4. Use current MAME CPS1/debugger/Lua evidence and JTCPS hardware evidence to form a falsifiable hypothesis.
+              5. Make the smallest root-cause change.
+              6. Add or strengthen regression coverage.
+              7. Run build, tests, sanitizers, smoke and available MAME lockstep.
+              8. Record evidence in the persistent agent documents.
+              9. Never weaken a test to hide a divergence.
+              10. Never replace integer/fixed-point behavior with floating point without evidence.
+              11. Never create a branch or rewrite main.
+              12. Do not commit or push; the surrounding workflow does that after validation.
+
+            If the real ROM is unavailable, do not claim behavioral equivalence. Continue with crash/UB fixes, instrumentation, deterministic harness work and test coverage.
+            If a subsystem is already green, audit adjacent paths rather than stopping.
+            Keep working until the completion criteria in AGENTS.md are objectively satisfied.
+
+      - name: Validate generated diff
+        run: |
+          set -euo pipefail
+          git diff --check
+          git status --short
+
+      - name: Build and test changed tree
+        run: |
+          set -euo pipefail
+          rm -rf build
+          cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_FBTESTS=ON -S . -B build
+          cmake --build build --target glutBasics --parallel 2 --verbose
+          ctest --test-dir build --output-on-failure
+          bash scripts/validate_golden_traces.sh
+
+      - name: Sanitizer gate
+        env:
+          ASAN_OPTIONS: abort_on_error=1
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+        run: |
+          set -euo pipefail
+          rm -rf build-sanitize
+          cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Debug -DBUILD_FBTESTS=ON -DENABLE_SANITIZERS=ON -S . -B build-sanitize
+          cmake --build build-sanitize --target glutBasics --parallel 2 --verbose
+          ctest --test-dir build-sanitize --output-on-failure
+
+      - name: Native smoke gate
+        run: |
+          set -euo pipefail
+          set +e
+          SF2_STATE_LOG=agent_smoke.csv timeout 15s xvfb-run -a ./build/glutBasics </dev/null
+          status=$?
+          set -e
+          test "$status" -eq 124
+          test -s agent_smoke.csv
+          frames=$(awk -F, 'NR > 1 { n++ } END { print n + 0 }' agent_smoke.csv)
+          test "$frames" -ge 300
+          rm -f agent_smoke.csv
+
+      - name: Real MAME lockstep gate
+        if: hashFiles('.agent/rom/allroms.bin') != '' && hashFiles('.agent/rom/sf2gfx.bin') != ''
+        uses: ./.github/actions/mame-lockstep
+        with:
+          rom-root: .agent/rom
+          port-executable: build/glutBasics
+          mame-bin: mame
+          mame-set: sf2ua
+
+      - name: Record validation evidence
+        run: |
+          set -euo pipefail
+          mkdir -p .agent
+          {
+            echo "run_id=${{ github.run_id }}"
+            echo "commit=$(git rev-parse HEAD)"
+            echo "jtcps=$(cat .agent/reference/JTCPS_COMMIT)"
+            echo "mame=$(cat .agent/reference/MAME_COMMIT)"
+            if [ -d .agent/rom ]; then echo "real_rom_lockstep=available"; else echo "real_rom_lockstep=unavailable"; fi
+          } > .agent/last-validation.txt
+
+      - name: Commit validated progress
+        id: commit
+        run: |
+          set -euo pipefail
+          git config user.name "sf2-autonomous-agent"
+          git config user.email "sf2-autonomous-agent@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "agent: advance native SF2 port"
+          git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Continue immediately after progress
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run autonomous-port.yml --repo "$GITHUB_REPOSITORY" --ref main
+
+      - name: Upload diagnostic evidence on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sf2-agent-diagnostics-${{ github.run_id }}
+          path: |
+            agent_smoke.csv
+            mame_state.csv
+            port_state.csv
+            .agent/last-validation.txt
+            build/Testing/Temporary/LastTest.log
+          if-no-files-found: ignore
+          retention-days: 7
