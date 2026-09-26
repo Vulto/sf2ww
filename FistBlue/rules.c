@@ -26,7 +26,6 @@ static void victory_p1(void);
 static void victory_p2(void);
 static void game_over_one_ply_remains(void);
 static void game_over_for_only_player(void);
-static void sub_89d4(short);
 static void kill_ply1(void);
 static void kill_ply2(void);
 static int get_struggle_1(Player *ply);
