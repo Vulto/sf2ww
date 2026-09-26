@@ -40,7 +40,7 @@ jobs:
           cmake             -DCMAKE_POLICY_VERSION_MINIMUM=3.5             -DCMAKE_BUILD_TYPE=RelWithDebInfo             -DBUILD_FBTESTS=ON             -S .             -B build
 
       - name: Build executable
-        run: cmake --build build --target glutBasics --parallel 2 --verbose
+        run: cmake --build build --target glutBasics test-redhammer --parallel 2 --verbose
 
       - name: Run tests
         run: ctest --test-dir build --output-on-failure
