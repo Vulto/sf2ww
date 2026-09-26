@@ -70,7 +70,7 @@ LBView *addSubView(LBView *view, void *renderFunc, void *delegate, int left, int
 	LBView *parent = view->subViews;
 
 	if (parent == NULL) {
-		view->subViews = calloc(sizeof(LBView), 1);
+		view->subViews = calloc(1, sizeof(LBView));
 		initView(view->subViews, renderFunc, delegate, left, top, width, height);
 		view->subViews->parent = view;
 		return (LBView *)view->subViews;
@@ -78,7 +78,7 @@ LBView *addSubView(LBView *view, void *renderFunc, void *delegate, int left, int
 		while (parent->nextView != NULL) {
 			parent = parent->nextView;
 		}
-		parent->nextView = calloc(sizeof(LBView), 1);
+		parent->nextView = calloc(1, sizeof(LBView));
 		initView(parent->nextView, renderFunc, delegate, left, top, width, height);
 		parent->nextView->parent = view;
 		return parent->nextView;
@@ -109,7 +109,7 @@ LBWindow *createWindow(int left, int top, int width, int height) {
 								   width - (WIN_TITLE_HEIGHT + 8) - 4, 
 								   WIN_TITLE_HEIGHT - 4);
 	areaView   = addSubView(windowView, &DrawNull, &ClickNull, 0, WIN_TITLE_HEIGHT, width, height);		
-	window = calloc(sizeof(LBWindow), 1);
+	window = calloc(1, sizeof(LBWindow));
 	window->view = windowView;
 	window->iconView = iconView;
 	window->titleView = titleView;
