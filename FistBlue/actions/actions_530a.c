@@ -59,6 +59,7 @@ static void sub_82bb2(Object2 *act) {
 }
 
 static void sub_82c26(Object2 *act) {
+	(void)act;
 //XXX	act->x0042=data_90000[act->x0040][act->x0041];	/* x0042 is *, x0040 uchar <<10, x0041 uchar << 5 */
 }
 
