@@ -90,6 +90,7 @@ static void sm_ending_blanka(void) {	// a554
 						TMInitForStage();
 						palette_from_game();
 					}
+					break;
 				FATALDEFAULT;
 			}
 			break;
