@@ -135,7 +135,7 @@ jobs:
           set -euo pipefail
           rm -rf build
           cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_FBTESTS=ON -S . -B build
-          cmake --build build --target glutBasics --parallel 2 --verbose
+          cmake --build build --target glutBasics test-redhammer --parallel 2 --verbose
           ctest --test-dir build --output-on-failure
           bash scripts/validate_golden_traces.sh
 
@@ -147,7 +147,7 @@ jobs:
           set -euo pipefail
           rm -rf build-sanitize
           cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Debug -DBUILD_FBTESTS=ON -DENABLE_SANITIZERS=ON -S . -B build-sanitize
-          cmake --build build-sanitize --target glutBasics --parallel 2 --verbose
+          cmake --build build-sanitize --target glutBasics test-redhammer --parallel 2 --verbose
           ctest --test-dir build-sanitize --output-on-failure
 
       - name: Native smoke gate
