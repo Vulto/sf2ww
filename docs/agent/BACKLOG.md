@@ -53,3 +53,5 @@ Prioridade 2 — validação audiovisual
 - [ ] Validate player/object push-box interactions against MAME after the real ROM fixture is mounted.
 
 - [ ] Validate normal and high-damage throws against MAME, including KO/time-warp behavior.
+
+- [ ] Validate flagged hitbox damage values through normal/special collision paths under sanitizer CI.
