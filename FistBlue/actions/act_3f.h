@@ -12,4 +12,4 @@ void action_3f(Object *obj);
 struct UserData_3f {
 	short XDest;
 	short YDest;
-};
+} __attribute__((packed));
