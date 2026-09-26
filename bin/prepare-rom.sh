@@ -9,7 +9,7 @@ trap 'rm -rf "$TempDir"' EXIT
 unzip -q -o "$ArchivePath" -d "$TempDir/roms"
 (
   cd "$TempDir/roms"
-  "$RootDir/bin/mt2-merge.sh"
+  sh "$RootDir/bin/mt2-merge.sh"
 )
 
 mv "$TempDir/roms/allroms.bin" "$RootDir/allroms.bin"
