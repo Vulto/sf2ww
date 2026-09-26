@@ -51,3 +51,5 @@ Prioridade 2 — validação audiovisual
 - Updated the comparator to compare the complete fixed MAME prefix while allowing the native process to emit additional frames before timeout; fewer native frames still fail.
 
 - [ ] Validate player/object push-box interactions against MAME after the real ROM fixture is mounted.
+
+- [ ] Validate normal and high-damage throws against MAME, including KO/time-warp behavior.
