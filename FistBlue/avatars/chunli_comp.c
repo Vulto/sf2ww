@@ -81,11 +81,6 @@ static void sub_34ddc(Player *ply) {
 	ply->AIVolley    = FALSE;
 	exit_comp_normal(ply);
 }
-static void sub_34dea(Player *ply) {
-	ply->AISigAttack = FALSE;
-	ply->AIVolley    = FALSE;
-	exit_to_compdisp1(ply);
-}
 static void sub_34874(Player *ply) {
 	PLAYERTICK;
 	if (AF2 < 0) {
