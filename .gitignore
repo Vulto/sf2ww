@@ -41,3 +41,4 @@ sf2gfx.bin
 build-sanitize/
 .agent/reference/
 .agent/rom/
+*.d
