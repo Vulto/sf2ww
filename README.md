@@ -16,27 +16,34 @@ Check out the [blog](https://sf2platinum.wordpress.com). I'd always intended to 
 
 ## ROMs required to run
 
-The source code does not include the original Street Fighter II World Warrior arcade ROM data. To run the native PC port, you must provide the ROM images separately and prepare the two combined files expected by the program:
+The source code does not include the original Street Fighter II World Warrior arcade ROM data. To run the native PC port, provide the ROM images separately and prepare the two combined files expected by the program:
 
 - `allroms.bin` — combined 68000 program ROM image
 - `sf2gfx.bin` — combined graphics ROM image
 
-The repository's `bin/mt2-merge.sh` script documents the required SF2 World Warrior ROM filenames and creates both files using the `interleave` utility. Use it with a legally obtained copy of the original ROM set.
+The repository's `bin/mt2-merge.sh` script accepts both the original filenames used by the old merge instructions and the canonical filenames commonly found inside an `sf2ua` MAME set. In particular, the program ROMs may be named:
 
-From the repository root, after installing the required `interleave` utility and placing the required source ROM files in the current directory:
+- `sf2u.30a`, `sf2u.37a`, `sf2u.31a`, `sf2u.38a`, `sf2u.28a`, `sf2u.35a`, `sf2_29a.bin`, `sf2_36a.bin`
+- or `sf2u_30a.11e`, `sf2u_37a.11f`, `sf2u_31a.12e`, `sf2u_38a.12f`, `sf2u_28a.9e`, `sf2u_35a.9f`, `sf2_29b.10e`, `sf2_36b.10f`
+
+The graphics ROM names are the `sf2-*.4a/.6a/.3a/.5a`, `sf2-*.4c/.6c/.3c/.5c`, and `sf2-*.4d/.6d/.3d/.5d` files used by the script.
+
+### Prepare the ROMs
+
+Install the `interleave` utility and place the legally obtained source ROM files in one working directory. Then run:
 
 ```bash
 sh bin/mt2-merge.sh
 ```
 
-The script prints the expected SHA-1 values so you can verify the generated files. It should produce:
+The script prints the expected SHA-1 values. A correct set produces:
 
 ```text
-allroms.bin
-sf2gfx.bin
+allroms.bin: 4256ec60bf9eec21f4d6bb34c38990a9401af82e
+sf2gfx.bin:  db52a6314b4c0cd4c48eb324720c83dd142c3bff
 ```
 
-Keep these two generated files in the repository root (or in the same working directory from which you launch `glutBasics`). They are ignored by Git and are not distributed with this repository.
+Keep these generated files in the repository root, or in the working directory from which you launch `glutBasics`. They are ignored by Git and are not distributed with this repository.
 
 ## Building and running
 
@@ -47,15 +54,10 @@ From the repository root:
 ```bash
 cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -S . -B build
 cmake --build build --parallel
-``
-
-Before running the game, make sure `allroms.bin` and `sf2gfx.bin` are in the repository root. Then launch the executable from the repository root:
-
-```bash
 ./build/glutBasics
 ```
 
-Alternatively, if you run the executable from another directory, copy or provide both ROM files in that executable's current working directory, because the native runner loads them using relative paths.
+The native runner loads `allroms.bin` and `sf2gfx.bin` using relative paths, so they must be present in its current working directory.
 
 ### With Xcode
 
@@ -77,7 +79,7 @@ The actual game code from the M68k ROMs, anything that's not a rewrite of the or
 
 In theory.
 
-todo: gfx_glut.\[c|h\] are not part of the M68k code and should be moved to RedHammer.
+todo: gfx_glut.\\[c|h\\] are not part of the M68k code and should be moved to RedHammer.
 
 ### RedHammer
 
@@ -94,11 +96,10 @@ An abandoned windowing GUI toolkit. I thought it might be fun to try writing a b
 * The project is a bit of a mess and needs organising
 * ~~No instructions on how to run it, which ROMs are required, etc. out of the box~~
 * No unit tests. Most game functions are tightly coupled to the game state and have side effects, making unit testing almost impossible
-* The project should be split up into RedHammer, FistBlue, and one combining them, so that RedHammer can be 
+* The project should be split up into RedHammer, FistBlue, and one combining them, so that RedHammer can be
 
 ## About the code
 
 ### Endianness
 
 CPS SF2 runs on a big-endian m68k CPU. When we're running natively on a little-endian CPU, this creates complications when trying to keep binary compatibility with in-memory structures. Endian swapping is mostly done at runtime except where it can be easily cached beforehand. The code has been tested on a big-endian PowerPC G4, but not for some time.
-
