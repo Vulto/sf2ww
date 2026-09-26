@@ -28,9 +28,8 @@ extern struct game g;
 
 #include "coll_bonus.h"
 
-(Object_G2 *a6) {			// 7d20a
-	
-	
+static void _CDBonus3(Object_G2 *a6) {
+    (void)a6;
 }
 
 static void _CDDecorSoundPts(Object *a6){		// 7e3b0
