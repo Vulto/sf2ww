@@ -210,7 +210,7 @@ short diminishing_damage(int damage, Player *vict) {  /* 7d4b6 */
 		12,  12,  12,  12,  12,   8,   8,   8,   8,   8,   4,   4,   4,   4,   4, 
 	}; // XXX there's one more byte I think? 0xc0
 	
-    if(vict->Energy >= 0x1f) { return damage; }
+    if(vict->Energy < 0 || vict->Energy >= 0x1f) { return damage; }
     damage -= (damage * data_93420[vict->Energy]) >> 5;
     if (damage==0) {damage = 1; }
     return damage;
