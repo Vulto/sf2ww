@@ -382,7 +382,7 @@ static void mac_stun2005(Player *ply, Player *opp) {		//7d8d4
  End Function
  */
 
-#pragma mark ---- HitBox Overlap Checking ----
+
 
 /* hitbox overlap checker 
  *      int dunno      %d0
@@ -471,7 +471,7 @@ static FBBOOL slib_check_overlap(Object *obj, Player *vict, const HitBox *a3, co
 }
 
 
-#pragma mark HitBox Lookup
+
 /* used to be lookup_hitbox_8,9,10 etc. */
 /* lookup for victim in %a2 */
 const HitBox *CDGetHitBoxHead (Object *obj) {			/* 7e01c */
@@ -796,7 +796,7 @@ int check_main_hitboxes(Object *obj, Object *vict, const HitBoxAct *a3) {       
 }
 
 
-#pragma mark ---- ReactMode Setting ----
+
 
 static void set_special_reactmode(Player *vict, Player *ply, const HitBoxAct *hbact) {	//7d64a checked
 	vict->NextReactMode = hbact->ReactMode;     /* 0x7d64a */
