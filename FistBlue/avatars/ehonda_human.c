@@ -436,13 +436,9 @@ static void sub_2dcea(Player *ply) {
 		PLAYERTICK;
 	}
 }
-static void _EHondaSetAnim(Player *ply, u16 d0, u16 d1) {		// 2e3be
-	// XXX setaction_list((Object *)ply, actlist_3ffbc[d0], d1 / 18);		// XXX
-}		
-
 static void _EHondaSMHandslap(Player *ply) {		// 2dc3a
 	UD *ud=(UD *)&ply->UserData;
-	const static unsigned char data_2dce2[] = {
+	static const unsigned char data_2dce2[] = {
 		255, 0, 5, 10, 255, 255, 255, 255, 255, 255
 	};
 	int d0;
