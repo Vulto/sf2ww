@@ -74,7 +74,7 @@ typedef struct tile_attribute_pair {
 
 /* the fixed precision 16:16bit used in coordinates and vectors */
 
-#pragma mark Little Endian Fixed Precision
+
 
 #ifdef SF2_ENDIAN_LITTLE
 
@@ -104,7 +104,7 @@ typedef union DUALtag {
 
 #endif
 
-#pragma mark Big Endian Fixed Precision
+
 
 #ifdef SF2_ENDIAN_BIG
 
@@ -134,7 +134,7 @@ typedef union DUALtag {
 
 #endif
 
-#pragma mark Utility types
+
 
 struct adjust {
     char x;
