@@ -37,7 +37,7 @@ extern ScrollState gstate_Scroll3;
 
 static short sub_7e86(void);
 
-const static u16 data_BonusTimes[3][2] = {{0x40, 0x28}, {0x20, 0x00}, {0x40, 0x28}};
+static const u16 data_BonusTimes[3][2] = {{0x40, 0x28}, {0x20, 0x00}, {0x40, 0x28}};
 
 static void gamemode_init_round (void);
 
@@ -141,7 +141,6 @@ static void sub_7c50(void) {
 
 static void game_mode_28(void) {	// 7af0
 	Object *obj;
-	Player *ply;
 	
 	switch (g.mode2) {
 		case 0:
