@@ -7,7 +7,10 @@ TempDir=$(mktemp -d)
 trap 'rm -rf "$TempDir"' EXIT
 
 unzip -q -o "$ArchivePath" -d "$TempDir/roms"
-"$RootDir/bin/mt2-merge.sh" 2>&1
+(
+  cd "$TempDir/roms"
+  "$RootDir/bin/mt2-merge.sh"
+)
 
 mv "$TempDir/roms/allroms.bin" "$RootDir/allroms.bin"
 mv "$TempDir/roms/sf2gfx.bin" "$RootDir/sf2gfx.bin"
