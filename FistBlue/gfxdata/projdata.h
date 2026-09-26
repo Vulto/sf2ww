@@ -121,17 +121,17 @@ const VECT16 data_cf05c[] = {{0x500, 0}, {-0x500, 0}, {0x580, 0}, {-0x580, 0}};
 const VECT16 data_cf07c[] = {{0x700, 0}, {-0x700, 0}, {0x780, 0}, {-0x780, 0}};
 
 
-#pragma mark ---- Hadouken Data ----
+
 
 const VECT16 *data_22c32[]={data_cf038, data_cf048 , data_cf05c};
 
-#pragma mark ---- Sonic Boom ----
 
-#pragma mark ---- TIGER ----
+
+
 
 const VECT16 *data_22c3e[]={data_cf038, data_cf05c, data_cf07c};
 
-#pragma mark ---- Yoga Fire Data ----
+
 /*
  * YOGA FIRE 
  */
@@ -141,4 +141,4 @@ const VECT16 *data_2349a[] = 	// velocity paths
 
 #define IMAGE_BLOCK	0x8000		// actually image_with_attrs
 
-#pragma mark ---- Yoga Flame ----
+
