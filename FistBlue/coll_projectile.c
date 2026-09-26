@@ -61,6 +61,7 @@ static void _CDStartAction38Vict(Player *vict) {
 
 
 void CDCheckProjectile(Object *obj, int d7) {   /* 0x7d0c0 check for projectile collision */
+    (void)d7;
 	/* d7 as far as I can tell is a leftover loop counter, hmm */
 	/* d5 is also significant, but not sure why yet */
     Player *ply, *opp;
