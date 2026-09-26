@@ -436,6 +436,13 @@ static void sub_2dcea(Player *ply) {
 		PLAYERTICK;
 	}
 }
+static void _EHondaSetAnim(Player *ply, u16 d0, u16 d1) {
+	(void)ply;
+	(void)d0;
+	(void)d1;
+	/* The original routine is intentionally inert in this port. */
+}
+
 static void _EHondaSMHandslap(Player *ply) {		// 2dc3a
 	UD *ud=(UD *)&ply->UserData;
 	static const unsigned char data_2dce2[] = {
