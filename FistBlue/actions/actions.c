@@ -1133,7 +1133,9 @@ static void DrawFighterPortrait(u16 **gfx_p, short fighterid, short flip) {	//15
     _draw_portrait_scr2(RHOffsetLookup16(RHCODE(0x15f8e), fighterid), flip, gfx_p);
 }
 
-void PrintPlayerPic(Player *ply, short side, short fighterid) {	
+void PrintPlayerPic(Player *ply, short side, short fighterid) {
+	(void)ply;
+
 	// fighterid %d3
 	static const u16 data_15f14[8]={
 		310, 288, 288, 295, 308, 285, 288, 288, 
