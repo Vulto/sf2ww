@@ -99,10 +99,10 @@ jobs:
           bash scripts/compare_state_csv.sh expected.csv actual.csv
       - name: Report MAME fixture status
         run: |
-          if [ -z "${SF2_MAME_ROM_ROOT:-}" ]; then
-            echo "MAME_COMPARISON_BLOCKED: no private ROM fixture is mounted on this runner."
+          if [ -z "${{ secrets.SF2_MAME_ROM_URL }}" ]; then
+            echo "MAME_COMPARISON_BLOCKED: SF2_MAME_ROM_URL is not configured."
           else
-            echo "MAME_COMPARISON_READY: private ROM fixture root is present."
+            echo "MAME_COMPARISON_READY: private ROM source is configured."
           fi
 
   full-mame-regression:
@@ -110,21 +110,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install MAME
+      - name: Install MAME and fixture tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y mame freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb
+          sudo apt-get install -y mame freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb unzip curl perl
           mame -version
           mame -listfull sf2ua | grep -q '^sf2ua '
-      - name: Check private ROM fixture
+      - name: Check private ROM source
         id: fixture
+        env:
+          RomUrl: ${{ secrets.SF2_MAME_ROM_URL }}
         run: |
-          if [ -z "${SF2_MAME_ROM_ROOT:-}" ] || [ ! -d "${SF2_MAME_ROM_ROOT}" ]; then
+          if [ -z "$RomUrl" ]; then
             echo "available=false" >> "$GITHUB_OUTPUT"
-            echo "MAME regression blocked: private ROM fixture is not mounted."
+            echo "MAME regression blocked: SF2_MAME_ROM_URL is not configured."
           else
             echo "available=true" >> "$GITHUB_OUTPUT"
           fi
+      - name: Prepare private ROM fixture
+        if: steps.fixture.outputs.available == 'true'
+        env:
+          SF2_MAME_ROM_URL: ${{ secrets.SF2_MAME_ROM_URL }}
+          SF2_MAME_ROM_SHA256: ${{ secrets.SF2_MAME_ROM_SHA256 }}
+        run: |
+          rm -rf .private-mame
+          mkdir -p .private-mame
+          curl --fail --location --retry 3 --output .private-mame/sf2ua.zip "$SF2_MAME_ROM_URL"
+          if [ -n "$SF2_MAME_ROM_SHA256" ]; then
+            echo "$SF2_MAME_ROM_SHA256  .private-mame/sf2ua.zip" | sha256sum -c -
+          fi
+          bash scripts/prepare_mame_fixture.sh .private-mame .private-mame/sf2ua.zip
       - name: Install port dependencies
         if: steps.fixture.outputs.available == 'true'
         run: |
@@ -137,7 +152,7 @@ jobs:
         if: steps.fixture.outputs.available == 'true'
         uses: ./.github/actions/mame-lockstep
         with:
-          rom-root: ${{ env.SF2_MAME_ROM_ROOT }}
+          rom-root: .private-mame
           port-executable: build/glutBasics
           mame-bin: mame
           mame-set: sf2ua
