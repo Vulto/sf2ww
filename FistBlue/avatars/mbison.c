@@ -181,6 +181,9 @@ static void sub_36318(Player *ply) {
 					} else {
 						PLAYERTICK;
 					}
+#if defined(__GNUC__)
+				__attribute__((fallthrough));
+#endif
 				FATALDEFAULT;
 			}
 			break;
@@ -195,6 +198,9 @@ static void sub_36318(Player *ply) {
 				case 2:			sub_365da(ply);  break;
 				FATALDEFAULT;
 			}
+#if defined(__GNUC__)
+			__attribute__((fallthrough));
+#endif
 		FATALDEFAULT;
 	}
 }
@@ -263,7 +269,7 @@ static void sub_36b12(Player *ply) {
 }
 static void sub_36796(Player *ply) {
 	UD *ud=(UD *)&ply->UserData;
-	const static short data_36818[3][8] = {
+	static const short data_36818[3][8] = {
 		{0x51, 0x4c, 0x47, 0x52, 0x51, 0x5a, 0x61, 0x55},
 		{0x3c, 0x36, 0x30, 0x35, 0x3c, 0x39, 0x3a, 0x38},
 		{0x35, 0x40, 0x41, 0x42, 0x35, 0x49, 0x57, 0x46},
@@ -474,6 +480,9 @@ static void sub_3645e(Player *ply) {
 					break;
 				FATALDEFAULT;
 			}
+#if defined(__GNUC__)
+			__attribute__((fallthrough));
+#endif
 		case 4:		// 36508
 			switch (ply->mode2) {
 				case 0:
@@ -505,6 +514,9 @@ static void sub_3645e(Player *ply) {
 					break;
 				FATALDEFAULT;
 			}
+#if defined(__GNUC__)
+			__attribute__((fallthrough));
+#endif
 		FATALDEFAULT;
 	}
 }
