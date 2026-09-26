@@ -47,7 +47,7 @@ char pt_go_task[NTHREADS];
 void RHWait(Task *task) {
 	int state;
 	// todo: learn to use signals
-	//printf("RHWait: worker %d waits (%s)\n", task->RHThreadID, task->signal);
+	//printf("RHWait: worker %d waits (%s)\n", (unsigned char)task->RHThreadID, task->signal);
 	pthread_mutex_lock(&ptmx_despatcher);
 	InChild = FALSE;
 	pthread_mutex_unlock(&ptmx_despatcher);
@@ -55,14 +55,14 @@ void RHWait(Task *task) {
 	pthread_mutex_lock(&ptmx_go_task);
 	pthread_cond_broadcast(&ptcv_despatcher);
 	
-	pt_go_task[task->RHThreadID] = FALSE;
+	pt_go_task[(unsigned char)task->RHThreadID] = FALSE;
 
-	while (!pt_go_task[task->RHThreadID]) {
+	while (!pt_go_task[(unsigned char)task->RHThreadID]) {
 		pthread_cond_wait(&ptcv_go_task, &ptmx_go_task);
 	}
-	state = pt_go_task[task->RHThreadID];
+	state = pt_go_task[(unsigned char)task->RHThreadID];
 	if (state == -1) {
-		pt_go_task[task->RHThreadID] = 0;
+		pt_go_task[(unsigned char)task->RHThreadID] = 0;
 	}
 	pthread_mutex_unlock(&ptmx_go_task);
 	if (state == -1) {
@@ -70,15 +70,16 @@ void RHWait(Task *task) {
 		
 		pthread_exit(NULL);
 	}
-	//printf("RHWait: worker %d awakens\n", task->RHThreadID);
+	//printf("RHWait: worker %d awakens\n", (unsigned char)task->RHThreadID);
 }
 void RHCleanup(Task *task) {
+	(void)task;
 	pthread_mutex_unlock(&ptmx_go_task);
 }
 void RHExit(Task *task) {
 	//printf("RHExit worker\n");
 	pthread_mutex_lock(&ptmx_go_task);
-	pt_go_task[task->RHThreadID] = FALSE;
+	pt_go_task[(unsigned char)task->RHThreadID] = FALSE;
 	pthread_mutex_unlock(&ptmx_go_task);
 	
 	pthread_mutex_lock(&ptmx_despatcher);
@@ -90,11 +91,11 @@ void RHExit(Task *task) {
 }
 void RHKill (Task *task) {
 	
-//	if(pthread_cancel(pt_threads[task->RHThreadID])) {
+//	if(pthread_cancel(pt_threads[(unsigned char)task->RHThreadID])) {
 //		printf("error cancelling task %x",task);
 //	}
 	pthread_mutex_lock(&ptmx_go_task);	
-	pt_go_task[task->RHThreadID] = -1;
+	pt_go_task[(unsigned char)task->RHThreadID] = -1;
 	pthread_cond_broadcast(&ptcv_go_task);
 	pthread_mutex_unlock(&ptmx_go_task);
 	
@@ -104,7 +105,7 @@ void RHResume(Task *task) {
 	InChild = TRUE;
 	
 	pthread_mutex_lock(&ptmx_go_task);	
-	pt_go_task[task->RHThreadID] = TRUE;
+	pt_go_task[(unsigned char)task->RHThreadID] = TRUE;
 	pthread_cond_broadcast(&ptcv_go_task);
 	pthread_mutex_unlock(&ptmx_go_task);
 
@@ -115,7 +116,7 @@ void RHResume(Task *task) {
 	pthread_mutex_unlock(&ptmx_despatcher);
 	if (task->status == TASK_EMPTY) {
 		//printf("pthread_join()\n");
-		pthread_join(pt_threads[task->RHThreadID], NULL);
+		pthread_join(pt_threads[(unsigned char)task->RHThreadID], NULL);
 	}
 	//printf("Back in despatcher\n");
 }
@@ -145,25 +146,25 @@ void *RHThreadWorker(void *arg) {
 	Task *task = (Task *)arg;
 	// wait until our turn, then begin
 	pthread_mutex_lock(&ptmx_go_task);
-	while (!pt_go_task[task->RHThreadID]) {
+	while (!pt_go_task[(unsigned char)task->RHThreadID]) {
 		pthread_cond_wait(&ptcv_go_task, &ptmx_go_task);
 	}
 	pthread_mutex_unlock(&ptmx_go_task);
 	
-	//printf("RHThreadWorker worker %d %s beginning\n", task->RHThreadID, task->name);
+	//printf("RHThreadWorker worker %d %s beginning\n", (unsigned char)task->RHThreadID, task->name);
 	if(task->code) {
 		task->code();
 	} else {
-		printf("NULL task %d\n", task->RHThreadID);
+		printf("NULL task %d\n", (unsigned char)task->RHThreadID);
 	}
 	// task should have called TASK_DIE by now
 	// in case it hasn't
 	task->status = TASK_EMPTY;
 	pthread_mutex_lock(&ptmx_go_task);
-	pt_go_task[task->RHThreadID] = FALSE;
+	pt_go_task[(unsigned char)task->RHThreadID] = FALSE;
 	pthread_mutex_unlock(&ptmx_go_task);
 	
-	//printf("RHThreadWorker worker %d ends\n", task->RHThreadID);
+	//printf("RHThreadWorker worker %d ends\n", (unsigned char)task->RHThreadID);
 	pthread_mutex_lock(&ptmx_despatcher);
 	InChild = FALSE;
 	pthread_cond_broadcast(&ptcv_despatcher);
