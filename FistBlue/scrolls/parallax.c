@@ -32,7 +32,7 @@ static void _GSUpdateRowScroll(RowScrollState *gs, short *a0, short *a1);
         g.x02be = gemu.RowScroll2 + (offset / sizeof(short));        \
     }                                                                \
 
-#pragma mark Linescroll
+
 
 #define LINESCROLL_SET_DEC(count)                \
 for (i=0; i<(count); ++i) {                        \
