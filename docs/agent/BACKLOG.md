@@ -37,3 +37,10 @@ Prioridade 2 — validação audiovisual
 - [ ] Mount the private/original ROM fixture on a trusted runner and execute the first real MAME/port lockstep comparison.
 - [x] Smoke gates reject premature clean exits and crashes by requiring the expected timeout status.
 - [x] Smoke verifies forward frame progress in addition to process liveness.
+
+
+### CI MAME runtime
+
+- [x] GitHub Actions installs MAME from the Ubuntu runner package.
+- [x] CI validates the installed MAME version and the `sf2ua` driver.
+- [ ] Mount the private `sf2ua` ROM fixture on a trusted runner and execute the real MAME/native lockstep.
