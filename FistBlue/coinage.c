@@ -33,10 +33,6 @@ extern struct executive_t Exec;
 #define COIN_LOCK_1		0x4
 #define COIN_LOCK_2		0x8
 
-static void sub_dee(void) {
-	g.CoinStatus = g.CoinStatus & ~(COIN_STATUS_1 | COIN_STATUS_2);
-}
-
 void decode_start_service(void) {	// 1e7a was swirlything
 	g.StartServiceButtons =
 		((g.RawButtons0Dash		& IPT_SERVICE) >> 2 ) |
@@ -56,7 +52,7 @@ void decode_start_service(void) {	// 1e7a was swirlything
 }
 
 void decode_coincosts(void) {			// 1d9a
-	const static char data_1de0[][2] = {
+	static const char data_1de0[][2] = {
 		{1,1}, {1,2}, {1,3}, {1,4}, {1,6}, {2, 1}, {3, 1}, {4, 1},
 	};
 	
