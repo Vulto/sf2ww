@@ -154,6 +154,8 @@ void mouseMotion(int x, int y) {
     gfx_glut_mousedragged(x, y);
 }
 void special(int key, int px, int py) {
+	(void)px;
+	(void)py;
     switch (key) {
         case GLUT_KEY_UP:		gInputs.p10 |= JOY_UP;    break;
         case GLUT_KEY_DOWN:		gInputs.p10 |= JOY_DOWN;  break;
@@ -163,6 +165,8 @@ void special(int key, int px, int py) {
     }
 }
 void specialup(int key, int px, int py) {
+	(void)px;
+	(void)py;
     switch (key) {
         case GLUT_KEY_UP:       gInputs.p10 &= ~JOY_UP;    break;
         case GLUT_KEY_DOWN:     gInputs.p10 &= ~JOY_DOWN;  break;
@@ -173,6 +177,8 @@ void specialup(int key, int px, int py) {
 }
 
 void keyup(unsigned char inkey, int px, int py) {
+	(void)px;
+	(void)py;
     switch (inkey) {
         case 'q':		gInputs.p10 &= ~(BUTTON_A);	            break;
         case 'w':		gInputs.p10 &= ~(BUTTON_B);	            break;
@@ -196,6 +202,8 @@ void keyup(unsigned char inkey, int px, int py) {
 }
     
 void key(unsigned char inkey, int px, int py){
+	(void)px;
+	(void)py;
     switch (inkey) {
         case 27:
             exit(0);
@@ -260,6 +268,7 @@ static long timespec_diff_ns(const struct timespec *end, const struct timespec *
 }
 
 void timerFunc(int value) {
+	(void)value;
     struct timespec now;
     long delay_ns;
     unsigned delay_ms;
