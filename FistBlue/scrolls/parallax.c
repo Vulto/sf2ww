@@ -98,7 +98,7 @@ void TMMaintRowScroll(RowScrollState *ss) {    /* 84480 */
             
             switch (g.CurrentStage) {
                 case STAGE_INDIA_DHALSIM:
-                    ss->planes = calloc(sizeof(RHTilePlane), 2);
+                    ss->planes = calloc(2, sizeof(RHTilePlane));
                     if (!ss->planes) {
                         FBPanic(1);
                     }
@@ -109,7 +109,7 @@ void TMMaintRowScroll(RowScrollState *ss) {    /* 84480 */
                 default:
                     
                     /* XXX remove me */
-                    ss->planes = calloc(sizeof(RHTilePlane), 2);
+                    ss->planes = calloc(2, sizeof(RHTilePlane));
                     ss->planes[0] = (RHTilePlane){  0,  63, -24, 40 };
                     ss->planes[1] = (RHTilePlane){ 64, 256,  40, 40 };
                     break;
