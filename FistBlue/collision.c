@@ -994,7 +994,7 @@ short CDPushOverlap(Player *a2, Object *a6) {
 	if (a2->ActionScript->HB_Push == 0) {return 0;} 
 	hb = a2->HitBoxes->push + a2->ActionScript->HB_Push;  /* XXX use globals */
 	if (a6->ActionScript->HB_Push == 0) {return 0;}
-	plyhb = a6->HitBoxes->push + a2->ActionScript->HB_Push;
+	plyhb = a6->HitBoxes->push + a6->ActionScript->HB_Push;
 	if(a2->ZDepth) {
 		/* 0x7e4b2 */
 		g.x8af6 = a2->XPI;
