@@ -77,7 +77,7 @@ jobs:
       - name: Run Codex agent
         uses: openai/codex-action@v1
         with:
-          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          openai-api-key: ${{ secrets.OPENAI_API_KEY || secrets.CODEX_OPENAI_API_KEY }}
           permission-profile: ":workspace"
           safety-strategy: drop-sudo
           allow-users: "Vulto"
