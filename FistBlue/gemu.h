@@ -140,7 +140,7 @@ gemuObjCursorSet((addr - 0x910000)/8);
 
 #ifndef CPS
 
-#define GEMU_CLEAR_OBJECT_72	gemu_clear_object_first72
+#define GEMU_CLEAR_OBJECT_72	gemu_clear_object_first72()
 
 #define GEMU_OBJECT_DRAW		gemuObjectDraw
 #define GEMU_OBJECT_DRAW_NOATTR	gemuObjectDrawNoAttr
