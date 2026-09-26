@@ -76,4 +76,3 @@ void PSCBVictoryChunLi(Player *ply) {
 		FATALDEFAULT;
 	}
 }
-#pragma mark Computer ChunLi
