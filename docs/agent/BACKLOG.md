@@ -44,6 +44,7 @@ Prioridade 2 — validação audiovisual
 - [x] GitHub Actions installs MAME from the Ubuntu runner package.
 - [x] CI validates the installed MAME version and the `sf2ua` driver.
 - [ ] Mount the private `sf2ua` ROM fixture on a trusted runner and execute the real MAME/native lockstep.
+- [ ] Validate fight HUD palette restoration and per-frame health-bar transitions against MAME.
 
 ## 2026-09-26 — Lockstep vector correction
 

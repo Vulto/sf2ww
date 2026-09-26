@@ -131,3 +131,12 @@
 - `lookup_damage_and_score()` tested `a3->Damage & 0x7f` but indexed the damage tables with the unmasked value.
 - If the high flag bit is present, normal damage could index past the 16-entry tables, and special damage could index past the 4-entry tables.
 - The lookup now masks the flag bit, uses the same `/2` table indexing as `LBGetDamage()`, and rejects invalid special codes before table access.
+
+
+## 2026-09-26 — Fight HUD palette lifetime and refresh
+
+- Character select explicitly replaces object palette `0x0c` with its selection palette.
+- The fight HUD health tiles also use object palette `0x0c`; the previous native flow never restored that palette when entering a fight, so the HUD inherited the character-select colors.
+- Restored the original ROM object palette `0x0c` during `init_fightgfx()` and refresh the HUD once per fight tick after collision/damage processing.
+- The refresh is necessary because `redraw_fight_dsk()` was otherwise only called during initialization, so `EnergyCursor` could never track subsequent damage.
+- CI build, tests, deterministic regression, and ASan/UBSan remain green after the fix. Visual/MAME acceptance remains pending the private ROM fixture.
