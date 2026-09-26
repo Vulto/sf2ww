@@ -248,6 +248,7 @@ static void game_mode_28(void) {	// 7af0
 				DSDrawAll_Hira();
 				soundsting(SOUND_CONTINUE);				
 			}
+			__attribute__((fallthrough));
 		case 12:
 			if (g.timer2-- == 0) {
 				NEXT(g.mode2);
@@ -681,6 +682,7 @@ void gamemode_prefightanim (void){
             g.ShowCapeAnimation = TRUE;	/* cape thrown */
             
             start_effect(LC0_LIGHT_ALL_ENABLE, 3);
+            __attribute__((fallthrough));
         }
         case 2: {
             check_if_new_player();
