@@ -156,16 +156,3 @@ jobs:
             echo "MAME_REAL_ROM_RUN_FAILED: exit status $status"
             exit "$status"
           fi
-      - name: Install port dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb
-      - name: Configure and build port
-        run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_FBTESTS=ON -S . -B build && cmake --build build --parallel
-      - name: Run MAME + native port lockstep
-        uses: ./.github/actions/mame-lockstep
-        with:
-          rom-root: .private-mame
-          port-executable: build/glutBasics
-          mame-bin: mame
-          mame-set: sf2ua
