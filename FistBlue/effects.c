@@ -339,7 +339,7 @@ void syslib_00 (void) {					// e12
 			break;
 		case 0x20:
 			while(TRUE) {
-				if(es.FadeScroll3 == 0xffffffff) { DIEFREE; }
+				if(es.FadeScroll3 == -1) { DIEFREE; }
 				massadder(CPS_PALBASE_SCROLL1, &es.FadeScroll1, 0x1000);
 				massadder(CPS_PALBASE_SCROLL2, &es.FadeScroll2, 0x1000);
 				massadder(CPS_PALBASE_SCROLL3, &es.FadeScroll3, 0x1000);
