@@ -49,7 +49,7 @@ jobs:
           rm -rf .agent/reference
           mkdir -p .agent/reference
           git clone --depth 1 --filter=blob:none --sparse "$JTCPS_REPO" .agent/reference/jtcps
-          git -C .agent/reference/jtcps sparse-checkout set cores/cps1 cores/cps15 doc README.md
+          git -C .agent/reference/jtcps sparse-checkout set cores/cps1 cores/cps15 doc
           git clone --depth 1 --filter=blob:none --sparse "$MAME_REPO" .agent/reference/mame
           git -C .agent/reference/mame sparse-checkout set docs src/mame/capcom src/devices/cpu/m68000
           git -C .agent/reference/jtcps rev-parse HEAD | tee .agent/reference/JTCPS_COMMIT
