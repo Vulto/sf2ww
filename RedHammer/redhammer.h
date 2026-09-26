@@ -9,6 +9,9 @@
 #ifndef MT2_redhammer_h
 #define MT2_redhammer_h
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include "sf2types.h"
 
 extern char *g_code_roms;
