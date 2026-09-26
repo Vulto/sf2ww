@@ -37,3 +37,7 @@ roms
 sf2au.zip
 allroms.bin
 sf2gfx.bin
+
+build-sanitize/
+.agent/reference/
+.agent/rom/
