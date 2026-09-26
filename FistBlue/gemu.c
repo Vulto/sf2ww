@@ -129,7 +129,7 @@ inline void gemuObjectDrawIDCoords(short id, u16 x, u16 y, u16 tile, u16 attr) {
 }
 
 inline void gemuIncGfxCursor(u32 *gfxcursor, short x, short y) {
-	*gfxcursor += (x << 16) + y;
+	*gfxcursor += ((u32)(u16)x << 16) + (u32)(u16)y;
 }
 
 inline void gemuCoordOffset(u32 *gfxcursor, short x, short y) {
