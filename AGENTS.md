@@ -95,3 +95,22 @@ Esses arquivos são o estado operacional persistente do agente.
 ## 11. Bloqueios
 
 Quando uma hipótese não se confirmar ou faltar informação nas fontes autorizadas, registrar em `FINDINGS.md`, mudar para o próximo item e retomar depois com abordagem diferente. Um bloqueio não interrompe o ciclo inteiro.
+
+
+## 12. Agente Codex autônomo no GitHub Actions
+
+O ciclo autônomo oficial é `.github/workflows/autonomous-port.yml`. Ele executa somente em `main`, usa o Codex GitHub Action em ambiente de workspace, prepara referências locais e, após cada iteração validada, grava o progresso em `main` e dispara a próxima iteração por `workflow_dispatch`.
+
+Referências obrigatórias:
+- `.agent/reference/jtcps`: JTCPS/JTFRAME, core FPGA CPS1 compatível com MiSTer;
+- `.agent/reference/mame`: fonte do MAME e sua documentação local.
+
+O agente usa JTCPS como evidência independente de hardware/timing/arquitetura CPS1, não como código a copiar.
+
+O agente nunca declara conclusão apenas porque compilação, testes unitários ou sanitizers passaram. A conclusão exige execução completa e lockstep contra a ROM original, cobertura funcional documentada e ausência de crashes/UB.
+
+A ROM original continua fora do Git. Quando `SF2_MAME_ROM_URL` estiver configurado, o workflow baixa a fixture privada no runner e executa o lockstep sem publicar a fixture.
+
+O agente não cria branches, não faz force-push e não reescreve histórico. O Codex modifica o workspace; o wrapper valida, commita e envia as mudanças para `main`.
+
+O loop imediato usa `workflow_dispatch` porque pushes feitos com `GITHUB_TOKEN` não disparam novamente workflows de `push`.
