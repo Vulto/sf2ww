@@ -446,7 +446,6 @@ void PSCBAttackDhalsim(Player *ply) {			// 3258e
 	}
 }
 
-#pragma mark Dhalsim Comp Projectiles
 static void dhalsim_comp_init_firebreath(Player *ply) {		// 32b3c
 	UD *ud = (UD *)ply->UserData;
 	NEXT(ply->mode2);
@@ -518,7 +517,6 @@ static void dhalsim_comp_start_proj_yogaflame(Player *ply) {		// 32be4
 	PLAYERTICK;	
 }
 
-#pragma mark Dhalsim Comp Callbacks 
 void PSCBPowerDhalsim(Player *ply) {		// 32b1a
 	UD *ud = (UD *)ply->UserData;
 	switch (ud->move_is_flame) {
