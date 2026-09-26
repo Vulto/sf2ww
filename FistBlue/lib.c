@@ -29,7 +29,7 @@
 #include "sm.h"
 
 #ifdef REDHAMMER
-#import "demo.h"
+#include "demo.h"
 #endif
 
 #if !defined(CPS)
@@ -49,7 +49,7 @@
 
 #include "libdata.h"
 
-#pragma mark Constants
+
 
 #define TICKER_X 176
 #define TICKER_Y 208
@@ -137,7 +137,7 @@ static void sub_2af2(void) {
 	g.Player2.Score = 0;
 }
 
-#pragma SiennaBird glue
+
 
 void sf2_backtrace(int count) {
 #ifndef CPS
@@ -158,11 +158,13 @@ void sf2_backtrace(int count) {
 }
 
 void debughook(int data) {
+	(void)data;
 	/* unimp */
 }
 
 // todo: move me
 _Noreturn void FBPanic(int data) {
+	(void)data;
 	printf("PANIC()\n");
 
 #ifndef CPS
@@ -178,7 +180,7 @@ _Noreturn void FBPanic(int data) {
 #endif
 }
 
-#pragma mark ---- Jumper Decoding ---
+
 
 void decode_difficulty(void) {
 	g.Difficulty = g.JPDifficulty & JP_DIFFMASK;
@@ -312,6 +314,7 @@ void LBDecodeInputs(void) {		// 2320
 	a = g.Player1.JoyDecode.full;
 	b = g.Player1.JoyDecodeDash.full;
 	c=a;d=b;
+	(void)d;
 	if (g.Player1.Direction) {		// todo: check this
 		a &= 0x77c; b &= 0x77c;
 		if (c & 2) {
@@ -431,7 +434,7 @@ void set_waitmode(void) {		/* 2388 */
 	}
 }
 
-#pragma mark ---- Timer Callbacks ----
+
 
 void fightstuff (void) {
     if (g.TimeWarpTimer) {
@@ -502,7 +505,7 @@ static void _refresh_jumpers(void) {		//1d72
 
 
 /****************************************************************/
-#pragma mark           INTERRUPT HANDLER                        
+
 /****************************************************************/
 
 
@@ -552,7 +555,7 @@ void sub_18c8(void) {
 }
 
 /****************************************************************/
-#pragma mark                STARTUP     
+
 /****************************************************************/
 
 void startup (void) {
@@ -671,6 +674,7 @@ short sf2rand(void) {
 }
 
 void set_ply_directions(Player *ply) {	/* 2f8a */
+	(void)ply;
 	short temp;
 	if (g.Player1.XPI > g.Player2.XPI) {
 		temp = 1;
@@ -703,10 +707,10 @@ short LBRareChance(void) {					// 3052
 }
 
 
-#pragma mark AI Updates
+
 
 static void _set_AI_urgency(Player *ply) {		// 30da
-	const static char data_95660[0x92]={
+	static const char data_95660[0x92]={
 		0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 
 		0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 
 		0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 
@@ -785,7 +789,7 @@ static void _init_energy(void) {			/* 2e6e */
 static void _init_difficulty(void) { 
 	Player *ply;
 
-	const static char data_2e4e[32]={
+	static const char data_2e4e[32]={
 		0x00, 0x01, 0x01, 0x02, 0x02, 0x02, 0x02, 0x03, 
 		0x03, 0x03, 0x03, 0x03, 0x04, 0x04, 0x04, 0x04, 
 		0x04, 0x04, 0x04, 0x04, 0x05, 0x05, 0x05, 0x05, 
@@ -953,7 +957,7 @@ void memclear(void *c, int len) {
 }
 #endif
 
-#pragma mark ---- Resetter Functions ----
+
 
 void clear_players(void) {
     memclear((char *)PLAYER1, (void *)(&PLAYER1->Alive) - (void *)(&PLAYER1->exists));	
@@ -1053,7 +1057,7 @@ static void sub_297a(void) {
 		g.FreeStack_530a[i] = &g.x530a[i];
 	}
 }
-#pragma mark ---- Decoding ----
+
 /**
  @brief Set `ButtonStrength` to the strength of `button`. Do not call if no buttons are pressed.
  @param buttons the current buttons
@@ -1102,7 +1106,7 @@ void set_towardsaway(Player *ply) {       /* 318a */
     }
 }
 
-#pragma mark ---- Object Alloc/Dealloc ----
+
 
 Object_G2 *pop_1174(void) {				/* 0x29c2 */
     if(g.FreeLayer2 == 0) { return NULL; }
@@ -1164,7 +1168,7 @@ void clearpush_5d0c(Object2 *obj){
 	g.FreeStack_530a[g.FreeCount_530a++] = obj;
 }
 
-#pragma mark ---- graphics ----
+
 
 static void sub_52bc(u16 *gp, short x, short y, char c) {
 	OBJECT_DRAW_NOATTR(gp, x, y, (c & 0xf) + SF2_TILE_OBJ_HEXCHARS);	
@@ -1345,7 +1349,7 @@ short sub_2fe6(Player *ply, Object *obj, short yoke) {
 	return 1;
 }
 
-#pragma mark ---- BCD emulation ----
+
 
 /* 
     The MC68000 has dedicatd instructions for arithmetic on Binary Coded
@@ -1530,7 +1534,7 @@ void LBCheckRoundResult(void) {
 
 void setup_stage_actions (void) { /* 822be */
     int i;
-	const static short counts[]={ 4, 10, 17, 7, 13, 10, 2, 2, 7, 4, 24, 16, 0, 8, 1, 11, };
+	static const short counts[]={ 4, 10, 17, 7, 13, 10, 2, 2, 7, 4, 24, 16, 0, 8, 1, 11, };
 
     static const struct actionhdr data_82312[]={
 		{0x08, 0x02, 0x01, 0x00, 0x04, 0x00, 0x000f, 0x0260, 0x0070},       // Ryu
@@ -1774,7 +1778,7 @@ void setup_stage_actions (void) { /* 822be */
 }
 void actionlibrary(void) {
 	
-	const static short counts[]={ 10, 21, 2, 1, 1, 0, 1, 1, 1, 2, 0, 4, 0, -1, -1, -1, 2, 21, 1, -1, };
+	static const short counts[]={ 10, 21, 2, 1, 1, 0, 1, 1, 1, 2, 0, 4, 0, -1, -1, -1, 2, 21, 1, -1, };
 	static const struct actionhdr data_82d7c[]={
 		{0x08, 0x08, 0x2f, 0x00, 0x04, 0x00, 0x0000, 0x0028, 0x0640},
 		{0x08, 0x08, 0x2f, 0x01, 0x04, 0x00, 0x0000, 0x0028, 0x0640},
@@ -1970,7 +1974,6 @@ void task_playground(void) {
     g.CPS.DispEna = 0x12da;
     fadenwait1();
     sound_cq_f0f7();
-    Object *obj;
     while (TRUE) {
         if (g.RawButtons0Dash & 0x40 || (g.Debug & (!(g.JPCost & 0x80)))) {
             //todo initTestMenu(); //207c
@@ -2054,7 +2057,7 @@ void task_playground(void) {
 }
 
 
-#pragma mark Synthetics
+
 // these are here mainly to keep things tidy and avoid modules needing to #include and extern globals
 short get_scr1x() { return gstate_Scroll1.position.x.part.integer; }
 short get_scr1y() { return gstate_Scroll1.position.y.part.integer; }
