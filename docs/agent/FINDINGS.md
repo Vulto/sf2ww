@@ -116,3 +116,11 @@
 - Corrected the branch to match the table layout and the regular collision damage path: indices below `0x20` use `data_99324/data_99544`, while `0x20+` uses `data_99566/data_995a6` after subtracting `0x20`.
 - This removes a deterministic out-of-bounds read from ordinary throw processing and restores the intended high-damage throw path.
 - Acceptance: build, unit tests, ASan/UBSan and native smoke must remain green; real MAME lockstep must validate throw damage values.
+
+
+## 2026-09-26 — KO damage-table bounds
+
+- `_EnergyDamageAdjust()` and `diminishing_damage()` indexed the 31-entry energy scaling table with signed `Energy` values without rejecting the terminal KO value `-1`.
+- A second collision/damage path after a KO could therefore read `data_93420[-1]`, an out-of-bounds access capable of producing undefined behavior or a crash.
+- Both paths now treat negative energy like the already-terminal `>= 0x1f` range and leave damage unchanged.
+- Acceptance: sanitizer CI must remain green and the MAME regression must show no post-KO state divergence.
