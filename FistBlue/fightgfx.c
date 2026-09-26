@@ -59,6 +59,10 @@ void check_newtopscore(void) {
 }                                 /* todo */
 
 void init_fightgfx(void) {                /* 0x9254 */
+    /* The first HUD frame must start from the round's full energy. */
+    g.Player1.EnergyCursor = g.Player1.Energy;
+    g.Player2.EnergyCursor = g.Player2.Energy;
+
     if (g.OnBonusStage) {
         redraw_fight_dsk();
         fight_player_names();
