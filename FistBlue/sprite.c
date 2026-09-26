@@ -573,10 +573,6 @@ void draw_layer2_grp3(void) {
 }
 
 static void ds_draw_hiragana(void) {		// 7e884
-	static const u16 data_7e900[] = {
-		0, 0x8197, 0x81b7, 0x8199, 0x819f, 0x81bf, 0x81cf, 0x817f, 0x81af,
-		0x818f, 0x817e, 0x816f, 0x816e
-	};
 	
 	/*
 	0x8180: a ka sa ta na ha ma ya ra wa
@@ -1325,6 +1321,7 @@ static void sub_7ef86(Object *obj, const u16 *tilep, const short *offsets,
 /* 7efd8 object with X and Y Flip */
 static void sub_7efd8(Object *obj, const u16 *tilep, const short *offsets, 
 					  short x, short y, u16 tiles, u16 attr) {
+	(void)obj;
 
 	short sx, sy;
 	u16 tile;
