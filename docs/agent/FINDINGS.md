@@ -130,4 +130,4 @@
 
 - `lookup_damage_and_score()` tested `a3->Damage & 0x7f` but indexed the damage tables with the unmasked value.
 - If the high flag bit is present, normal damage could index past the 16-entry tables, and special damage could index past the 4-entry tables.
-- The lookup now derives one masked damage index and reuses it for all table accesses.
+- The lookup now masks the flag bit, uses the same `/2` table indexing as `LBGetDamage()`, and rejects invalid special codes before table access.
