@@ -240,7 +240,6 @@ short ply_opp_apply_grip_damage(Player *ply,
 								short sound_d6) {		// 3466 
 	/* returns true if victim knocked out. */
 	Object *obj;
-	short d4;
 	
 	// todo: d2 is always zero when called, remove from args
 	ply->Timer2 = 12;
@@ -578,7 +577,7 @@ void sub_2b7c(void) {
 	}
 }
 
-#pragma mark DIFFICULTY
+
 
 void sub_4720(void) {
 	static const u16 data_4754[32]={
@@ -901,7 +900,7 @@ void bumpdifficulty_06(void) { /* 45ea */
 			if(g.Diff06Cnt >= 9) {
 				d1 = 0x30;
 			} else {
-				d1 = data_46aa[g.Diff06Cnt];
+				d1 = data_46aa[(unsigned char)g.Diff06Cnt];
 			}
 			g.Diff_0a04 += d1;
 			g.Diff_0a04 &= 0xff;
@@ -964,7 +963,7 @@ void BumpDiff_PowerMove(void) {	// 46c2 same as 4816?
 	}
 }
 
-#pragma mark State machine
+
 
 /*!
  sf2ua: 0x8d34
