@@ -80,7 +80,7 @@ static void sm_ending_blanka(void) {	// a554
 					NEXT(g.mode4);
 					es.FadeBusy = 1;
 					QueueEffect(0xc1c, 3);
-					/* fall through */
+					__attribute__((fallthrough));
 				case 2:
 					if (!es.FadeBusy) {
 						NEXT(g.mode3);
