@@ -95,3 +95,10 @@
 - Cross-check against the documented WW fighter layout confirms P1 `$FF83C6` and P2 `$FF86C6`; X/Y are 32-bit fields at struct offsets `$06/$08`, while `$28` is the native action-script type and `$2A` is energy.
 - The MAME probe now reads `$06/$08`, preserving the existing mode/animation/energy/move fields.
 - The CSV comparator now treats the 900-frame MAME capture as the required prefix and permits the native probe to run longer under its timeout. A short native capture remains a hard failure.
+
+## 2026-09-26 — Push-box target index correction
+
+- `CDPushOverlap()` selected the target object's push-box using the attacker's `HB_Push` index (`a2->ActionScript->HB_Push`) instead of the target object's own `HB_Push` field.
+- This can select the wrong target box and can read outside the intended target hitbox table when the two action scripts use different indices.
+- Corrected the access to `a6->ActionScript->HB_Push`, preserving the original table and overlap algorithm.
+- Acceptance: build, unit tests, ASan/UBSan and native smoke must remain green; real MAME lockstep is still required to confirm behavioral equivalence during push-box interactions.
