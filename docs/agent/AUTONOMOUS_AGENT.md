@@ -14,3 +14,6 @@ JTCPS reference: https://github.com/jotego/jtcps
 MAME reference: https://github.com/mamedev/mame
 
 Completion requires the objective evidence defined in `AGENTS.md`; a green compile alone is not completion.
+
+
+Autonomous loop heartbeat: continue from current `main` state on every workflow invocation.
