@@ -216,7 +216,7 @@ void enqueue_and_layer (Object *obj) {
     }
 }
 
-#pragma mark ---- Animation Functions ----
+
 
 int check_ground_collision(Object *ply) {		//3152
     if(ply->OnPlatform) {
