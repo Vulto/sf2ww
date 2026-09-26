@@ -58,5 +58,5 @@ struct UserData_EHonda {
 	EHondaMove	pm2;	// 99
 	EHondaMove	pm3;	// 9b
 	
-};
+} __attribute__((packed));
 
