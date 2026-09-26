@@ -63,6 +63,9 @@ void init_fightgfx(void) {                /* 0x9254 */
     g.Player1.EnergyCursor = g.Player1.Energy;
     g.Player2.EnergyCursor = g.Player2.Energy;
 
+    /* Character select repurposes object palette 0x0c; restore the fight HUD palette. */
+    FBSetPalette(PALETTE_0C, RHCODE16_ARRAY(0x8a8ac, 16, PALETTE_0C));
+
     if (g.OnBonusStage) {
         redraw_fight_dsk();
         fight_player_names();
