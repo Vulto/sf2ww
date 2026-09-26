@@ -3,7 +3,7 @@
 Prioridade 0 — segurança/runtime
 - [ ] Substituir o smoke com ROMs zeradas por execução com ROM válida externa ao repositório.
 - [ ] Construir harness MAME/port em lockstep e registrar o primeiro frame divergente.
-- [x] Mapear o vetor de estado lógico no MAME e no port.
+- [ ] Mapear o vetor de estado lógico no MAME e no port.
 - [ ] Cobrir crashes/segfaults e UB em todos os caminhos de jogo acessíveis.
 - [ ] Auditar índices de tilemap e acesso a ROM em todos os caminhos gráficos, incluindo rotinas atualmente desativadas.
 
