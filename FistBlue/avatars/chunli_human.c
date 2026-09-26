@@ -301,6 +301,7 @@ static int sub_304a8(Player *ply, u16 joys) {
 }
 
 static int sub_30592(Player *ply, u16 joys) {
+	(void)joys;
 	UD *ud=(UD *)&ply->UserData;
 	
 	switch (ply->ButtonStrength) {
@@ -437,7 +438,6 @@ static int sub_30614(Player *ply, u16 buttons_d5) {
 }
 
 
-#pragma mark Human move callbacks
 
 int PLCBStandChunLi(Player *ply) {		// 3011e
 	UD *ud=(UD *)&ply->UserData;
@@ -660,6 +660,9 @@ static void sub_30a6a(Player *ply) {
 			} else {
 				PLAYERTICK;
 			}
+#if defined(__GNUC__)
+		__attribute__((fallthrough));
+#endif
 		FATALDEFAULT;
 	}
 }
@@ -688,6 +691,9 @@ static void sub_30884(Player *ply) {
 					break;
 				case 6:
 					sub_30a6a(ply);
+#if defined(__GNUC__)
+				__attribute__((fallthrough));
+#endif
 				FATALDEFAULT;
 			}
 			break;
