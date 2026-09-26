@@ -89,3 +89,9 @@
 - GitHub Actions now installs MAME on the hosted Ubuntu runner and validates the installed MAME driver for `sf2ua`. The current CI run passed build, unit tests, ASan/UBSan, native smoke, MAME installation/driver validation, and the conditional full-MAME job.
 - The real MAME/native lockstep remains blocked only by the absence of the private ROM fixture on the GitHub runner; the CI no longer treats MAME installation itself as a blocker.
 - Acceptance: the integrated crash-fix changes must keep all existing CI jobs green; current validation passes.
+
+## 2026-09-26 — Correct fighter state vector
+
+- Cross-check against the documented WW fighter layout confirms P1 `$FF83C6` and P2 `$FF86C6`; X/Y are 32-bit fields at struct offsets `$06/$08`, while `$28` is the native action-script type and `$2A` is energy.
+- The MAME probe now reads `$06/$08`, preserving the existing mode/animation/energy/move fields.
+- The CSV comparator now treats the 900-frame MAME capture as the required prefix and permits the native probe to run longer under its timeout. A short native capture remains a hard failure.
