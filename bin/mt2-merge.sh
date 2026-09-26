@@ -8,10 +8,39 @@ set -eu
 # The sf2ua set is distributed with two common filename variants for the
 # program ROMs. Accept both variants so the merge step matches MAME's set.
 
-command -v interleave >/dev/null 2>&1 || {
-    echo "error: interleave is required and must be in PATH" >&2
-    exit 1
-}
+if ! command -v interleave >/dev/null 2>&1; then
+    interleave() {
+        perl -e '
+            use strict;
+            use warnings;
+            my ($Mode, $Output, @Inputs) = @ARGV;
+            die "at least two input files are required\n" if @Inputs < 2;
+            my @Data;
+            my $Size;
+            for my $Input (@Inputs) {
+                open my $In, "<:raw", $Input or die "$Input: $!\n";
+                local $/;
+                my $Data = <$In>;
+                close $In;
+                $Size = length($Data) unless defined $Size;
+                die "input files must have equal sizes\n" unless length($Data) == $Size;
+                die "input size must be divisible by mode\n" if $Size % $Mode;
+                push @Data, $Data;
+            }
+            open my $Out, ">:raw", $Output or die "$Output: $!\n";
+            for (my $Offset = 0; $Offset < $Size; $Offset += $Mode) {
+                for my $Data (@Data) {
+                    print {$Out} substr($Data, $Offset, $Mode);
+                }
+            }
+            close $Out;
+        ' "$@"
+    }
+else
+    interleave() {
+        command interleave "$@"
+    }
+fi
 
 pick() {
     for name in "$@"; do
