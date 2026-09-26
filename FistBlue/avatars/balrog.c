@@ -39,12 +39,6 @@ static void sub_36f1e(Player *ply) {
 	ply->AIVolley = FALSE;
 	exit_to_compdisp1(ply);
 }
-static void sub_36f2c(Player *ply) {
-	ply->AISigAttack = FALSE;
-	ply->AIVolley = FALSE;
-	comp_setjumping_main(ply);
-}
-
 static void sub_36f64(Player *ply) {
 	switch (ply->mode2) {
 		case 0:
