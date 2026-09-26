@@ -374,7 +374,7 @@ void check_powermove_input(Player *ply) {
         PLCBPowerZangeif,
         PLCBPowerDhalsim
     };
-    return data_2a7fa[ply->FighterID](ply);
+    (void)data_2a7fa[ply->FighterID](ply);
 }
 
 short ply_cb_standmove(Player *ply) {
