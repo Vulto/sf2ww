@@ -298,12 +298,10 @@ inline u16 RHSwapWord(const u16 num)
 }
 u32 RHReadLong(int romaddr)
 {
-    u32 raw;
     return RHReadLongAt((u32)romaddr);
 }
 u16 RHReadWord(int romaddr)
 {
-    u16 raw;
     return RHReadWordAt((u32)romaddr);
 }
 
