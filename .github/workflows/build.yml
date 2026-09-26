@@ -1,84 +1,84 @@
-name: Build
+name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
 
-# Keep a single active validation run for this workflow. A newer push supersedes
-# an older in-progress run instead of accumulating redundant executions.
 concurrency:
-  group: sf2-validation-${{ github.workflow }}-${{ github.ref }}
+  group: sf2-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  DEBIAN_FRONTEND: noninteractive
+
 jobs:
-  build-and-lint:
-    runs-on: ubuntu-latest
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb
-      - name: Configure
-        run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -S . -B build
-      - name: Build
-        run: cmake --build build --parallel
-      - name: Validate executable
-        run: test -x build/glutBasics
+        with:
+          fetch-depth: 1
 
-  tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev
-      - name: Configure
-        run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_FBTESTS=ON -S . -B build
-      - name: Build and test
-        run: cmake --build build --parallel && ctest --test-dir build --output-on-failure
-
-  sanitizers:
-    runs-on: ubuntu-latest
-    env:
-      ASAN_OPTIONS: "abort_on_error=1"
-      UBSAN_OPTIONS: "halt_on_error=1:print_stacktrace=1"
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb
-      - name: Configure
-        run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Debug -DBUILD_FBTESTS=ON -DENABLE_SANITIZERS=ON -S . -B build
-      - name: Build
-        run: cmake --build build --parallel
-      - name: Run unit tests under sanitizers
-        run: ctest --test-dir build --output-on-failure
-      - name: Run sanitizer unit tests only
-        run: ctest --test-dir build --output-on-failure
-
-  deterministic-regression:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev
+          sudo apt-get install -y             build-essential             cmake             freeglut3-dev             libglu1-mesa-dev             libgl1-mesa-dev             libcmocka-dev             xvfb
+          gcc --version
+          cmake --version
+
       - name: Configure
-        run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_FBTESTS=ON -S . -B build
-      - name: Build
-        run: cmake --build build --parallel
-      - name: Run deterministic tests
+        env:
+          CC: gcc
+        run: |
+          rm -rf build
+          cmake             -DCMAKE_POLICY_VERSION_MINIMUM=3.5             -DCMAKE_BUILD_TYPE=RelWithDebInfo             -DBUILD_FBTESTS=ON             -S .             -B build
+
+      - name: Build executable
+        run: cmake --build build --target glutBasics --parallel 2 --verbose
+
+      - name: Run tests
         run: ctest --test-dir build --output-on-failure
+
+      - name: Validate executable
+        run: |
+          test -x build/glutBasics
+          file build/glutBasics
+
       - name: Validate golden traces
         run: bash scripts/validate_golden_traces.sh
+
+  sanitizers:
+    name: Sanitizers
+    needs: build
+    runs-on: ubuntu-24.04
+    env:
+      ASAN_OPTIONS: abort_on_error=1
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y             build-essential             cmake             freeglut3-dev             libglu1-mesa-dev             libgl1-mesa-dev             libcmocka-dev
+
+      - name: Configure sanitized build
+        env:
+          CC: gcc
+        run: |
+          rm -rf build
+          cmake             -DCMAKE_POLICY_VERSION_MINIMUM=3.5             -DCMAKE_BUILD_TYPE=Debug             -DBUILD_FBTESTS=ON             -DENABLE_SANITIZERS=ON             -S .             -B build
+
+      - name: Build sanitized executable
+        run: cmake --build build --target glutBasics --parallel 2 --verbose
+
+      - name: Run sanitized tests
+        run: ctest --test-dir build --output-on-failure
