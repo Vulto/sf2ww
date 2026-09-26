@@ -448,7 +448,8 @@ void fightstuff (void) {
 inline void fighttick(void) {
     proc_all_actions();
     CDCheckPlayers();
-    DSDrawAllMain(); 
+    redraw_fight_dsk();
+    DSDrawAllMain();
 }
 inline void proc_all_actions (void) {    /* 0x7f9a */
     proc_player_actions();    
