@@ -744,7 +744,9 @@ static void draw_scroll2(void) {
 	glPopMatrix();
 	(void)scrollbot;
 	(void)scrolltop;
-}(void) {
+}
+
+static void draw_scroll3(void) {
 	int x,y, flip, tx, ty, tilety, tiletx;
 	float sx, sy;
 
