@@ -244,6 +244,9 @@ static void guile_comp_kick(Player *ply) {		//33db8
 					break;
 					FATALDEFAULT;
 			}
+#if defined(__GNUC__)
+			__attribute__((fallthrough));
+#endif
 			FATALDEFAULT;
 	}
 }
