@@ -209,6 +209,8 @@ jobs:
           set -euo pipefail
           git config user.name "sf2-autonomous-agent"
           git config user.email "sf2-autonomous-agent@users.noreply.github.com"
+          # Dependency files are generated build artifacts and must never enter main.
+          find . -type f -name "*.d" -delete
           git add -A
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
