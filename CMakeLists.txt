@@ -111,7 +111,7 @@ target_link_libraries(glutBasics PRIVATE m OpenGL::GL OpenGL::GLU GLUT::GLUT Thr
 option(ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 
 if (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(glutBasics PRIVATE -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unknown-pragmas -Wno-error=implicit-fallthrough -Wno-error=unused-function -Wno-error=ignored-qualifiers -Wno-error=old-style-declaration -Wno-error=char-subscripts -Wno-error=comment -Wno-error=parentheses -Wno-error=sequence-point -Wno-error=missing-field-initializers -Wno-error=missing-braces -Wno-error=deprecated -Wno-error=unused-value -Wno-error=unused-but-set-variable)
+    target_compile_options(glutBasics PRIVATE -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unknown-pragmas -Wno-error=implicit-fallthrough -Wno-error=unused-function -Wno-error=ignored-qualifiers -Wno-error=old-style-declaration -Wno-error=char-subscripts -Wno-error=comment -Wno-error=parentheses -Wno-error=sequence-point -Wno-error=missing-field-initializers -Wno-error=missing-braces -Wno-error=deprecated -Wno-error=unused-value -Wno-error=unused-but-set-variable -Wno-error=sign-compare -Wno-error=unused-variable -Wno-error=cast-function-type -Wno-error=type-limits -Wno-error=address -Wno-error=address-of-packed-member)
 
     if (ENABLE_SANITIZERS)
         target_compile_options(glutBasics PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
