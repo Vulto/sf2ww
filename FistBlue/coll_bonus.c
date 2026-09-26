@@ -233,7 +233,7 @@ static void sub_7db12 (Object *obja6, Object_G2 *obja2) {
 			if (g.GPWasProjectile) {
                 LBAddPoints(data_7db7e[(unsigned char)obja2->UD.UDcar.h0093c], obja6->Owner->Side);
 			} else {
-                LBAddPoints(data_7db7e[obja2->UD.UDcar.h0093c], ((Player *)obja6)->Side);
+                LBAddPoints(data_7db7e[(unsigned char)obja2->UD.UDcar.h0093c], ((Player *)obja6)->Side);
 			}
 			action_132fe(obja2, 0);
 		}
