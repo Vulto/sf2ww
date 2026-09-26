@@ -12,7 +12,7 @@ for expected in "$goldenDir"/*.csv; do
     trap 'rm -f "$actual"' EXIT
     cp "$expected" "$actual"
     bash "$comparator" "$expected" "$actual"
-    awk -F, '
+    awk -F, 'BEGIN { prevFrame = -1; prevTick = -1 }
         NR == 1 { if ($1 != "frame") exit 20; next }
         NF < 4 { exit 21 }
         $1 !~ /^[0-9]+$/ { exit 22 }
