@@ -35,18 +35,18 @@ u16 RHReadWordPtr(const void *addr);
 
 const void *RHOffsetLookup16(const u16 *base, int index);
 
-const u16 RHWordOffset(u32 base, int index);
-const u8 RHByteOffset(u32 base, int index);
+u16 RHWordOffset(u32 base, int index);
+u8 RHByteOffset(u32 base, int index);
 
-const u32 RH3DLong(u32 base, int dim2, int dim3, int i1, int i2, int i3);
-const u32 RH2DLong(u32 base, int dim2, int i1, int i2);
-const u32 RH1DLong(u32 base, int index);
-const u16 RH3DWord(u32 base, int dim2, int dim3, int i1, int i2, int i3);
-const short RH3DShort(u32 base, int dim2, int dim3, int i1, int i2, int i3);
-const u16 RH2DWord(u32 base, int dim2, int i1, int i2);
-const short RH2DShort(u32 base, int dim2, int i1, int i2);
-const u8 RH3DByte(u32 base, int dim2, int dim3, int i1, int i2, int i3);
-const u8 RH2DByte(u32 base, int dim2, int i1, int i2);
+u32 RH3DLong(u32 base, int dim2, int dim3, int i1, int i2, int i3);
+u32 RH2DLong(u32 base, int dim2, int i1, int i2);
+u32 RH1DLong(u32 base, int index);
+u16 RH3DWord(u32 base, int dim2, int dim3, int i1, int i2, int i3);
+short RH3DShort(u32 base, int dim2, int dim3, int i1, int i2, int i3);
+u16 RH2DWord(u32 base, int dim2, int i1, int i2);
+short RH2DShort(u32 base, int dim2, int i1, int i2);
+u8 RH3DByte(u32 base, int dim2, int dim3, int i1, int i2, int i3);
+u8 RH2DByte(u32 base, int dim2, int i1, int i2);
 
 
 u32 RHSwapLong(const u32 num);
