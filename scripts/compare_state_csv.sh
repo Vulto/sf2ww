@@ -51,8 +51,10 @@ FNR == 1 {
     row = actual_row - skip
 
     if (!(row in expected_row)) {
-        printf("ROW_COUNT_MISMATCH at frame %s: actual has extra rows\n", $1)
-        exit 11
+        # The expected MAME probe is a fixed prefix. The native process may
+        # produce additional frames before timeout; compare the common prefix
+        # and require at least the full expected sequence in the final check.
+        next
     }
 
     if (NF != expected_nf[row]) {
@@ -72,7 +74,7 @@ FNR == 1 {
 
 END {
     if (actual_rows < expected_rows) {
-        printf("ROW_COUNT_MISMATCH: expected %d rows after skip, actual %d\n",
+        printf("ROW_COUNT_MISMATCH: expected at least %d rows after skip, actual %d\n",
                expected_rows, actual_rows)
         exit 14
     }
