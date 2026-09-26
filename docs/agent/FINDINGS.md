@@ -79,3 +79,13 @@
 - `bin/mt2-merge.sh` now accepts both the historical names and the canonical MAME-set names without changing the generated layout.
 - The original ROM data remains external to the repository, as required by `AGENTS.md`.
 - Acceptance for this step: merge reproducibility and SHA-1 validation pass. Real MAME/native lockstep remains pending because the current execution environment does not provide the MAME executable.
+
+
+## 2026-09-26 — Crash-fix branch reconciliation and GitHub MAME validation
+
+- Existing branches were compared against `main`; branches that were only behind or whose changes were already represented in `main` were not replayed wholesale.
+- The historical `ci/_crashfix-001` branch contained still-relevant x64 safety work that was not fully represented in `main`: packed CPS user-data overlays, checked ROM pointer/offset accessors, safe ROM action metadata reads, safe sprite ROM range validation, fixed-point wraparound preservation, AI ROM lookup validation, palette bounds validation, and signed-shift cleanup.
+- Those root-cause fixes were integrated directly into `main` without creating a new working branch.
+- GitHub Actions now installs MAME on the hosted Ubuntu runner and validates the installed MAME driver for `sf2ua`. The current CI run passed build, unit tests, ASan/UBSan, native smoke, MAME installation/driver validation, and the conditional full-MAME job.
+- The real MAME/native lockstep remains blocked only by the absence of the private ROM fixture on the GitHub runner; the CI no longer treats MAME installation itself as a blocker.
+- Acceptance: the integrated crash-fix changes must keep all existing CI jobs green; current validation passes.
