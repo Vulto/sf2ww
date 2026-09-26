@@ -1,0 +1,62 @@
+name: MAME lockstep
+description: Run the private MAME state probe and native port state probe, then compare them.
+inputs:
+  rom-root:
+    description: Private fixture root containing roms/, allroms.bin and sf2gfx.bin.
+    required: true
+  port-executable:
+    description: Native port executable path.
+    required: false
+    default: build/glutBasics
+  mame-bin:
+    description: MAME executable.
+    required: false
+    default: mame
+  mame-set:
+    description: MAME ROM set name.
+    required: false
+    default: sf2ua
+runs:
+  using: composite
+  steps:
+    - name: Validate private fixture
+      shell: bash
+      env:
+        ROM_ROOT: ${{ inputs.rom-root }}
+      run: |
+        set -euo pipefail
+        test -d "$ROM_ROOT/roms"
+        test -f "$ROM_ROOT/allroms.bin"
+        test -f "$ROM_ROOT/sf2gfx.bin"
+
+    - name: Run MAME state probe
+      shell: bash
+      env:
+        SF2_MAME_ROMPATH: ${{ inputs.rom-root }}/roms
+        MAME_BIN: ${{ inputs.mame-bin }}
+        SF2_MAME_SET: ${{ inputs.mame-set }}
+      run: |
+        set -euo pipefail
+        rm -f mame_state.csv
+        xvfb-run -a bash scripts/run_mame_state.sh
+
+    - name: Run native port state probe
+      shell: bash
+      env:
+        ROM_ROOT: ${{ inputs.rom-root }}
+        PORT_EXECUTABLE: ${{ inputs.port-executable }}
+      run: |
+        set -euo pipefail
+        cp "$ROM_ROOT/allroms.bin" allroms.bin
+        cp "$ROM_ROOT/sf2gfx.bin" sf2gfx.bin
+        set +e
+        SF2_STATE_LOG=port_state.csv timeout 30s xvfb-run -a "$PORT_EXECUTABLE" </dev/null
+        status=$?
+        set -e
+        if [ "$status" -ne 124 ]; then
+          exit "$status"
+        fi
+
+    - name: Compare first divergence
+      shell: bash
+      run: bash scripts/compare_state_csv.sh mame_state.csv port_state.csv
