@@ -561,6 +561,9 @@ void PLCBCompAttackMBison(Player *ply) {
 						case 2:		sub_365da(ply);	break;
 						FATALDEFAULT;
 					}
+#if defined(__GNUC__)
+				__attribute__((fallthrough));
+#endif
 				FATALDEFAULT;
 			}
 		}
