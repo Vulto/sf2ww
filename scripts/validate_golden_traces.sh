@@ -2,16 +2,8 @@
 set -eu
 
 goldenDir="tests/golden"
-comparator="scripts/compare_state_csv.sh"
-
-test -f "$comparator"
-
 for expected in "$goldenDir"/*.csv; do
     [ -f "$expected" ] || continue
-    actual="$(mktemp)"
-    trap 'rm -f "$actual"' EXIT
-    cp "$expected" "$actual"
-    bash "$comparator" "$expected" "$actual"
     awk -F, 'BEGIN { prevFrame = -1; prevTick = -1 }
         NR == 1 { if ($1 != "frame") exit 20; next }
         NF < 4 { exit 21 }
@@ -23,8 +15,6 @@ for expected in "$goldenDir"/*.csv; do
         prevTick = $3
         END { if (NR < 2) exit 26 }
     ' "$expected"
-    rm -f "$actual"
-    trap - EXIT
 done
 
-printf '%s\n' "GOLDEN_TRACES_VALID"
+printf '%s\n' "GOLDEN_TRACE_FORMAT_VALID"
