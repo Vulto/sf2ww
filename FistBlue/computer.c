@@ -61,7 +61,6 @@ static void comp_changetactics(Player *ply, short d0);	/* 2c1b4 */
 
 static void comp_standblock(Player *ply);		/* 2cd8e */
 static int check_comp_should_jump(Player *ply);	/* 2cce8 */
-static void comp_set_standattack(Player *ply);
 static int comp_check_block (Player *ply);	/* 2cd88 */
 static int comp_check_standattack(Player *ply); /* 2cde2 */
 static void comp_turn_crouch(Player *ply);	/* 0x2ce84 */
@@ -105,7 +104,7 @@ void  set_comp_difficulty(Player *ply) {		/* 285ea */
 
 
 
-#pragma mark ---- Checks ----
+
 inline static int check_comp_should_jump(Player *ply) {	/* 2cce8 */
 	return ply->CompDoJump;		/* x0213 char */
 }
@@ -171,7 +170,7 @@ static short comp_check_platform(Player *ply) {		// 2ccee
 	return FALSE;
 }
 
-#pragma mark ---- AI BEGIN ----
+
 
 void computer_per_frame(Player *ply) {		/* 2ac70 */
 	switch (ply->mode0) {
@@ -189,7 +188,7 @@ void computer_per_frame(Player *ply) {		/* 2ac70 */
 			CASetAnim1(ply, STATUS_NORMAL);
 			break;
 		case 2:
-			if (g.RoundCnt==0  & ply->FighterID == FID_M_BISON && g.ShowCapeAnimation) {
+			if (g.RoundCnt == 0 && ply->FighterID == FID_M_BISON && g.ShowCapeAnimation) {
 				/* Special cape stuff */
 				sub_3623e(ply);
 			} else {
@@ -300,7 +299,7 @@ static void comp_jump_dhalsimcheck(Player *ply) {		/* 2c828 */
 	comp_jump_physics(ply);
 }
 
-#pragma mark ---- Per-Avatar Callbacks ----
+
 
 static short comp_jump_plycallback(Player *ply) { /* 2c9be */
 	int (*data_2c9cc[])(Player *) = {
@@ -329,7 +328,7 @@ static void comp_footsweep_or_jump(Player *ply) {		/* 2cbc4 */
 }
 
 
-#pragma mark ---- comp_plstat_* ----
+
 
 void comp_plstat_normal(Player *ply) {  /* 2c2a4 */
 	short temp;
@@ -604,7 +603,7 @@ static void comp_plstat_turnaround(Player *ply) {	/* 2c9fe */
 	}
 	
 }
-static void sub_2cc96(Player *ply) { /* really does nothing */ }
+static void sub_2cc96(Player *ply) { (void)ply; }
 static void comp_plstat_block(Player *ply) {		// 2cb04
 	short temp;
 	switch (ply->mode2) {
@@ -718,7 +717,7 @@ static void comp_standattack_or_jump(Player *ply) {		/* 2cbd6 */
 	if(check_comp_should_jump(ply)){comp_set_jump(ply); return;}
 }
 
-#pragma mark ---- Setstatus ----
+
 
 static void comp_set_block4 (Player *ply) {
 	ply->mode2=0;
@@ -770,7 +769,7 @@ static void comp_attack_plycallback (Player *ply) { /* 2cc58 */
 	data_2cc66[ply->FighterID](ply);	
 }
 
-#pragma mark ---- Comp NextAction ----
+
 
 
 short comp_setnextaction(Player *ply) {		/* 2c5de */
@@ -874,7 +873,7 @@ static void comp_changetactics(Player *ply, short d0) {	/* 2c1b4 */
 	process_plstat_frontend(ply);
 }
 
-#pragma mark ---- COMP setters ----
+
 
 short comp_diceroll(Player *ply) {	// 2c34a
 	if (ply->AIVolley == FALSE || ply->DiceRollCount == 0) {
@@ -888,15 +887,7 @@ short comp_diceroll(Player *ply) {	// 2c34a
 	} 
 	return FALSE;
 }
-static void sub_2c4fa(Player *ply) {
-	ply->mode1 = PLSTAT_STANDBLOCK;
-	ply->mode2 = 0;
-	if (ply->ActionScript->Crouch) {
-		ply->mode2 = 4;
-	}
-}
 
-#pragma mark ---- Exit to plstat ----
 /* setstatus and plstat_* */	
 
 
@@ -989,7 +980,7 @@ void comp_exit_plstat_crouch(Player *ply) {	/* 0x2c496  */
 	process_plstat_frontend(ply);
 }
 
-#pragma mark Comp Setstatus
+
 /* setstatus but no plstat */
 
 static void comp_turn_crouch(Player *ply) { /* 0x2ce84 1 caller */
