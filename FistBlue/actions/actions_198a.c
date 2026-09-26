@@ -36,8 +36,6 @@ extern ScrollState gstate_Scroll3;
 
 extern short g_d7;		/* global for counter */
 
-static void sub_25f06(Object_G2 *obj);
-
 static void _SMAct00(Object_G2 *obj) {			// 24a50
 	/* big fish on Brazil level */
 	switch (obj->mode0) {
@@ -193,24 +191,6 @@ static void _SMRyuSigns(Object_G2 *obj) {		// 24c4e
 	}
 }
 
-static void sub_24fcc(Object *obja0, Object *obja6) {
-	obja0->XPI = obja6->XPI;
-	obja0->YPI = obja6->YPI + 64;
-}
-
-
-static void sub_24fe0(Object_G2 *obj) {
-//	if (obj->UD.UDunknown.h0097c) {
-//		obj->UD.UDunknown.h0098p->mode0 = 4;
-//		obj->UD.UDunknown.h0097 = FALSE;
-//	}
-}
-
-
-static void sub_24f96(int argd0, Object *obj) {
-	
-}
-
 const HitBox hitb_24f8e[] = {EMPTY_HITBOX, {0, 80, 16, 80}};
 
 const struct hitboxes hitboxes_24f76 = {
@@ -254,11 +234,9 @@ static void _SMAct03(Object_G2 *obj) {		// 24efa
 //in drums.c
 void _SMAct04(Object_G2 *obj);
 void _SMAct05(Object_G2 *obj);
-#pragma mark 06-The Car		
 // in car.c
 void _ActSMCar(Object_G2 *obj);
 
-#pragma mark Act07 Guiles Crate
 static void _SMAct07(Object_G2 *obj) {			// 272c6
 	static const char data_27384[] = {
 		0, 4, 2, 3, 0, 1, 3, 2, 1, 4, 3, 2, 0, 1, 4, 2
@@ -309,11 +287,13 @@ static void _SMAct07(Object_G2 *obj) {			// 272c6
 		case 4:
 		case 6:
 			clearpush_1174(obj);
+#if defined(__GNUC__)
+		__attribute__((fallthrough));
+#endif
 		FATALDEFAULT;
 	}
 }
 
-#pragma mark Act08
 
 static int _Act08PlatformCheck(Player *plya3, Object_G2 *obj) {		// 277d4
 	short d2;
@@ -522,11 +502,6 @@ static void _SMAct08(Object_G2 *obj) {		// 274e4
 }
 
 
-static void sub_921e(void) {
-	if (g.x8ab9 <= 5) {
-		sub_90c8();
-	}
-}
 static void sub_922c(void) {
 	sub_bcd_8(1, &g.x8ab9);
 	sub_528a();
@@ -596,7 +571,6 @@ static void sub_27912(Object_G2 *obj) {
 	check_rect_queue_draw((Object *)obj);
 }
 
-#pragma mark Act09 Bonus1 Barrels
 
 static int _barrel_gravity(Object_G2 *obj) {				// 27b4c
 	obj->Y.full += obj->UD.UDbonus1.Velocity.full;
@@ -628,7 +602,7 @@ static void sub_27b5e(Object_G2 *obj) {			// 27b5e
 }
 
 static void _init_barrel_hitpoints(Object_G2 *obj) {     // 278ac
-    const static char data_278c2[] = {
+    static const char data_278c2[] = {
         0, 1, 2, 0, 1, 2, 0, 3, 0, 1, 2, 0, 1, 2, 0, 0
     };
 
