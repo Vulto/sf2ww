@@ -63,20 +63,21 @@ jobs:
         run: cmake --build build --parallel
       - name: Run unit tests under sanitizers
         run: ctest --test-dir build --output-on-failure
-      - name: Run headless game smoke test
+      - name: Run real-ROM game smoke test
         run: |
-          truncate -s 1048576 allroms.bin
-          truncate -s 2097152 sf2gfx.bin
+          test -s allroms.bin
+          test -s sf2gfx.bin
           set +e
-          SF2_STATE_LOG=smoke_state.csv timeout 15s xvfb-run -a ./build/glutBasics </dev/null
+          SF2_STATE_LOG=smoke_state.csv timeout 30s xvfb-run -a ./build/glutBasics </dev/null
           status=$?
           set -e
           if [ "$status" -ne 124 ]; then
+            echo "REAL_ROM_RUN_FAILED: exit status $status"
             exit "$status"
           fi
           frames=$(( $(wc -l < smoke_state.csv) - 1 ))
-          if [ "$frames" -lt 300 ]; then
-            echo "SMOKE_FRAME_PROGRESS_FAILURE: expected at least 300 state frames, got $frames"
+          if [ "$frames" -lt 600 ]; then
+            echo "REAL_ROM_FRAME_PROGRESS_FAILURE: expected at least 600 state frames, got $frames"
             exit 1
           fi
 
