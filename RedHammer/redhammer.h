@@ -23,6 +23,13 @@ typedef struct fistblue_tile_plane RHTilePlane;
 
 void load_cps_roms(void);
 
+void *RHCodePtrRange(u32 offset, size_t size);
+void *RHCodePtrChecked(u32 offset, const char *file, int line);
+void *RHCodePtr(u32 offset);
+u32 RHCodeOffsetChecked(const void *addr, size_t size, const char *file, int line);
+u16 RHReadWordPtr(const void *addr);
+#define RHCODE_OFFSET(ptr, size) RHCodeOffsetChecked((ptr), (size), __FILE__, __LINE__)
+
 const void *RHOffsetLookup16(const u16 *base, int index);
 
 const u16 RHWordOffset(u32 base, int index);
