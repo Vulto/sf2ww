@@ -109,7 +109,9 @@ static void apply_throw_damage(Player *ply, Player *opp_a3, short index) {
     opp_a3->UndealtDamage = dr.damage;
     opp_a3->RewardID = dr.d5;
     if (g.FastEndingFight == 0 && g.OnBonusStage == 0) {
-        if(opp_a3->Energy < dr.damage) { return; }
+        opp_a3->Energy -= dr.damage;
+        opp_a3->EnergyDash -= dr.damage;
+        if(opp_a3->Energy >= 0) { return; }
         
         if(opp_a3->FighterID == FID_CHUN_LI) {
             queuesound(SOUND_KO_FEMALE);
