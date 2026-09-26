@@ -96,7 +96,7 @@ jobs:
           if [ -z "${SF2_MAME_ROM_ROOT:-}" ]; then
             echo "MAME_COMPARISON_BLOCKED: no private ROM fixture is mounted on this runner."
           else
-            echo "MAME_COMPARISON_READY: private fixture root is present."
+            echo "MAME_COMPARISON_READY: private ROM fixture root is present."
           fi
 
   full-mame-regression:
@@ -121,27 +121,11 @@ jobs:
       - name: Configure and build port
         if: steps.fixture.outputs.available == 'true'
         run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_FBTESTS=ON -S . -B build && cmake --build build --parallel
-      - name: Run MAME state probe
+      - name: Run MAME + native port lockstep
         if: steps.fixture.outputs.available == 'true'
-        env:
-          SF2_MAME_ROMPATH: ${{ env.SF2_MAME_ROM_ROOT }}/roms
-        run: |
-          rm -f mame_state.csv
-          xvfb-run -a bash scripts/run_mame_state.sh
-      - name: Run port state probe
-        if: steps.fixture.outputs.available == 'true'
-        run: |
-          test -f "${SF2_MAME_ROM_ROOT}/allroms.bin"
-          test -f "${SF2_MAME_ROM_ROOT}/sf2gfx.bin"
-          cp "${SF2_MAME_ROM_ROOT}/allroms.bin" allroms.bin
-          cp "${SF2_MAME_ROM_ROOT}/sf2gfx.bin" sf2gfx.bin
-          set +e
-          SF2_STATE_LOG=port_state.csv timeout 30s xvfb-run -a ./build/glutBasics </dev/null
-          status=$?
-          set -e
-          if [ "$status" -ne 124 ]; then
-            exit "$status"
-          fi
-      - name: Compare first divergence
-        if: steps.fixture.outputs.available == 'true'
-        run: bash scripts/compare_state_csv.sh mame_state.csv port_state.csv
+        uses: ./.github/actions/mame-lockstep
+        with:
+          rom-root: ${{ env.SF2_MAME_ROM_ROOT }}
+          port-executable: build/glutBasics
+          mame-bin: mame
+          mame-set: sf2ua

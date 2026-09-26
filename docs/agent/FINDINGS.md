@@ -29,18 +29,21 @@
 - These were replaced with memcpy-based word reads while preserving the original byte offsets and endian conversion.
 - CI for the correction passed build, tests, smoke-compare, and ASan/UBSan; the full-MAME job remains conditional on the private ROM fixture.
 - A secondary audit found draw_scroll2_planes could form a negative SCR2 tilemap index from its display-loop coordinates; the mapping now masks tx/ty to the CPS1 6-bit tilemap domain before indexing.
+
 ## 2026-09-21 — MAME probe headless execution
 
 - The scheduled full-MAME job installed Xvfb but launched the MAME state probe directly with OpenGL.
 - On a GitHub-hosted Linux runner there is no guaranteed graphical display, so the probe could fail before producing the state CSV even when the private ROM fixture is present.
 - The regression step now runs the existing MAME probe through `xvfb-run -a`, keeping the ROM fixture external while making the comparison harness deterministic in headless CI.
 - Acceptance: the full-MAME job must reach the state-dump step without requiring a physical display; actual state equivalence remains blocked until the private ROM fixture is mounted.
+
 ## 2026-09-21 — Smoke must detect premature exit
 
 - The native smoke previously accepted both a 15/30-second timeout and a clean exit status of 0.
 - A crash is normally non-zero, but an early clean exit could therefore be misclassified as a passing runtime test.
 - The smoke gates now require the expected timeout status (124), proving the executable remained alive for the observation window. Any clean early exit or crash fails CI.
-- This strengthens the crash/segfault coverage without changing game behavior.
+- This strengthens the crash/UB coverage without changing game behavior.
+
 ## 2026-09-21 — Smoke verifies forward frame progress
 
 - A live process alone is insufficient crash/runtime coverage: a deadlocked or stalled frontend can remain alive until the timeout.
@@ -60,3 +63,11 @@
 - A corrupted or invalid task id could therefore turn a runtime scheduling error into an out-of-bounds write/read against the task table and potentially crash the native process.
 - Both entry points now reject ids outside `0..MAX_TASKS-1` before touching the task table.
 - Acceptance: invalid task ids must not access `Exec.Tasks` or invoke the pthread backend; valid task ids retain the existing behavior.
+
+## 2026-09-26 — Reusable MAME lockstep action
+
+- The central workflow already had the required build, smoke, and conditional full-MAME jobs, but the MAME probe, native port probe, and first-divergence comparison were duplicated as workflow steps.
+- The contract requires a reusable composite action for the common MAME + port + diff logic.
+- Added `.github/actions/mame-lockstep/action.yml`, which validates the private fixture, runs the MAME state probe headlessly, runs the native port probe with the same fixture, and invokes the existing first-divergence comparator.
+- The scheduled/merge full-MAME job now delegates that sequence to the composite action.
+- Acceptance: the single central workflow remains the only workflow, while the full-MAME job uses the reusable action and preserves the external/private ROM boundary.
