@@ -57,8 +57,6 @@ static void action_NN(Object *obj) {
 
 
 static void _draw_portrait_scr2(const SimpleImage *a1, short d1, u16 **gfx_p);
-static POINT16 Act23RandomSmallOffset(void);
-static Player *sub_1e7ae(Object *obj);
 
 static void action_0(Object *obj);
 static void action_1(Object *obj);	/* cb2a */
@@ -277,7 +275,7 @@ static void action_1(Object *obj) {	/* cb2a */
 						case 2:
 							if(obj->Timer-- == 0) {
 								obj->Timer = 10;
-								obj->Draw2.part.integer = data_cc0e[obj->x002e];	/* u16 x 8 */
+								obj->Draw2.part.integer = data_cc0e[(unsigned char)obj->x002e];	/* u16 x 8 */
 								obj->x002e++;
 								obj->x002e &= 0xe;
 							}		
@@ -2006,6 +2004,9 @@ static void action_1c(Object *obj) {
 
 
 static void sub_15cf2(u16 *gfx_p_a3, int d2, int d3) {
+	(void)gfx_p_a3;
+	(void)d2;
+	(void)d3;
 	// todo
 }
 
@@ -2457,6 +2458,7 @@ static void action_NN(Object *obj) {
 
 
 void action_1cd3c(Player *ply) {
+	(void)ply;
 	/* XXX vegas claw falls off */
 }
 
@@ -3806,120 +3808,6 @@ static void action_41(Object *obj)
 
 
 // see barrels.c
-
-
-
-static void action_43(Object *obj) {        //219ce
-	if (obj->SubSel) {
-		//21adc todo
-		switch (obj->mode0) {
-			case 0:
-				NEXT(obj->mode0);
-				obj->Pool       = 6;
-				obj->LocalTimer = 40;
-                
-				//todo
-//				memcpy(gfx_p, data_21b2a, 160);
-                RHSetActionList(obj, RHCODE(0x21f26), 0);
-				break;
-			case 2:
-				if (obj->LocalTimer) {
-					--obj->LocalTimer;
-				} else {
-					if (g.mode2 == 0xc) {
-						FreeActor(obj);
-					} else {
-						actiontick(obj);
-						enqueue_and_layer(obj);
-					}
-				}
-				break;
-			case 4:
-			case 6:
-				FreeActor(obj);
-				break;
-			FATALDEFAULT;
-		}
-	} else {
-		if (g.Version != VERSION_JAP) {
-			// 21a66
-			switch (obj->mode0) {
-				case 0:
-					NEXT(obj->mode0);
-					obj->Pool  = 2;
-					obj->Draw1 = -1;
-					obj->Step  = 0;
-					obj->Draw2.full = 0xfff0;
-					obj->YPI += 0x50;
-					obj->LocalTimer = 0x80;
-					obj->x002e = 0x40;
-                    RHSetActionList(obj, RHCODE(0x21bea), 1);
-					break;
-				case 2:
-					if (g.mode2 == 0xc) {
-						queuesound(SOUND_GAME_OVER);
-						DrawTileText(TILETEXT_GAME_OVER);
-						FreeActor(obj);
-					} else {
-						if (obj->mode1 == 0) {
-							++obj->Draw2.full;
-							if(--obj->x002e == 0) {
-								obj->mode1 = 2;
-							}
-						}
-						enqueue_and_layer(obj);
-					}
-					break;
-				case 4:
-				case 6:
-					FreeActor(obj);
-					break;
-					FATALDEFAULT;
-			}
-		} else {
-			// Japan only
-			switch (obj->mode0) {
-				case 0:
-					NEXT(obj->mode0);
-					obj->Pool  = 2;
-					obj->Draw1 = -1;
-					obj->Step  = 0;
-					obj->Draw2.full = 0xffbd;
-					obj->YPI += 0xb7;
-					obj->LocalTimer = 0x80;
-					obj->x002e = 0x40;
-                    RHSetActionList(obj, RHCODE(0x21bea), 0);
-					//setaction_list(obj, data_21bea, 0); TODO
-					break;
-				case 2:
-					if (g.mode2 == 0xc) {
-						queuesound(SOUND_GAME_OVER);
-						DrawTileText(TILETEXT_GAME_OVER);
-						FreeActor(obj);
-					} else {
-						if (obj->mode1 == 0) {
-							++obj->Step;
-							obj->Step &= 0x1f;
-							obj->YPI -= 2;
-							++obj->Draw2.full;
-							if(--obj->x002e == 0) {
-								obj->mode1 = 2;
-							}
-						}
-						enqueue_and_layer(obj);
-					}
-					break; 
-				case 4:
-				case 6:
-					FreeActor(obj);
-					break;
-				FATALDEFAULT;
-			}
-		}
-
-	}
-
-}
 
 
 
