@@ -897,7 +897,8 @@ static void guile_attack_jump(Player *ply) {		// 2fc80
 			switch (ply->mode2) {
 				case 0:
 					NEXT(ply->mode2);
-					if ((ply->JoyCorrect & 0xb) || (ply->JoyCorrect & JOYCO_TOWARD) == 0) {
+					/* The original expression is a tautology for every JoyCorrect value; preserve that behavior explicitly. */
+					if (1) {
 						ply->Flip ^= 1;
 					}
 					ply->Timer2 = 12;
@@ -942,7 +943,8 @@ static void guile_attack_jump(Player *ply) {		// 2fc80
 			switch (ply->mode2) {
 				case 0:
 					NEXT(ply->mode2);
-					if ((ply->JoyCorrect & 0xb) || (ply->JoyCorrect & JOYCO_TOWARD) == 0) {
+					/* The original expression is a tautology for every JoyCorrect value; preserve that behavior explicitly. */
+					if (1) {
 						ply->Flip ^= 1;
 					}
 					ply->Timer2 = 12;
