@@ -182,7 +182,7 @@ static void sub_1152(short data) {	// same as 10e0, but doesn't do Object0
 	blackadder(gemu.PalUnk2[0], &es.x5d52, 7, data);
 }
 
-#pragma mark SYSLIB_00
+
 
 void syslib_00 (void) {					// e12
     Task *task = &Exec.Tasks[Exec.CurrentTask];
@@ -329,7 +329,7 @@ void syslib_00 (void) {					// e12
             /* XXX some missing */
 			
 		case 0x1e:
-			while(es.FadeScroll3 != 0xffffffff)  {
+			while(es.FadeScroll3 != -1)  {
 				massadder(CPS_PALBASE_SCROLL1, &es.FadeScroll1, -0x1000);
 				massadder(CPS_PALBASE_SCROLL2, &es.FadeScroll2, -0x1000);
 				massadder(CPS_PALBASE_SCROLL3, &es.FadeScroll3, -0x1000);
@@ -461,7 +461,7 @@ void syslib_0c (void) {
 			DIEBREAK;
 		case 0x12:
 			QueueEffect(LC0_DARK_OBJECT, task->params.Param2);    
-			do {sf2sleep(1);} while (es.FadeObject != 0xffffffff);
+			do {sf2sleep(1);} while (es.FadeObject != -1);
 			g.x02b8 = 0;
 			g.x02ba = 0;
 			clear_object();
@@ -469,19 +469,19 @@ void syslib_0c (void) {
 			DIEBREAK;
 		case 0x14:
 			QueueEffect(LC0_DARK_SCROLL1, task->params.Param2);    
-			do {sf2sleep(1);} while (es.FadeScroll1 != 0xffffffff);    
+			do {sf2sleep(1);} while (es.FadeScroll1 != -1);    
 			gfxrepeat(CPS_VIDEO_SCROLL1, 0x1000, GFXROM_SCROLL1 + ' ', 0);
 			es.FadeBusy = FALSE;
 			DIEBREAK;
 		case 0x16:
 			QueueEffect(LC0_DARK_123, task->params.Param2);    
-			do {sf2sleep(1);} while (es.FadeScroll2 != 0xffffffff);    
+			do {sf2sleep(1);} while (es.FadeScroll2 != -1);    
 			gfxrepeat(CPS_VIDEO_SCROLL2, 0x1000, GFXROM_SCROLL2 , 0);
 			es.FadeBusy = FALSE;
 			DIEBREAK; 
 		case 0x18:
 			QueueEffect(LC0_DARK_SCROLL3, task->params.Param2);    
-			do {sf2sleep(1);} while (es.FadeScroll3 != 0xffffffff);    
+			do {sf2sleep(1);} while (es.FadeScroll3 != -1);    
 			gfxrepeat(CPS_VIDEO_SCROLL3, 0x1000, GFXROM_SCROLL3 , 0);
 			es.FadeBusy = FALSE;
 			DIEBREAK;
@@ -492,7 +492,7 @@ void syslib_0c (void) {
 			break;
 		case 0x1e:
 			QueueEffect(LC0_DARK_123, task->params.Param2);
-			do {sf2sleep(1);} while (es.FadeScroll3 != 0xffffffff);  
+			do {sf2sleep(1);} while (es.FadeScroll3 != -1);  
 			clear_scrolls_123(task);      /* dies */
 			break;
 		case 0x20:
@@ -504,7 +504,7 @@ void syslib_0c (void) {
 			start_effect(LC0_DARK_SCROLL2, task->params.Param2);
 			start_effect(LC0_DARK_SCROLL3, task->params.Param2);
 			
-			do { sf2sleep(1); } while (es.FadeScroll3 != 0xffffffff);
+			do { sf2sleep(1); } while (es.FadeScroll3 != -1);
 			_clear_scr23_wait_die(task);
             break;
         FATALDEFAULT;
@@ -865,7 +865,7 @@ static void syslib_20(void) {		//5410 increase player score
 	DIEFREE;
 }
 
-#pragma mark SysLib08 Text Routines 
+
 
 
 
@@ -905,7 +905,7 @@ static void syslib_26(void) {
 	
 
 
-#pragma mark STATIC TASKS 
+
 
 void task_scheduler(void) {		//14f2
 	unsigned char i;
@@ -1000,7 +1000,7 @@ static void sub_716a(Player *ply) {
 	}
 }
 
-#pragma mark ---- Fade Entries ----
+
 
 void fadenwait1 (void) {			/* 0x2138 */
     es.FadeBusy = TRUE;
@@ -1090,7 +1090,8 @@ static void LBPlayerHasLeft(Player *ply) {			// 7660
 	DrawTileText(LIBTEXT_ERASE + ply->Side);	
 }
 	
-static void SMPlayerBlinker(Task *task, Player *ply) {		// 6ea4
+static void SMPlayerBlinker(Task *task, Player *ply) {
+	(void)task;		// 6ea4
 	if (ply->Alive == FALSE) {
 		switch (ply->BlinkerMode0) {
 			case 0:
