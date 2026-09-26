@@ -73,6 +73,7 @@ all_done:
 
 // 207f0 barrels
 void action_207f0(Object *obj, short d7) {
+    (void)d7;
     int i;
     Object_G2 *obj2;
     
