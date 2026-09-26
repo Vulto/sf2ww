@@ -152,20 +152,6 @@ static void sub_2525a(Object_G2 *obj) {
 	queuesound(0x3b);
 	check_rect_queue_draw((Object *)obj);
 }
-static void sub_25220(Object_G2 *obj) {
-	if (--obj->UD.UDbonus2.h009ac == 0) {
-		if (obj->UD.UDbonus2.h0092c) {
-			sub_2525a(obj);
-			return;
-		}
-		obj->UD.UDbonus2.h009ac = 1;
-	}
-	obj->mode1 = 2;
-	obj->mode2 = 0;
-	obj->VelY.full = 0x200;
-	queuesound(0x3b);
-	check_rect_queue_draw((Object *)obj);
-}
 static void sub_257d8 (Object *obj) {			// 257d8 random force
 	static const short data_257fa[] = {
 		-32, -16, -16, 0, 0, 16, 16, 32,
