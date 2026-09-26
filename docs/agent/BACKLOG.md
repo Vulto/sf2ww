@@ -49,3 +49,5 @@ Prioridade 2 — validação audiovisual
 
 - Corrected the MAME fighter position probe to read the documented fighter struct X/Y fields at offsets `$06/$08` from P1 `$FF83C6` and P2 `$FF86C6`. The previous probe incorrectly sampled `$28/$2C`, which are action-script/energy fields in the native struct model.
 - Updated the comparator to compare the complete fixed MAME prefix while allowing the native process to emit additional frames before timeout; fewer native frames still fail.
+
+- [ ] Validate player/object push-box interactions against MAME after the real ROM fixture is mounted.
