@@ -1,3 +1,9 @@
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#endif
 /*
  *  projdata.h
  *  GLUTBasics
@@ -12,20 +18,20 @@ const short data_22bf6[5] = { 0x50, 0x58, 0x00, 0x40, 0x68 };
 const short data_22c00[5] = { 0x38, 0x22, 0x00, 0x32, 0x4e };
 
 const HitBox hitb_2329c[] = {{0,0,0,0}, {0,0,0x1c,0x13},{0,0,0x29,0x11}};
-const HitBoxAct hitb_232a8[] = {{0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,15,12,11,1,0x2a,3,2,2,3,0x14,0}};
+const HitBoxAct hitb_232a8[] = {{0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,15,12,11,1,0x2a,3,2,2,3,0x14}};
 
 const HitBox hitb_23334[] = {{0,0,0,0}, {0,0,0x29, 0x11}};
-const HitBoxAct hitb_2334c = {0,0,0,0, 0,0,0,0,0};
+const HitBoxAct hitb_2334c = {0,0,0,0, 0,0,0,0};
 
 const HitBox hitb_233bc[] = {{ 0,0,0,0}, {0,0, 0x1c, 0x13},{ 0, 0, 0, 0}};
-const HitBoxAct hitb_233c4 = { 0,0,0,0, 0,0, 0,    0,    0, 0, 0, 0,0};
+const HitBoxAct hitb_233c4 = { 0,0,0,0, 0,0, 0,    0,    0, 0, 0, 0};
 
 const HitBox hitb_2493e[] = {{0,0,0,0}, {0x2, 0x11, 0x18, 0x10}};
-const HitBoxAct hitb_24946 = { 0,0,0,0,0,0,0,0,0,0,0,0,0};
+const HitBoxAct hitb_24946 = { 0,0,0,0,0,0,0,0,0,0,0,0};
 
 const HitBox hitb_249a2[] = {{ 0,0,0,0}, {0xde, 0x20, 0x28, 0x18},{ 0,0,0,0}};
-const HitBoxAct hitb_249aa = { 0,0,0,0, 0,    0,    0,    0,    0,0,0,0,0};
+const HitBoxAct hitb_249aa = { 0,0,0,0, 0,    0,    0,    0,    0,0,0,0};
 
 const struct hitboxes data_23290 = {		/* Hadouken Hitboxes */
 	hitb_2329c,
@@ -121,17 +127,17 @@ const VECT16 data_cf05c[] = {{0x500, 0}, {-0x500, 0}, {0x580, 0}, {-0x580, 0}};
 const VECT16 data_cf07c[] = {{0x700, 0}, {-0x700, 0}, {0x780, 0}, {-0x780, 0}};
 
 
-
+#pragma mark ---- Hadouken Data ----
 
 const VECT16 *data_22c32[]={data_cf038, data_cf048 , data_cf05c};
 
+#pragma mark ---- Sonic Boom ----
 
-
-
+#pragma mark ---- TIGER ----
 
 const VECT16 *data_22c3e[]={data_cf038, data_cf05c, data_cf07c};
 
-
+#pragma mark ---- Yoga Fire Data ----
 /*
  * YOGA FIRE 
  */
@@ -141,4 +147,8 @@ const VECT16 *data_2349a[] = 	// velocity paths
 
 #define IMAGE_BLOCK	0x8000		// actually image_with_attrs
 
+#pragma mark ---- Yoga Flame ----
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
