@@ -50,6 +50,19 @@ jobs:
           test -x build/glutBasics
           file build/glutBasics
 
+      - name: Native smoke test
+        run: |
+          set -euo pipefail
+          set +e
+          SF2_STATE_LOG=agent_smoke.csv timeout 15s xvfb-run -a ./build/glutBasics </dev/null
+          status=$?
+          set -e
+          test "$status" -eq 124
+          test -s agent_smoke.csv
+          frames=$(awk -F, 'NR > 1 { n++ } END { print n + 0 }' agent_smoke.csv)
+          test "$frames" -ge 300
+          rm -f agent_smoke.csv
+
       - name: Validate golden traces
         run: bash scripts/validate_golden_traces.sh
 
