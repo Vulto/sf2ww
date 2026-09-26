@@ -109,3 +109,10 @@
 - Using attacker energy could select the wrong damage factor and could index the 31-entry table with an invalid value when attacker state is outside the expected range.
 - Corrected the index to `ply->Opponent->Energy`, matching the victim-based adjustment used by the regular collision damage path.
 - Acceptance: build, unit tests, ASan/UBSan and native smoke must remain green; real MAME lockstep must validate throw damage and KO behavior.
+
+## 2026-09-26 — Throw damage table branch correction
+
+- `LBGetDamage()` had the normal/special damage-table condition reversed. Normal throw indices (for example 12–15) entered the special-table branch and subtracted `0x20`, producing negative table indices; the `0x20` special damage index entered the normal table.
+- Corrected the branch to match the table layout and the regular collision damage path: indices below `0x20` use `data_99324/data_99544`, while `0x20+` uses `data_99566/data_995a6` after subtracting `0x20`.
+- This removes a deterministic out-of-bounds read from ordinary throw processing and restores the intended high-damage throw path.
+- Acceptance: build, unit tests, ASan/UBSan and native smoke must remain green; real MAME lockstep must validate throw damage values.
