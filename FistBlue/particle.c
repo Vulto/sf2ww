@@ -22,10 +22,11 @@ void RHSetActionList(Object *obj, const void *listaddr, short sel) {
     RHSetAction(obj, (FBAction *)RHOffsetLookup16(listaddr, sel));
 }
 void RHSetAction(Object *obj, const FBAction *act) {
+    u32 action_offset = RHCODE_OFFSET(act, sizeof(FBAction));
     obj->ActionScriptType   = ACTIONSCRIPT_ROM;
     obj->ActionScript       = act;
-    obj->Timer              = RHSwapWord(act->Delay);
-    obj->AnimFlags          = RHSwapWord(act->Flags);
+    obj->Timer              = RHWordOffset(action_offset, offsetof(FBAction, Delay) / sizeof(u16));
+    obj->AnimFlags          = RHWordOffset(action_offset, offsetof(FBAction, Flags) / sizeof(u16));
 
 #if 0
     const struct image *image = (const struct image *)RHCODE(RHSwapLong(obj->ActionScript->Image));
@@ -55,8 +56,9 @@ void RHActionTick(Object *obj) {
     if(--obj->Timer == 0) {
         if(RHSwapWord(obj->ActionScript->Flags) & 0x8000) {
             
-            u32 *next = (void *)obj->ActionScript + sizeof(FBAction);
-            obj->ActionScript = (FBAction *)RHCODE(RHSwapLong(*next));
+            u32 action_offset = RHCODE_OFFSET(obj->ActionScript, sizeof(FBAction));
+            u32 target = RHReadLong((int)(action_offset + sizeof(FBAction)));
+            obj->ActionScript = (FBAction *)RHCODE(target);
         } else {
             obj->ActionScript++;
         }
@@ -175,8 +177,8 @@ Object *alloc_action_by_type(short type) {
 
 void update_motion(Object *obj) {		/* 2416 */
     /* fixed precision arithmetic */	
-    obj->X.full += (obj->Path[obj->Step].x.full << 8);
-    obj->Y.full += (obj->Path[obj->Step].y.full << 8);
+    obj->X.full = (int)((u32)obj->X.full + ((u32)(int)obj->Path[obj->Step].x.full << 8));
+    obj->Y.full = (int)((u32)obj->Y.full + ((u32)(int)obj->Path[obj->Step].y.full << 8));
 }
 
 
@@ -231,12 +233,12 @@ int check_ground_collision(Object *ply) {		//3152
 
 void update_obj_path(Object *ply) {		/* 31b0 */
     if (ply->Flip != FACING_LEFT) { 
-		ply->X.full -= ply->Path[ply->Step ^ ply->Flip].x.full << 8;
+		ply->X.full = (int)((u32)ply->X.full - ((u32)(int)ply->Path[ply->Step ^ ply->Flip].x.full << 8));
 	} 
 	else { 
-		ply->X.full += ply->Path[ply->Step ^ ply->Flip].x.full << 8;
+		ply->X.full = (int)((u32)ply->X.full + ((u32)(int)ply->Path[ply->Step ^ ply->Flip].x.full << 8));
 	}
-	ply->Y.full -= ply->Path[ply->Step ^ ply->Flip].y.full << 8;
+	ply->Y.full = (int)((u32)ply->Y.full - ((u32)(int)ply->Path[ply->Step ^ ply->Flip].y.full << 8));
 }
 
 
