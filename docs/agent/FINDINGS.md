@@ -124,3 +124,10 @@
 - A second collision/damage path after a KO could therefore read `data_93420[-1]`, an out-of-bounds access capable of producing undefined behavior or a crash.
 - Both paths now treat negative energy like the already-terminal `>= 0x1f` range and leave damage unchanged.
 - Acceptance: sanitizer CI must remain green and the MAME regression must show no post-KO state divergence.
+
+
+## 2026-09-26 — Damage-table flag bits
+
+- `lookup_damage_and_score()` tested `a3->Damage & 0x7f` but indexed the damage tables with the unmasked value.
+- If the high flag bit is present, normal damage could index past the 16-entry tables, and special damage could index past the 4-entry tables.
+- The lookup now derives one masked damage index and reuses it for all table accesses.
