@@ -28,7 +28,7 @@ static void drawsimple_scroll2noattr(Object *obj, const u16 *tiles, int width, i
 #define IMAGE_NEWLINE 0xffff
 
 
-#pragma mark ---- Palette Setters ----
+
 
 void palette_base_scroll1(void) {
     for (int u = 0; u < 32; ++u) {
@@ -146,7 +146,7 @@ void clear_scrolls_123(Task *task) {           /* 0x4c3c */
 
 
 
-#pragma mark ---- Glyph Printers ----
+
 
 void printchar2 (u16 *cursor, int x, int y ,u8 *printzeroes, u16 tile, u16 attr) {	/* 0x50f6 */
 	if(*printzeroes) {
@@ -251,7 +251,7 @@ static void _putchar(u16 **cursor, u32 *gfxcursor, u16 arg, u16 attr) { /* 521a 
 	x = *gfxcursor >> 16;
 	y = *gfxcursor & 0xffff;
 	
-    OBJECT_DRAW(*cursor, x, y , arg & 0xff + SF2_TILE_OBJ_ASCII_12X12, attr);  /* main charset */ 
+    OBJECT_DRAW(*cursor, x, y , (arg & 0xff) + SF2_TILE_OBJ_ASCII_12X12, attr);  /* main charset */ 
     COORDS_OFFSET(gfxcursor, 12,0);
     OBJ_CURSOR_BUMP(cursor);
 }
@@ -432,7 +432,7 @@ void DrawTileText(enum libtextgfx_sel sel) {	/* sub_5816 */
 	}
 }
 
-#pragma mark ---- Display Clearers ----
+
 
 void clear_scrolls(void) {		/* 0x5f10 */
 	short i;
@@ -825,7 +825,7 @@ void sub_1a0c(void) {			//1a0c
 	setpalette_scroll3(g.Stage);
 }
 
-#pragma mark Letterbox drawers for ending seqs
+
 
 static void sub_6196(u16 **gfxp, u16 tile, u16 attr, int count) {
 	int i;
