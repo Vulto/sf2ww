@@ -119,11 +119,12 @@ LBWindow *createWindow(int left, int top, int width, int height) {
 }
 
 void destroyWindow(LBWindow *window) {
+	(void)window;
 	
 }
 
 
-#pragma mark Draw Routines
+
 
 void DrawPlainView(GLint left, GLint top, GLint width, GLint height) {
 	
@@ -194,6 +195,7 @@ void DrawTileScr1(u16 tileid, u16 palette, int left, int top, int width, int hei
 	glDisable(GL_TEXTURE_2D);
 }
 void DrawTitleBar(LBView *view) {
+	(void)view;
 	char outString [256] = "";
 
 	sprintf (outString, "GAME WINDOW");
@@ -203,15 +205,18 @@ void DrawWindowButton(LBView *view) {
 	DrawTileObj(SF2_TILE_OBJ_VICTORY, 0, 0, 0, view->rect.width, view->rect.height);
 }
 void DrawNull(LBView *view) {
+	(void)view;
 }
 
-#pragma mark Event Callbacks
+
 
 int WindowButtonClicked(LBView *view) {
 	gGameInWindow = FALSE;
 	return TRUE;
 }
 void mouseZoom(int x, int y) {
+	(void)x;
+	(void)y;
 	printf("mouseZoom\n");
 	gWimpScale = ((y - gDragDeltaY) / 10.0) + 1.0;
 	glutPostRedisplay();
@@ -229,6 +234,8 @@ int RootViewClick(LBView *view, int button, int state, int x, int y, int scrx, i
 }
 int ClickNull(LBView *view) { return TRUE; }
 void mouseDrag(int x, int y) {
+	(void)x;
+	(void)y;
 	printf("mouseDrag\n");
 	gDragView->rect.left = x - gDragDeltaX;
 	gDragView->rect.top = y - gDragDeltaY;
