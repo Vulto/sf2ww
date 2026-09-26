@@ -188,22 +188,16 @@ void gemu_set_cache_clear(void) {
 void gemu_clear_cache(void) {
 	int i;
 	for (i=0; i<TEXTURE_CACHE_SIZE; ++i) {
-		if (TC.text_scr1[i]) {
-			glDeleteTextures(1, TC.text_scr1[i]);
-			TC.text_scr1[i][0] = 0;
-		}
+		glDeleteTextures(1, &TC.text_scr1[i][0]);
+		TC.text_scr1[i][0] = 0;
 	}
 	for (i=0; i<TEXTURE_CACHE_SIZE; ++i) {
-		if (TC.text_scr2[i]) {
-			glDeleteTextures(1, TC.text_scr2[i]);
-			TC.text_scr2[i][0] = 0;
-		}			
+		glDeleteTextures(1, &TC.text_scr2[i][0]);
+		TC.text_scr2[i][0] = 0;			
 	}
 	for (i=0; i<TEXTURE_CACHE_SIZE; ++i) {
-		if (TC.text_scr3[i]) {
-			glDeleteTextures(1, TC.text_scr3[i]);
-			TC.text_scr3[i][0] = 0;
-		}			
+		glDeleteTextures(1, &TC.text_scr3[i][0]);
+		TC.text_scr3[i][0] = 0;			
 	}
 	for (i=0; i<TEXTURE_CACHE_SIZE; ++i) {
 		if (TC.text_obj[i][0]) {
@@ -247,9 +241,9 @@ static inline void gemu_color_tile(int pixelSize, short palette, GLubyte *img, G
 }
 
 void gemu_cache_scroll1(u16 tile, short palette) {
-    if (tile >= TEXTURE_CACHE_SIZE || palette < 0 || palette >= 32) { return; }
+    if (palette < 0 || palette >= 32) { return; }
 	static GLubyte tempmap[8][8][4];
-	if (TC.text_scr1[tile][0] && TC.text_scr1[tile][1] != palette) {
+	if (TC.text_scr1[tile][0] && TC.text_scr1[tile][1] != (GLuint)palette) {
 		glDeleteTextures(1, &TC.text_scr1[tile][0]);
 		TC.text_scr1[tile][0] = 0;
 	}	
@@ -272,7 +266,7 @@ void gemu_cache_scroll1(u16 tile, short palette) {
 void gemu_cache_scroll2(u16 tile, short palette) {
     if (tile >= TEXTURE_CACHE_SIZE || palette < 0 || palette >= 32) { return; }
 	static GLubyte tempmap[16][16][4];
-	if (TC.text_scr2[tile][0] && TC.text_scr2[tile][1] != palette) {
+	if (TC.text_scr2[tile][0] && TC.text_scr2[tile][1] != (GLuint)palette) {
 		glDeleteTextures(1, &TC.text_scr2[tile][0]);
 		TC.text_scr2[tile][0] = 0;
 	}		
@@ -297,7 +291,7 @@ void gemu_cache_scroll2(u16 tile, short palette) {
 void gemu_cache_scroll3(u16 tile, short palette) {
     if (tile >= TEXTURE_CACHE_SIZE || palette < 0 || palette >= 32) { return; }
 	static GLubyte tempmap[32][32][4];
-	if (TC.text_scr3[tile][0] && TC.text_scr3[tile][1] != palette) {
+	if (TC.text_scr3[tile][0] && TC.text_scr3[tile][1] != (GLuint)palette) {
 		glDeleteTextures(1, &TC.text_scr3[tile][0]);
 		TC.text_scr3[tile][0] = 0;
 	}	
@@ -320,7 +314,7 @@ void gemu_cache_scroll3(u16 tile, short palette) {
 void gemu_cache_object(u16 tile, short palette) {
     if (tile >= TEXTURE_CACHE_SIZE || palette < 0 || palette >= 32) { return; }
 	static GLubyte tempmap[16][16][4];
-	if (TC.text_obj[tile][0] && TC.text_obj[tile][1] != palette) {
+	if (TC.text_obj[tile][0] && TC.text_obj[tile][1] != (GLuint)palette) {
 		glDeleteTextures(1, &TC.text_obj[tile][0]);
 		TC.text_obj[tile][0] = 0;
 	}
@@ -345,7 +339,7 @@ void gemu_cache_object(u16 tile, short palette) {
 
 u16 *ehonda;
 
-#pragma mark Entry
+
 
 void gfx_glut_init(void) {
 	int i;
@@ -379,11 +373,11 @@ void gfx_glut_init(void) {
 
 }
 
-const static unsigned char pixbit[8] = { 128, 64, 32, 16, 8, 4, 2, 1 }; // XXX replace with PIXELBIT
+static const unsigned char pixbit[8] = { 128, 64, 32, 16, 8, 4, 2, 1 }; // XXX replace with PIXELBIT
 
 #define PIXELBIT(n) (1 << (7 - (n)))
 
-#pragma mark Tile reading / decoding
+
 
 static int gfxrom_read(void *buffer, size_t size) {
     return fread(buffer, 1, size, gfxrom) == size;
@@ -540,7 +534,7 @@ void gemu_readtile_scroll3(u16 tileid) {
     }
 }
 
-#pragma mark Tile drawing
+
 
 static inline void draw_gl_tile(int sx, int sy, int flip, float size) {
     glBegin(GL_POLYGON);
@@ -748,85 +742,9 @@ static void draw_scroll2(void) {
 	glColor3f(1.0, 1.0, 1.0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glPopMatrix();
-}
-
-static void draw_scroll2_planes(void) {
-    int i;
-    int bottomRow, topRow;
-    int record;
-    int flip;
-    int scr2x, tiletx, tilety;
-    float size = TILE_SIZE_SCR2;
-    
-    if (!gemu_scroll_enable[2]) {
-        return;
-    }
-    if (!gstate_RowScroll.nPlanes) {
-        return;
-    }
-    glPushMatrix();
-    scr2x = g.CPS.Scroll2X;
-    glTranslatef(-(scr2x & 0xf) / 16.0 * TILE_SIZE_SCR2, ((g.CPS.Scroll2Y & 0xf) / 16.0 * TILE_SIZE_SCR2)  , 0);
-    
-    tilety = g.CPS.Scroll2Y / 16;
-    tiletx = scr2x          / 16;
-
-    for (i=0; i<gstate_RowScroll.nPlanes; ++i) {
-        RHTilePlane *plane = &gstate_RowScroll.planes[i];
-
-        bottomRow = plane->y1 >> 4;     // pixels to tiles
-        topRow    = plane->y2 >> 4;
-        
-        int tx,ty;
-        // z Stride per line (not tile row)
-        float zDepth = (plane->y2 != plane->y1)
-            ? (plane->z2 - plane->z1) / (plane->y2 - plane->y1)
-            : 0.0f;
-        
-        for (ty = bottomRow; ty <=topRow; ++ty) {
-
-            // case 1 - bottom Y is fractional, top Y is not
-            // case 2 - top Y is fractional, bottom Y is not
-            // case 3 - both are fractional
-            // case 4 - neither are (easiest)
-            float zBottom = (plane->z1 + (ty - bottomRow) * 16 * zDepth) / 30.0;    // div by 30 to squish it into the frustum
-            float zTop    = (zBottom + 16 * zDepth) / 30.0;
-            
-            for (tx = -6; tx<39 ; ++tx) {
-                int mapTx = tx & 0x3f;
-                int mapTy = ty & 0x3f;
-                record = SCROLL_DECODE_SCR2(mapTx, mapTy);
-                if (gemu.Tilemap_Scroll2[record][0] == TILE_BLANK_SCR2) {
-                    // Blank tile in SCR2
-                    continue;
-                }
-                gemu_cache_scroll2(gemu.Tilemap_Scroll2[record][0],
-                                   gemu.Tilemap_Scroll2[record][1] & TILE_MASK_PALETTE);
-                flip = (gemu.Tilemap_Scroll2[record][1] & TILE_MASK_FLIP) >> 5;
-
-                int sx = tx-12;
-                int sy = ty-8;
-                
-                // draw_gl_tile:
-                glBegin(GL_POLYGON);
-                glTexCoord2f(flips[flip][0][0],flips[flip][0][1]);
-                glVertex3f(((sx+1) * size), ((sy+1) * size), zTop);
-                glTexCoord2f(flips[flip][1][0],flips[flip][1][1]);
-                glVertex3f((( sx ) * size), ((sy+1) * size), zTop);
-                glTexCoord2f(flips[flip][2][0],flips[flip][2][1]);
-                glVertex3f((( sx ) * size), (( sy ) * size), zBottom);
-                glTexCoord2f(flips[flip][3][0],flips[flip][3][1]);
-                glVertex3f(((sx+1) * size), (( sy ) * size), zTop);
-                glEnd();
-
-
-            }
-        }
-    }
-    
-}
-
-static void draw_scroll3(void) {
+	(void)scrollbot;
+	(void)scrolltop;
+}(void) {
 	int x,y, flip, tx, ty, tilety, tiletx;
 	float sx, sy;
 
@@ -867,7 +785,7 @@ static void draw_scroll3(void) {
 	glPopMatrix();
 }	
 
-#pragma mark Entry 2
+
 
 int dummyScr1 = 0;
 
@@ -1169,7 +1087,7 @@ void drawGLString(GLfloat x, GLfloat y, char *string){
 	}
 }
 
-#pragma mark Trackball handling
+
 
 void mouseDolly(int pointx, int pointy) {
 	if (gDolly) {
@@ -1204,7 +1122,7 @@ void mouseTrackball(int pointx, int pointy) {
 	}
 }
 
-#pragma mark Mouse callbacks
+
 
 void gfx_glut_mousedown(int pointx, int pointy) {
 	if (gDolly) { // if we are currently dollying, end dolly
