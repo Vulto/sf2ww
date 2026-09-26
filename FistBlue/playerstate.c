@@ -75,6 +75,24 @@ const short data_2abb0[12][8] = {
 
 
 
+static u8 player_action_extra_sprite(const Player *ply)
+{
+    if (ply->ActionScriptType == ACTIONSCRIPT_NATIVE) {
+        return ((const Action *)ply->ActionScript)->ExtraSprite;
+    }
+    return RHByteOffset(RHCODE_OFFSET(ply->ActionScript, sizeof(FBAction)),
+                        offsetof(FBAction, ExtraSprite));
+}
+
+static u8 player_action_priority(const Player *ply)
+{
+    if (ply->ActionScriptType == ACTIONSCRIPT_NATIVE) {
+        return ((const Action *)ply->ActionScript)->Priority;
+    }
+    return RHByteOffset(RHCODE_OFFSET(ply->ActionScript, sizeof(FBAction)),
+                        offsetof(FBAction, Priority));
+}
+
 static short PSGetRoundResult(void) {		/* 2a768 */
 	return g.RoundResult;
 }
@@ -98,7 +116,7 @@ void PSEntry(Player *ply) {   /* 0x28396 was: player_per_frame */
 	// Update an 'extra' sprite associated with an avatar, such as Vega's claw
     ply->ExtraSpriteEna = FALSE;
     if(ply->exists && ply->VegaHasClaw) {
-        if((offsetsel = ply->ActionScript->ExtraSprite)) {
+        if((offsetsel = player_action_extra_sprite(ply))) {
             ply->ExtraSpriteEna = TRUE;
             ply->Draw_OffsetX = ply->Sprite2[offsetsel].Offset.x;
             ply->Draw_OffsetY = ply->Sprite2[offsetsel].Offset.y;
@@ -1655,9 +1673,9 @@ static void ply_calc_draw_order(void) {		/* 28414 */
 	} else {
 		g.PlyDrawOrder = 0;
 		if (g.Player1.exists && g.Player2.exists) {
-			if (g.Player2.ActionScript->Priority > g.Player1.ActionScript->Priority) {	/* priority */
+			if (player_action_priority(&g.Player2) > player_action_priority(&g.Player1)) {	/* priority */
 				g.PlyDrawOrder = 1;	
-			} else if (g.Player2.ActionScript->Priority == g.Player1.ActionScript->Priority) {
+			} else if (player_action_priority(&g.Player2) == player_action_priority(&g.Player1)) {
 				g.PlyDrawOrder = g.LastDrawOrder;
 				return;
 			}
