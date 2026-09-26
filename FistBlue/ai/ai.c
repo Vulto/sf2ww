@@ -134,7 +134,8 @@ void AIInitPlayer(Player *ply) {		//2b780
 	
 	AISetAgg0(ply, DP.a1, DP.a2);
 }
-static short sub_2c120(Player *ply, Player *a0, short *d6) {	
+static short sub_2c120(Player *ply, Player *a0, short *d6) {
+	(void)ply;
 	/* one caller */
 	short d0;
 	
@@ -960,7 +961,7 @@ void AIInitDefensive(Player *ply) {				// 2b82a
 	DS = dataAIDefensive[ply->FighterID][(unsigned char)ply->YokeSaved];	/* * to vector list to struct */
 	/* range of YokeSaved is 0-15 */
 
-	if (0xff07 & (1 << ply->YokeSaved) && ply->Energy <= data_2b8a4[RAND16] ) {		
+	if (0xff07 & (1 << ply->YokeSaved) && ply->Energy <= data_2b8a4[(unsigned char)RAND16] ) {		
 		ply->AIStratDef = DS->codes[DS->low_energy[RAND32]];
 	} else {
 		ply->AIStratDef = DS->codes[DS->high_energy[RAND32]];	
