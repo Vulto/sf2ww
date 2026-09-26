@@ -14,7 +14,7 @@ Não tratar conhecimento de treinamento como fonte autoritativa. Validar hipóte
 
 ## 2. Escopo e integridade
 
-Trabalhar exclusivamente no objetivo do porte. Não fazer refatorações, dependências ou mudanças arquiteturais sem necessidade para o critério de sucesso. Nunca versionar ROMs, dumps, sprites, tiles ou samples extraídos do original. O MAME pode usar uma ROM externa, privada e fora do controle de versão. O objetivo é comportamento equivalente, não binário idêntico.
+Trabalhar exclusivamente no objetivo do porte. Não fazer refatorações, dependências ou mudanças arquiteturais sem necessidade para o critério de sucesso. A ROM original fornecida para validação deve estar disponível no CI/CD do GitHub Actions em armazenamento privado do GitHub (secret), e o pipeline deve materializá-la no runner para os testes reais. Nunca publicar a ROM em código, artefato público, release ou outro conteúdo acessível publicamente. O objetivo é comportamento equivalente, não binário idêntico.
 
 ## 3. Critério de sucesso
 
