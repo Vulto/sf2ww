@@ -1,0 +1,40 @@
+FistBlue/avatars/sagat.o: FistBlue/avatars/sagat.c FistBlue/sf2.h \
+ FistBlue/sf2types.h FistBlue/sf2macros.h FistBlue/workarounds.h \
+ FistBlue/sf2const.h RedHammer/strings.h RedHammer/redhammer.h \
+ FistBlue/sf2types.h FistBlue/structs.h FistBlue/particle.h \
+ FistBlue/scrolls/scroll.h FistBlue/std_object.h FistBlue/player.h \
+ FistBlue/coinage.h FistBlue/actions/actions_198a.h FistBlue/std_object.h \
+ FistBlue/player.h FistBlue/particle.h FistBlue/rules.h \
+ FistBlue/actions/actions.h FistBlue/actions/actions_198a.h \
+ FistBlue/playerstate.h FistBlue/computer.h FistBlue/sound.h \
+ FistBlue/projectiles.h FistBlue/lib.h FistBlue/gfxlib.h FistBlue/task.h \
+ FistBlue/avatars/sagat.h
+FistBlue/sf2.h:
+FistBlue/sf2types.h:
+FistBlue/sf2macros.h:
+FistBlue/workarounds.h:
+FistBlue/sf2const.h:
+RedHammer/strings.h:
+RedHammer/redhammer.h:
+FistBlue/sf2types.h:
+FistBlue/structs.h:
+FistBlue/particle.h:
+FistBlue/scrolls/scroll.h:
+FistBlue/std_object.h:
+FistBlue/player.h:
+FistBlue/coinage.h:
+FistBlue/actions/actions_198a.h:
+FistBlue/std_object.h:
+FistBlue/player.h:
+FistBlue/particle.h:
+FistBlue/rules.h:
+FistBlue/actions/actions.h:
+FistBlue/actions/actions_198a.h:
+FistBlue/playerstate.h:
+FistBlue/computer.h:
+FistBlue/sound.h:
+FistBlue/projectiles.h:
+FistBlue/lib.h:
+FistBlue/gfxlib.h:
+FistBlue/task.h:
+FistBlue/avatars/sagat.h:
