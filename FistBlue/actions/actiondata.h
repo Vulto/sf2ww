@@ -6,21 +6,21 @@
  *  Copyright 2010 Ben Torkington. All rights reserved.
  *
  */
-#pragma mark action_1
+
 
 const char data_cb60[] = { 6,6,6,6,6,2,6,6,6,6,6,0 };
 const char data_cb6c[] = { 0,1,0,0,0,0,0,0,0,0,0,0 };
 const short data_cc0e[] = { 31,30,31,29,31,30,31,29};
 
 
-#pragma mark Act02 Bikes chun li
 
-#pragma mark Act03 Das Boat
 
-#pragma mark Act2e
+
+
+
 // act2e_plane.h
 
-#pragma mark Act35
+
 
 
 const char data_1fab6[100]={
@@ -39,7 +39,7 @@ const char data_1fb1a[40]={
     0x01, 0x03, 0xf5, 0x02, 0x00, 0x00, 0xff, 0xff,  };
 /* next address 0001fb42 */
 
-#pragma mark Palettes
+
 
 const u16 data_160ea[12][16] = {
     { 0x0111, 0x0fd9, 0x0fb8, 0x0e97, 0x0c86, 0x0965, 0x0643, 0x0fff, 0x0ddb, 0x0ba8, 0x0999, 0x0765, 0x0f00, 0x0b00, 0x0700, 0x0000, },
