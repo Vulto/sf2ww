@@ -359,21 +359,6 @@ void mac_stun_from76(Player *ply, Player *opp) {			//7d884
 		
     }
 }
-static void mac_stun2005(Player *ply, Player *opp) {		//7d8d4
-    Object *obj;
-    if((obj = AllocActor())) {
-        center_collision_coords();
-        obj->exists = TRUE;
-        obj->Sel    = SF2ACT_HITSTUN;     /* hitstuns */
-        obj->XPI    = g.GPCollX;
-        obj->YPI    = g.GPCollY;
-        obj->Owner = opp;
-        obj->Flip   = ply->Flip;
-        obj->SubSel = 5;
-    }
-}
-
-
 /*
  Function RectsOverlap:Int(x0, y0, w0, h0, x2, y2, w2, h2)
  If x0 > (x2 + w2) Or (x0 + w0) < x2 Then Return False
@@ -1074,6 +1059,3 @@ static void start_timewarp_action (Player *vict) {	/* 7d720 */
 }
 
 
-static void sub_7e314(void) {		// 7e314
-	g.Player2.PushDirection = 1;
-}
