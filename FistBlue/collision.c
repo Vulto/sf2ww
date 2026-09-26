@@ -135,13 +135,17 @@ int lookup_damage_and_score(Player *ply, Player *vict, const HitBoxAct *a3) { /*
 	
 	
     const u8 damageIndex = a3->Damage & 0x7f;
-    const u8 specialIndex = damageIndex - 0x20;
 
     g_d5=vict->MoreBoxes[vict->Difficulty];
     if(damageIndex < 0x20) {
-        g.GPPointsReward = data_99544[damageIndex];
-        return data_99324[damageIndex][ply->Difficulty];
+        const u8 tableIndex = damageIndex / 2;
+        g.GPPointsReward = data_99544[tableIndex];
+        return data_99324[tableIndex][ply->Difficulty];
     }
+    if(damageIndex >= 0x28) {
+        return 0;
+    }
+    const u8 specialIndex = (damageIndex - 0x20) / 2;
     g.GPPointsReward = data_995a6[specialIndex];
 
     if(ply->Energy < data_99566[specialIndex][1]) {
