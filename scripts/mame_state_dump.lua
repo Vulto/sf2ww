@@ -26,8 +26,8 @@ end
 
 local function player(base)
     return {
-        s32(mem:read_u32(base + 0x28)),
-        s32(mem:read_u32(base + 0x2c)),
+        s32(mem:read_u32(base + 0x06)),
+        s32(mem:read_u32(base + 0x08)),
         mem:read_u8(base + 0x02),
         mem:read_u8(base + 0x03),
         mem:read_u8(base + 0x04),
