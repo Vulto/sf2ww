@@ -128,7 +128,6 @@ void PSCBVictoryRyu(Player *ply) {		//2d3bc
 	}
 }
 
-#pragma mark Hadouken
 
 void RyuKenStartHadouken(Player *ply) {			//2d766
 	NEXT(ply->mode2);
@@ -172,7 +171,6 @@ short ryuken_power_move_recovery_timer(Player *ply) {
 // End Hadouken shared
 
 
-#pragma mark Shoryuken
 /*!
  * sf2ua: 2d3a2
  * returns: the Y velocity
@@ -259,7 +257,6 @@ void RyuSMShoryuken(Player *ply) {		//2d84a
 }
 
 
-#pragma mark Hurricane
 
 void RyuStartHurricane(Player *ply) {		//2d914
 	struct UserData_RyuKen *ud=(struct UserData_RyuKen *)&ply->UserData;
@@ -284,7 +281,7 @@ void RyuSMHurricane(Player *ply) {		//2d96e
 	UD *ud=(UD *)&ply->UserData;
 
     // ThrowDisable after Hurricane
-    const static char data_2d9fe[16]={1,5,5,5,10,10,10,10,15,15,15,15,20,20,20,30};
+    static const char data_2d9fe[16]={1,5,5,5,10,10,10,10,15,15,15,15,20,20,20,30};
 
 	switch (ply->mode3) {
 		case 0:
