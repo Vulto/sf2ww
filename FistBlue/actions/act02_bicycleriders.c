@@ -66,7 +66,8 @@ void action_2(Object *obj) {				//d240 Bicycle people
 	struct UserData_Act2 *ud = (struct UserData_Act2 *)&obj->UserData;
 	
     const VECT16 data_d3ae[] = {
-        {-0x200, 0}, {0x200, 0}
+        { .x.full = -0x200, .y.full = 0 },
+        { .x.full =  0x200, .y.full = 0 }
     };
 	    
 	if(obj->SubSel) {
