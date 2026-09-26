@@ -17,6 +17,7 @@ extern Game g;
 
 
 void sound_cq_addto(short data) {	/* 62ac */
+	(void)data;
 	/* sound unimplemented */
 }
 
@@ -46,6 +47,7 @@ void quirkysound(short data) {		// 6300
 	/* was full of tamper protection - removed */
 }
 void queuesound(int data) {			// 62f2
+	(void)data;
 	/* todo unimplemented */
 }
 void setstagemusic(void) {
