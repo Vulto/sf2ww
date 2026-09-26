@@ -36,83 +36,6 @@ static void sub_94aec(int d2);
 
 static void sm_ending_blanka(void);
 
-static void sub_aaa6(void) {
-
-	switch (g.mode2) {
-		case 0:
-			
-			break;
-		default:
-			break;
-	}
-	
-}
-static void sub_aefe(void) {
-	switch (g.mode2) {
-		case 0:
-			NEXT(g.mode2);
-			es.FadeBusy = 1;
-			start_effect(SL0C | 0x1c, 3);
-			break;
-		case 2:
-			if (!es.FadeBusy) {
-				NEXT(g.mode2);
-				LBResetState();
-				sound_cq_f0f7();
-				g.x02ec = 0;
-				g.CPS.Scroll2X = 0;
-				g.CPS.Scroll2Y = 0;
-				g.Stage = 0x11;
-				palette_from_game();
-				queuesound(SOUND_VICTORY);
-				draw_portraits_postfight();
-				action_print_chant();
-				start_effect(0x02, 3);
-			}
-			break;
-		case 4:
-			if (!g.TextEffectBusy) {
-				NEXT(g.mode2);
-				g.timer3 = 180;
-			}
-			break;
-		case 6:
-			if (--g.timer3 == 0) {
-				NEXT(g.mode2);
-			}
-			break;
-		case 8:
-			if (g.PlayersOnline == 0) {
-				NEXT(g.mode2);
-				g.timer2 = 150;
-				DrawTileText(TILETEXT_GAME_OVER);
-				queuesound(0x13);
-			}
-			break;
-		case 10:
-			if (--g.timer2 == 0) {
-				NEXT(g.mode2);
-				es.x5d56 = 0;
-				start_effect(0, 4);
-			}
-			break;
-		case 12:
-			if (es.x5d56) {
-				g.WaitMode = 0;
-				clear_scrolls();
-				g.mode0 = g.mode1 = g.mode2 = g.mode3 = g.mode4 = g.mode5 = 0;
-				ClearEffectQueue();
-				die_top8();
-				task_kill(5);
-				task_kill(3);
-				create_task(task_attractSequence, 1, 0, 0, 0);
-				justdie();
-			}
-			break;
-		FATALDEFAULT;
-	}	
-}
-
 void game_mode_26(void) {	// 7aea
 	if (g.SkipEnding) {
 		//aefe todo
@@ -157,7 +80,7 @@ static void sm_ending_blanka(void) {	// a554
 					NEXT(g.mode4);
 					es.FadeBusy = 1;
 					QueueEffect(0xc1c, 3);
-					break;
+					/* fall through */
 				case 2:
 					if (!es.FadeBusy) {
 						NEXT(g.mode3);
