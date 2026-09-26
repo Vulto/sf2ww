@@ -139,7 +139,7 @@ static void apply_throw_damage(Player *ply, Player *opp_a3, short index) {		///0
 }
 
 int _EnergyDamageAdjust(Player *ply, int damage) {			// 3640 change to globals
-    if (ply->Opponent->Energy >= 0x1f ) { return damage; }
+    if (ply->Opponent->Energy < 0 || ply->Opponent->Energy >= 0x1f) { return damage; }
     damage -= (data_93420[ply->Opponent->Energy] * damage )/ 32;
     if (damage == 0) { damage = 1; }
     return damage;
