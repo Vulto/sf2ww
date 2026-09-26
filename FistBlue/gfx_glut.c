@@ -782,7 +782,9 @@ static void draw_scroll3(void) {
 			
             draw_gl_tile(x-6, y-4, flip, TILE_SIZE_SCR3);
         }
-    }    
+    }
+	(void)sx;
+	(void)sy;
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glPopMatrix();
 }	
