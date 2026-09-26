@@ -133,6 +133,10 @@ jobs:
               - Every behavioral change must be justified by MAME execution/debugger/state trace, MAME source/docs, JTCPS/JTFRAME CPS1/CPS1.5 RTL/docs, or an existing project regression fixture.
               - If evidence is insufficient, add instrumentation/tests to obtain evidence instead of guessing.
               - Prefer measured original values and transitions over speculative refactoring.
+              - Do not use frame-number equality as the primary behavioral oracle. Compare numeric execution state and transition vectors; frame counters are metadata only.
+              - Treat MAME debugger memory/register values and numeric execution traces as primary runtime evidence. Use MAME source/docs to validate addresses, timing and hardware semantics.
+              - Use JTCPS/JTFRAME CPS1 and CPS1.5 RTL as the independent hardware contract for clocks, bus timing, memory mapping, video timing, inputs and hardware-visible state. Do not infer gameplay constants from RTL when the game software behavior can be measured directly.
+              - When a divergence is found, record the exact numeric field, expected value, actual value, execution transition, and the MAME/JTCPS evidence that constrains the fix.
 
             Loop:
               1. Inspect git state, backlog and baseline compiler diagnostics.
