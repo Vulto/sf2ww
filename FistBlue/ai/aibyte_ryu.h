@@ -1390,7 +1390,7 @@ const AIAggTable data_99dbe = {
 	{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 2, 4, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, },
 	{data_9976a, data_99796, data_997c0, data_997de, data_997fe, data_9981a, data_9981a, data_9981a, data_9981a, data_9981a, data_9981a, data_9981a, data_9981a, data_9981a, data_9981a, data_9981a, }
 };
-#pragma mark RyuLookup
+
 const u8 *data_99d6e[8]={
 	data_996de,
 	data_996d4,
