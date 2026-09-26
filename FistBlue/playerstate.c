@@ -140,7 +140,7 @@ static void (* const playerstate_LU[11])(Player *ply) = {
 	proc_plstat_thrown_recovery,
 };
 
-#pragma mark ---- Diziness ----
+
 
 static void PSMakeDizzy(Player *ply) {			/* 2a652 make dizzy */
 	ply->DizzyFall     = TRUE;
@@ -214,7 +214,7 @@ static void PSDizzyAccounting(Player *ply) {
 	}
 }
 
-#pragma mark ---- Damage Accounting ----
+
 
 static void PSPlayerDamage(Player *ply, short energy){		//2a460
 	short temp;
@@ -426,7 +426,7 @@ static void _PSPlatformCheck(Player *ply) {	// 2979a
 }
 
 static void _PSDizzyStruggle(Player *ply) {		//29fe0
-	const static u32 data_98cd2[32]={
+	static const u32 data_98cd2[32]={
 		0xfc000000, 0xfc000000, 0xf8000000, 0xf8000000,
 		0xf8000000, 0xf8000000, 0xf0000000, 0xf0000000,
 		0xf0000000, 0xe0000000, 0xc0000000, 0x80000000,
@@ -441,7 +441,7 @@ static void _PSDizzyStruggle(Player *ply) {		//29fe0
 	if (ply->Human) {
 		/* 29fe4 */
 		if ((ply->JoyDecodeDash.full & 0xf) && 
-			(!ply->JoyDecodeDash.full & ply->JoyDecode.full & 0xf)
+			((!ply->JoyDecodeDash.full) & ply->JoyDecode.full & 0xf)
 			) {
 			ply->DizzyStruggle += 2;
 		}
@@ -530,7 +530,7 @@ void exit_jumping2(Player *ply) {	/* 0x288b8 */
 	set_falling_from_platform(ply);
 }
 
-#pragma mark ---- NextAction ----
+
 
 void plstat_do_nextaction(Player *ply) {    /* 28924 */
     void (*data_28932[])(Player *ply) = {
@@ -561,7 +561,7 @@ void sub_28814(Player *ply) {			// 28814
 	ply->DSOffsetX = 0;
 }
 
-#pragma mark ---- proc_plstat_* ----
+
 
 void proc_plstat_normal(Player *ply) {          /* 286cc */
     int temp;
@@ -687,6 +687,7 @@ void proc_plstat_crouch(Player *ply) {		// 28940
 }
 
 void PSCBAttackBlankaStub (Player *ply) {
+	(void)ply;
     /* XXX stub */
 }
 
@@ -717,6 +718,7 @@ void proc_plstat_attacking(Player *ply) {
 }
 
 static void PSCBPowerNULL(Player *ply) {	// 28ea2
+	(void)ply;
 	/* nothing, for E.Honda and Blanka */
 }
 
@@ -1009,6 +1011,7 @@ void proc_plstat_victory(Player *ply) {		//296f2
 						NEXT(ply->mode2);
 					}
 					_PSPlatformCheck(ply);
+					__attribute__((fallthrough));
 				case 4:
 					if (g.FlagTimeWarp == 0) {
 						NEXT(ply->mode2);
@@ -1192,7 +1195,7 @@ void check_dizzy(Player *ply) {			/* 292a0 */
 }
 
 void random_dizzyspell(Player *ply) {				/* 0x29f20 */
-	const static u16 data_29f5a[32]={
+	static const u16 data_29f5a[32]={
 		0x003c, 0x005a, 0x0078, 0x00b4, 0x003c, 0x005a, 0x0096, 0x00b4, 0x0096, 0x00b4, 0x0096,
 		0x00d2, 0x0096, 0x0078, 0x00d2, 0x0078, 0x005a, 0x003c, 0x00d2, 0x0078, 0x005a, 0x00b4,
 		0x0096, 0x003c, 0x0096, 0x0078, 0x0096, 0x00d2, 0x0096, 0x005a, 0x00b4, 0x0096,  };
@@ -1502,7 +1505,7 @@ short PSSetNextAction(Player *ply) {		// 288c0
 	return FALSE;
 }
 
-#pragma mark ply_exit_*
+
 
 void ply_exit_stand(Player *ply) {	// 2876a
     if(ply->Human) {
@@ -1661,7 +1664,7 @@ void PSStateRoundOver(Player *ply) {				/* 2cd0c */
 	}
 }
 
-#pragma mark ---- callback 28340 ----
+
 
 static void ply_calc_draw_order(void) {		/* 28414 */
 	if (g.x0a5c) {		/* char, bison beating Mbison at end? */
@@ -1767,6 +1770,7 @@ static void _PSCalcOppDistances(void) {
 			break;
 		case STAGE_BONUS_BARRELS:
 			sub_208a6();		// far away hmm... 
+			__attribute__((fallthrough));
 		default:
 			/* 28578 */
 			_PSOppDistCalc(PLAYER1, PLAYER2);
