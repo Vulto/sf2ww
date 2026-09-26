@@ -54,6 +54,7 @@ jobs:
         run: |
           set -euo pipefail
           truncate -s 1048576 allroms.bin
+          truncate -s 6291456 sf2gfx.bin
           set +e
           SF2_STATE_LOG=agent_smoke.csv timeout 15s xvfb-run -a ./build/glutBasics </dev/null
           status=$?
