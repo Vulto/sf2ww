@@ -67,25 +67,6 @@ const u16 *realign_scr3a(ScrollState *gs, u16 **gfx_p) {
 }
 
 
-static const u16 *realign_scr3b(ScrollState *gs, u16 **gfx_p) {        // 8442a for scroll3
-    u32 d0;
-    u32 d1;
-    int offset;
-#ifdef CPS
-#warning Scroll cursor arithmetic not optimal for CPS
-#endif
-    *gfx_p -= 16;
-    offset = (*gfx_p - BMAP_SCROLL3) * sizeof(u16);
-    d0 = offset & 0xfffff800;
-    d1 = (offset + 0x20) & 0x7ff;
-    d0 |= d1;
-    *gfx_p = (u16 *)BMAP_SCROLL3+(d0 / sizeof(u16));
-    
-    gs->Index = (gs->Index + gs->Offset) & gs->OffMask;
-    
-    return &data_d8000[ RHWordOffset(gs->TileMaps, gs->Index / 2) ][ gs->XCoarse/2 ];
-}
-
 // u16       yxxx xxxy yyyy[2]        2y x 64y x 32y x 2words x u16  tiles 8x8
 // void 00yx xxxx xyyy yy00            rowmask 0x1f80
 static const u16 *_GSRealignScr1a(ScrollState *gs, u16 **gfx_p) {    // 84052 checked
