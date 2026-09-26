@@ -26,7 +26,7 @@
 #define FALSE 0
 
 ///////////////////////////////////
-#pragma mark FistBlue
+
 ///////////////////////////////////
 /* game params */
 #define ENERGY_START	0x90 
@@ -57,12 +57,12 @@ typedef enum {
 #define TIMERESULT_DOUBLE_KO	-1
 
 ///////////////////////////////////
-#pragma mark Text library constants
+
 ///////////////////////////////////
 #define SF2_TEXTLIB_EOL				0x2f
 
 ///////////////////////////////////
-#pragma mark Tile Constants
+
 ///////////////////////////////////
 
 
@@ -112,11 +112,11 @@ typedef enum {
 
 
 ///////////////////////////////////
-#pragma mark Action library IDs
+
 ///////////////////////////////////
 
 
-#pragma mark Actor Library
+
 #define SF2ACT_0X02				 0x2	// China deco bicycle people
 #define SF2ACT_DAS_BOAT			 0x3	// USA Ken deco 
 #define SF2ACT_INDIA_ELEPHANTS   0x7	
