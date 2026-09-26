@@ -139,6 +139,7 @@ jobs:
           if [ -n "$SF2_MAME_ROM_SHA256" ]; then
             echo "$SF2_MAME_ROM_SHA256  .private-mame/sf2ua.zip" | sha256sum -c -
           fi
+          bash scripts/validate_sf2ua_fixture.sh .private-mame/sf2ua.zip
           bash scripts/prepare_mame_fixture.sh .private-mame .private-mame/sf2ua.zip
       - name: Install port dependencies
         if: steps.fixture.outputs.available == 'true'
