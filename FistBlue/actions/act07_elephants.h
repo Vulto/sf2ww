@@ -11,4 +11,4 @@ void action_07(Object *obj);
 
 struct UserData_Act07 {
 	Object *x0080[4];
-};
+} __attribute__((packed));
