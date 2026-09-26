@@ -26,7 +26,6 @@ extern Game g;
 static void sub_23508(Object *obj, short d7);
 static void projsm_fireball(Object *obj, short d7);
 static void proc_yogafire(Object *obj, short d7); /* 0x23426 */
-static void action_207f0(Object *obj, short d7);
 static void destroy_projectile(Object *obj) {		// 235f8
 	NEXT(obj->mode0);
 	if(obj->Energy == -1) {
@@ -48,8 +47,7 @@ void process_projectiles(void) {			/* 22aca */
 			case SF2_PROJ_YOGAFLAME: sub_23508(&g.Objects1[i],d7);        break;
 			case SF2_PROJ_SONICBOOM: projsm_fireball(&g.Objects1[i], d7); break;
 			case SF2_PROJ_TIGER:	 projsm_fireball(&g.Objects1[i], d7); break;
-			case SF2_PROJ_X05:		 action_207f0(&g.Objects1[i], d7);    break;		
-			FATALDEFAULT;
+						FATALDEFAULT;
 		}
 		--d7;
 	}
