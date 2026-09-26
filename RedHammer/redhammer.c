@@ -126,6 +126,75 @@ void print_rom_offset(const char *message, const void *addr)
     printf("%s: %08lx\n", message, ((char *)addr) - g_code_roms);
 }
 
+void *RHCodePtrRange(u32 offset, size_t size)
+{
+    if (g_code_roms == NULL) {
+        fprintf(stderr, "RHCODE: ROM image is not loaded (offset 0x%08x)\\n", offset);
+        abort();
+    }
+    if ((size_t)offset > ALL_CODE_SIZE || size > ALL_CODE_SIZE - (size_t)offset) {
+        fprintf(stderr, "RHCODE: ROM range 0x%08x + 0x%zx outside ROM\\n", offset, size);
+        abort();
+    }
+    return g_code_roms + offset;
+}
+
+void *RHCodePtrChecked(u32 offset, const char *file, int line)
+{
+    if (g_code_roms == NULL || offset >= ALL_CODE_SIZE) {
+        fprintf(stderr, "RHCODE: invalid ROM offset at %s:%d: 0x%08x\\n", file, line, offset);
+        abort();
+    }
+    return g_code_roms + offset;
+}
+
+void *RHCodePtr(u32 offset)
+{
+    return RHCodePtrRange(offset, 1);
+}
+
+u32 RHCodeOffsetChecked(const void *addr, size_t size, const char *file, int line)
+{
+    uintptr_t base, pointer, end;
+    if (g_code_roms == NULL) {
+        fprintf(stderr, "RHCODE: ROM image is not loaded at %s:%d\\n", file, line);
+        abort();
+    }
+    base = (uintptr_t)g_code_roms;
+    pointer = (uintptr_t)addr;
+    end = base + (uintptr_t)ALL_CODE_SIZE;
+    if (pointer < base || pointer > end || size > (size_t)(end - pointer)) {
+        fprintf(stderr, "RHCODE: pointer %p + 0x%zx is outside ROM at %s:%d\\n", addr, size, file, line);
+        abort();
+    }
+    if ((pointer - base) > 0xffffffffu) {
+        fprintf(stderr, "RHCODE: pointer offset does not fit 32 bits at %s:%d\\n", file, line);
+        abort();
+    }
+    return (u32)(pointer - base);
+}
+
+u16 RHReadWordPtr(const void *addr)
+{
+    u16 value;
+    memcpy(&value, addr, sizeof(value));
+    return RHSwapWord(value);
+}
+
+static u16 RHReadWordAt(u32 offset)
+{
+    u16 value;
+    memcpy(&value, RHCodePtrRange(offset, sizeof(value)), sizeof(value));
+    return RHSwapWord(value);
+}
+
+static u32 RHReadLongAt(u32 offset)
+{
+    u32 value;
+    memcpy(&value, RHCodePtrRange(offset, sizeof(value)), sizeof(value));
+    return RHSwapLong(value);
+}
+
 const void *RHOffsetLookup16(const u16 *base, int index)
 {
     u16 raw;
@@ -139,7 +208,7 @@ const void *RHOffsetLookup16(const u16 *base, int index)
 const u16 RHWordOffset(u32 base, int index)
 {
     u16 raw;
-    memcpy(&raw, RHCODE(base + (2 * index)), sizeof(raw));
+    memcpy(&raw, RHCodePtrRange(base + (u32)(2 * index), sizeof(raw)), sizeof(raw));
     return RHSwapWord(raw);
 }
 
@@ -230,14 +299,12 @@ inline u16 RHSwapWord(const u16 num)
 u32 RHReadLong(int romaddr)
 {
     u32 raw;
-    memcpy(&raw, RHCODE(romaddr), sizeof(raw));
-    return RHSwapLong(raw);
+    return RHReadLongAt((u32)romaddr);
 }
 u16 RHReadWord(int romaddr)
 {
     u16 raw;
-    memcpy(&raw, RHCODE(romaddr), sizeof(raw));
-    return RHSwapWord(raw);
+    return RHReadWordAt((u32)romaddr);
 }
 
 void redhammer_run_tests(void) {
