@@ -66,23 +66,24 @@ jobs:
       - name: Run sanitizer unit tests only
         run: ctest --test-dir build --output-on-failure
 
-  smoke-compare:
+  deterministic-regression:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install MAME
+      - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y mame xvfb
-          mame -version
-          mame -listfull sf2ua | grep -q '^sf2ua '
-      - name: Validate state comparator
-        run: |
-          printf '%s\n' 'frame,game_mode,game_tick,stage' '1,2,3,4' '2,2,4,4' > expected.csv
-          cp expected.csv actual.csv
-          bash scripts/compare_state_csv.sh expected.csv actual.csv
+          sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev
+      - name: Configure
+        run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_FBTESTS=ON -S . -B build
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Run deterministic tests
+        run: ctest --test-dir build --output-on-failure
+      - name: Validate golden traces
+        run: bash scripts/validate_golden_traces.sh
   full-mame-regression:
-    if: ${{ github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
