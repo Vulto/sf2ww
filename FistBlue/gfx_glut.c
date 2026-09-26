@@ -779,7 +779,9 @@ static void draw_scroll2_planes(void) {
         
         int tx,ty;
         // z Stride per line (not tile row)
-        float zDepth = (plane->z2 - plane -> z1) / (plane->y2 - plane->y1);     // XXX zero division possible if y1==y2
+        float zDepth = (plane->y2 != plane->y1)
+            ? (plane->z2 - plane->z1) / (plane->y2 - plane->y1)
+            : 0.0f;
         
         for (ty = bottomRow; ty <=topRow; ++ty) {
 
