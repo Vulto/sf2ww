@@ -32,9 +32,12 @@ Manter `docs/agent/ARCHITECTURE_EXCEPTIONS.md` com exceções justificadas por e
 Construir e manter harness de comparação com:
 1. entradas determinísticas, versionando apenas replays pequenos;
 2. MAME e port em lockstep na taxa nativa confirmada pelo driver;
-3. captura por frame do vetor lógico, frame renderizado e eventos de áudio;
-4. relatório do primeiro frame divergente, campo e delta, sem versionar frames de referência;
-5. baseline contra o resultado do `main` anterior para regressões.
+3. comparar `arcade_time_ns` e `arcade_cpu_cycles` como eixo temporal comum;
+4. medir no port `host_logic_ns` e `host_start_late_ns` como métricas de execução do host, sem tratá-las como ciclos 68000;
+5. capturar PC e registradores 68000 do MAME para diagnóstico causal;
+6. captura do vetor lógico, transições numéricas, timing e eventos de áudio;
+7. relatório da primeira divergência numérica, campo, delta e timestamp de execução, sem versionar frames de referência;
+8. baseline contra o resultado do `main` anterior para regressões.
 
 Documentar endereços e campos relevantes em `docs/agent/STATE_MAP.md`. Verificar a sintaxe atual do MAME/Lua/debugger em sua documentação, não assumir APIs antigas.
 
@@ -58,7 +61,9 @@ Nunca parar após um item. Se o backlog esvaziar, criar trabalho de expansão at
 
 Commits devem referenciar evidência de validação, causa raiz e regressão. Não commitar tentativas não validadas como progresso.
 
-## 7. CI/CD
+## 7. Build and CI/CD
+
+O build nativo usa exclusivamente `make` com GCC, C99 e OpenGL. CMake, cmocka e outros sistemas de build/teste não fazem parte do produto.
 
 Manter um pipeline central, preferencialmente `.github/workflows/ci.yml`, contendo:
 - `build-and-lint` em push/PR;

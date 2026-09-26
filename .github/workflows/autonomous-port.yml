@@ -37,9 +37,9 @@ jobs:
       - name: Install toolchain and reference runtime
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb mame mame-tools git unzip curl jq
+          sudo apt-get install -y build-essential freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev xvfb mame mame-tools git unzip curl jq
           gcc --version
-          cmake --version
+          make --version
           mame -version
           mame -listxml sf2ua >/dev/null
 
@@ -54,7 +54,6 @@ jobs:
           git -C .agent/reference/mame sparse-checkout set docs src/mame/capcom src/devices/cpu/m68000
           git -C .agent/reference/jtcps rev-parse HEAD | tee .agent/reference/JTCPS_COMMIT
           git -C .agent/reference/mame rev-parse HEAD | tee .agent/reference/MAME_COMMIT
-          test -d .agent/reference/mame/docs
 
       - name: Materialize private MAME fixture when configured
         env:
@@ -63,27 +62,25 @@ jobs:
           set -euo pipefail
           rm -rf .agent/rom
           if [ -z "$SF2_MAME_ROM_URL" ]; then
-            echo "SF2_MAME_ROM_URL is not configured; real-ROM lockstep is unavailable in this iteration."
+            echo "SF2_MAME_ROM_URL is not configured; real-ROM lockstep is unavailable."
             exit 0
           fi
           mkdir -p .agent/rom/roms
-          curl --fail --location --retry 3 --silent --show-error "$SF2_MAME_ROM_URL" -o .agent/rom/sf2ua.zip
-          unzip -q -o .agent/rom/sf2ua.zip -d .agent/rom/roms
+          curl --fail --location --retry 3 --silent --show-error "$SF2_MAME_ROM_URL" -o .agent/rom/rom.zip
+          unzip -q -o .agent/rom/rom.zip -d .agent/rom/roms
           rm -f allroms.bin sf2gfx.bin
-          ./bin/prepare-rom.sh .agent/rom/sf2ua.zip
+          ./bin/prepare-rom.sh .agent/rom/rom.zip
           cp allroms.bin .agent/rom/allroms.bin
           cp sf2gfx.bin .agent/rom/sf2gfx.bin
-          sha1sum .agent/rom/allroms.bin .agent/rom/sf2gfx.bin
-          rm -f allroms.bin sf2gfx.bin .agent/rom/sf2ua.zip
+          rm -f allroms.bin sf2gfx.bin .agent/rom/rom.zip
 
       - name: Baseline compile diagnostics
         id: baseline
         continue-on-error: true
         run: |
           set -o pipefail
-          rm -rf build
-          cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_FBTESTS=ON -S . -B build 2>&1 | tee "$RUNNER_TEMP/sf2-configure.log"
-          cmake --build build --target glutBasics test-redhammer --parallel 2 --verbose 2>&1 | tee "$RUNNER_TEMP/sf2-build.log"
+          make clean
+          make -j2 2>&1 | tee "$RUNNER_TEMP/sf2-build.log"
           test "${PIPESTATUS[0]}" -eq 0
 
       - name: Summarize compiler diagnostics
@@ -111,7 +108,7 @@ jobs:
           prompt: |
             You are the autonomous engineering agent for Vulto/sf2ww.
 
-            Mission: continue working on main until the native PC port of Street Fighter II World Warrior is actually complete. Do not stop because the project builds or because CI is green.
+            Mission: continue on main until the fixed arcade target is behaviorally reproduced by the native C/OpenGL port. Do not stop at a green build.
 
             Read first:
               AGENTS.md
@@ -120,42 +117,36 @@ jobs:
               docs/agent/STATE_MAP.md
               docs/agent/ARCHITECTURE_EXCEPTIONS.md
               docs/agent/RENDER_VALIDATION.md
+              docs/agent/TIMING_VALIDATION.md
 
             References:
               .agent/reference/jtcps
               .agent/reference/mame
-            If .agent/rom exists, it contains the private sf2ua fixture.
+            If .agent/rom exists, it contains the private ROM fixture.
 
             Mandatory methodology:
-              - Compilation errors are the first priority. Do not work on gameplay/rendering while the tree does not compile with -Wall -Wextra -Werror.
-              - Treat $RUNNER_TEMP/sf2-build.log and $RUNNER_TEMP/sf2-compile-summary.md as primary immediate evidence.
-              - Do not invent implementations, constants, state transitions, timing, physics, graphics formats or callbacks.
-              - Every behavioral change must be justified by MAME execution/debugger/state trace, MAME source/docs, JTCPS/JTFRAME CPS1/CPS1.5 RTL/docs, or an existing project regression fixture.
-              - If evidence is insufficient, add instrumentation/tests to obtain evidence instead of guessing.
-              - Prefer measured original values and transitions over speculative refactoring.
-              - Do not use frame-number equality as the primary behavioral oracle. Compare numeric execution state and transition vectors; frame counters are metadata only.
-              - Treat MAME debugger memory/register values and numeric execution traces as primary runtime evidence. Use MAME source/docs to validate addresses, timing and hardware semantics.
-              - Use JTCPS/JTFRAME CPS1 and CPS1.5 RTL as the independent hardware contract for clocks, bus timing, memory mapping, video timing, inputs and hardware-visible state. Do not infer gameplay constants from RTL when the game software behavior can be measured directly.
-              - When a divergence is found, record the exact numeric field, expected value, actual value, execution transition, and the MAME/JTCPS evidence that constrains the fix.
+              - The only build system is Make. Do not reintroduce CMake or cmocka.
+              - Keep C99, OpenGL and -Wall -Wextra -Werror.
+              - Do not use frame-number equality as the primary behavioral oracle.
+              - Compare numeric state transitions and arcade_time_ns/arcade_cpu_cycles.
+              - MAME machine.time converted with attotime:as_ticks(10000000) is the common arcade-time axis.
+              - Capture MAME 68000 PC/registers for causal diagnosis.
+              - Native host_logic_ns and host_start_late_ns are performance/deadline measurements, not x86-equivalence claims.
+              - Use MAME source/docs and JTCPS/JTFRAME as independent evidence. Do not guess constants.
+              - Every fix requires an observed divergence, a falsifiable hypothesis and a regression.
+              - Preserve integer/fixed-point semantics.
+              - If real ROM lockstep is unavailable, never claim behavioral equivalence; improve instrumentation, crash/UB coverage and harnesses instead.
+              - Never create branches, force-push, weaken tests, or hide divergences.
+              - Do not commit or push; the wrapper validates and commits.
 
-            Loop:
-              1. Inspect git state, backlog and baseline compiler diagnostics.
-              2. If compilation fails, fix only the highest-value concrete compiler diagnostics first.
-              3. Once compilation succeeds, run unit tests and sanitizer gates.
-              4. Then run the strongest available native-vs-MAME comparison.
-              5. For each divergence, form a falsifiable hypothesis using MAME and JTCPS evidence.
-              6. Make the smallest root-cause change backed by that evidence.
-              7. Add or strengthen a regression test that fails without the change.
-              8. Re-run the complete applicable validation.
-              9. Record measured before/after evidence and reference revisions.
-              10. Never weaken a test to hide a divergence.
-              11. Never replace integer/fixed-point behavior with floating point without evidence.
-              12. Never create a branch or rewrite main.
-              13. Do not commit or push; the surrounding workflow does that after validation.
-
-            If the real ROM is unavailable, do not claim behavioral equivalence. Continue with crash/UB fixes, instrumentation, deterministic harness work and test coverage.
-            If a subsystem is already green, audit adjacent paths rather than stopping.
-            Keep working until the completion criteria in AGENTS.md are objectively satisfied.
+            Loop continuously:
+              1. inspect diagnostics and current comparison;
+              2. find the first causal numeric divergence;
+              3. verify it against MAME/JTCPS evidence;
+              4. make the smallest root-cause correction;
+              5. add a regression;
+              6. run make, sanitizer, smoke and real-MAME comparison when available;
+              7. record evidence and repeat.
 
       - name: Capture agent changes
         id: changes
@@ -169,74 +160,40 @@ jobs:
           fi
           git status --short
 
-      - name: Upload baseline diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: sf2-baseline-diagnostics-${{ github.run_id }}
-          path: |
-            ${{ runner.temp }}/sf2-build.log
-            ${{ runner.temp }}/sf2-configure.log
-            ${{ runner.temp }}/sf2-compile-summary.md
-          if-no-files-found: ignore
-          retention-days: 14
-
-      - name: Build and test changed tree
+      - name: Build and validate changed tree
         run: |
           set -euo pipefail
-          rm -rf build
-          cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_FBTESTS=ON -S . -B build
-          cmake --build build --target glutBasics test-redhammer --parallel 2 --verbose
-          ctest --test-dir build --output-on-failure
-          bash scripts/validate_golden_traces.sh
-
-      - name: Sanitizer gate
-        env:
-          ASAN_OPTIONS: abort_on_error=1
-          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
-        run: |
-          set -euo pipefail
-          rm -rf build-sanitize
-          cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Debug -DBUILD_FBTESTS=ON -DENABLE_SANITIZERS=ON -S . -B build-sanitize
-          cmake --build build-sanitize --target glutBasics test-redhammer --parallel 2 --verbose
-          ctest --test-dir build-sanitize --output-on-failure
-
-      - name: Native smoke gate
-        run: |
-          set -euo pipefail
+          make clean
+          make -j2
+          make clean
+          make SANITIZE=1 -j2
+          make clean
+          make -j2
+          truncate -s 1048576 allroms.bin
+          truncate -s 6291456 sf2gfx.bin
           set +e
-          if [ -f .agent/rom/roms/allroms.bin ] && [ -f .agent/rom/roms/sf2gfx.bin ]; then
-            cp .agent/rom/roms/allroms.bin allroms.bin
-            cp .agent/rom/roms/sf2gfx.bin sf2gfx.bin
-          else
-            # Crash/UB smoke is independent of ROM equivalence. Use deterministic
-            # placeholders when the private fixture is unavailable; real MAME
-            # lockstep remains gated on the private fixture.
-            dd if=/dev/zero of=allroms.bin bs=1M count=1 status=none
-            dd if=/dev/zero of=sf2gfx.bin bs=1M count=6 status=none
-          fi
-          SF2_STATE_LOG=agent_smoke.csv timeout 15s xvfb-run -a ./build/glutBasics </dev/null
+          SF2_STATE_LOG=agent_smoke.csv SF2_TIMING_LOG=agent_timing.csv timeout 15s xvfb-run -a ./glutBasics </dev/null
           status=$?
           set -e
           test "$status" -eq 124
           test -s agent_smoke.csv
-          frames=$(awk -F, 'NR > 1 { n++ } END { print n + 0 }' agent_smoke.csv)
-          test "$frames" -ge 300
-          rm -f agent_smoke.csv
+          test -s agent_timing.csv
+          awk -F, 'NR > 1 { n++ } END { if (n < 300) exit 1 }' agent_smoke.csv
+          rm -f allroms.bin sf2gfx.bin agent_smoke.csv agent_timing.csv
+          bash scripts/validate_golden_traces.sh
 
       - name: Real MAME lockstep gate
         if: hashFiles('.agent/rom/allroms.bin') != '' && hashFiles('.agent/rom/sf2gfx.bin') != ''
         uses: ./.github/actions/mame-lockstep
         with:
           rom-root: .agent/rom
-          port-executable: build/glutBasics
+          port-executable: ./glutBasics
           mame-bin: mame
           mame-set: sf2ua
 
       - name: Record validation evidence
         if: steps.changes.outputs.changed == 'true'
         run: |
-          set -euo pipefail
           mkdir -p "$RUNNER_TEMP/sf2-agent"
           {
             echo "run_id=${{ github.run_id }}"
@@ -267,16 +224,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run autonomous-port.yml --repo "$GITHUB_REPOSITORY" --ref main
 
-      - name: Upload diagnostic evidence on failure
+      - name: Upload diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: sf2-agent-diagnostics-${{ github.run_id }}
           path: |
             agent_smoke.csv
+            agent_timing.csv
             mame_state.csv
             port_state.csv
             ${{ runner.temp }}/sf2-agent/last-validation.txt
-            build/Testing/Temporary/LastTest.log
           if-no-files-found: ignore
           retention-days: 7

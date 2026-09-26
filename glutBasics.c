@@ -11,6 +11,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdint.h>
 
 #include <sys/types.h>
 
@@ -51,6 +52,7 @@ extern CPSGFXEMU gemu;
 static const long CPS_FRAME_NS = 16768000L;
 static struct timespec gNextFrame;
 static FILE *gStateLog;
+static FILE *gTimingLog;
 static unsigned long gStateFrame;
 
 typedef struct {
@@ -226,12 +228,13 @@ static void log_state_frame(void) {
         return;
     }
 
-    ++gStateFrame;
     fprintf(gStateLog,
-            "%lu,%u,%u,%u,%u,%u,%u,%u,%u,%u,"
+            "%lu,%llu,%llu,%u,%u,%u,%u,%u,%u,%u,%u,%u,"
             "%d,%d,%d,%d,%d,%u,%d,%d,%d,"
             "%d,%d,%d,%d,%d,%u,%d,%d,%d\n",
             gStateFrame,
+            (unsigned long long)((gStateFrame - 1u) * 16768000ULL),
+            (unsigned long long)((gStateFrame - 1u) * 167680ULL),
             g.mode0,
             g.tick,
             (unsigned)g.Stage,
@@ -268,16 +271,48 @@ static long timespec_diff_ns(const struct timespec *end, const struct timespec *
 }
 
 void timerFunc(int value) {
-	(void)value;
+    (void)value;
     struct timespec now;
+    struct timespec logic_start;
+    struct timespec logic_end;
     long delay_ns;
+    long host_logic_ns;
+    long host_start_late_ns;
     unsigned delay_ms;
 
+    if (clock_gettime(CLOCK_MONOTONIC, &now) != 0) {
+        perror("clock_gettime");
+        exit(EXIT_FAILURE);
+    }
+    host_start_late_ns = timespec_diff_ns(&now, &gNextFrame);
+    if (host_start_late_ns < 0) {
+        host_start_late_ns = 0;
+    }
+
+    logic_start = now;
+    ++gStateFrame;
     task_timer();
+
+    if (clock_gettime(CLOCK_MONOTONIC, &logic_end) != 0) {
+        perror("clock_gettime");
+        exit(EXIT_FAILURE);
+    }
+    host_logic_ns = timespec_diff_ns(&logic_end, &logic_start);
+
     log_state_frame();
+    if (gTimingLog != NULL) {
+        fprintf(gTimingLog, "%lu,%llu,%llu,%ld,%ld\n",
+                gStateFrame,
+                (unsigned long long)((gStateFrame - 1u) * 16768000ULL),
+                (unsigned long long)((gStateFrame - 1u) * 167680ULL),
+                host_logic_ns,
+                host_start_late_ns);
+        fflush(gTimingLog);
+    }
+
     glutPostRedisplay();
 
-    clock_gettime(CLOCK_MONOTONIC, &now);
+    now = logic_end;
     do {
         gNextFrame.tv_nsec += CPS_FRAME_NS;
         if (gNextFrame.tv_nsec >= 1000000000L) {
@@ -306,9 +341,20 @@ int main (int argc, const char * argv[])
                 return EXIT_FAILURE;
             }
             fprintf(gStateLog,
-                    "frame,game_mode,game_tick,stage,round_cnt,time_bcd,time_ticks,fight_over,rng1,rng2,"
+                    "frame,arcade_time_ns,arcade_cpu_cycles,game_mode,game_tick,stage,round_cnt,time_bcd,time_ticks,fight_over,rng1,rng2,"
                     "p1_x,p1_y,p1_mode0,p1_mode1,p1_mode2,p1_anim,p1_energy,p1_move,p1_stand_squat,"
                     "p2_x,p2_y,p2_mode0,p2_mode1,p2_mode2,p2_anim,p2_energy,p2_move,p2_stand_squat\n");
+        }
+    }
+    {
+        const char *timing_path = getenv("SF2_TIMING_LOG");
+        if (timing_path != NULL && timing_path[0] != '\0') {
+            gTimingLog = fopen(timing_path, "w");
+            if (gTimingLog == NULL) {
+                perror("SF2_TIMING_LOG");
+                return EXIT_FAILURE;
+            }
+            fprintf(gTimingLog, "frame,arcade_time_ns,arcade_cpu_cycles,host_logic_ns,host_start_late_ns\n");
         }
     }
 

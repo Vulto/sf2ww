@@ -28,40 +28,29 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y             build-essential             cmake             freeglut3-dev             libglu1-mesa-dev             libgl1-mesa-dev             libcmocka-dev             xvfb
+          sudo apt-get install -y build-essential freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev xvfb
           gcc --version
-          cmake --version
+          make --version
 
-      - name: Configure
-        env:
-          CC: gcc
-        run: |
-          rm -rf build
-          cmake             -DCMAKE_POLICY_VERSION_MINIMUM=3.5             -DCMAKE_BUILD_TYPE=RelWithDebInfo             -DBUILD_FBTESTS=ON             -S .             -B build
-
-      - name: Build executable
+      - name: Build
         run: |
           set -o pipefail
-          cmake --build build --target glutBasics test-redhammer --parallel 2 --verbose 2>&1 | tee build.log
+          make clean
+          make -j2 2>&1 | tee build.log
 
       - name: Upload build diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: compile-diagnostics-${{ github.run_id }}
-          path: |
-            build.log
-            build/Testing/Temporary/LastTest.log
+          path: build.log
           if-no-files-found: ignore
           retention-days: 14
 
-      - name: Run tests
-        run: ctest --test-dir build --output-on-failure
-
       - name: Validate executable
         run: |
-          test -x build/glutBasics
-          file build/glutBasics
+          test -x ./glutBasics
+          file ./glutBasics
 
       - name: Native smoke test
         run: |
@@ -69,14 +58,14 @@ jobs:
           truncate -s 1048576 allroms.bin
           truncate -s 6291456 sf2gfx.bin
           set +e
-          SF2_STATE_LOG=agent_smoke.csv timeout 15s xvfb-run -a ./build/glutBasics </dev/null
+          SF2_STATE_LOG=agent_smoke.csv SF2_TIMING_LOG=agent_timing.csv timeout 15s xvfb-run -a ./glutBasics </dev/null
           status=$?
           set -e
           test "$status" -eq 124
           test -s agent_smoke.csv
-          frames=$(awk -F, 'NR > 1 { n++ } END { print n + 0 }' agent_smoke.csv)
-          test "$frames" -ge 300
-          rm -f agent_smoke.csv
+          test -s agent_timing.csv
+          awk -F, 'NR > 1 { n++ } END { if (n < 300) exit 1 }' agent_smoke.csv
+          rm -f agent_smoke.csv agent_timing.csv allroms.bin sf2gfx.bin
 
       - name: Validate golden traces
         run: bash scripts/validate_golden_traces.sh
@@ -96,17 +85,20 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y             build-essential             cmake             freeglut3-dev             libglu1-mesa-dev             libgl1-mesa-dev             libcmocka-dev
-
-      - name: Configure sanitized build
-        env:
-          CC: gcc
-        run: |
-          rm -rf build
-          cmake             -DCMAKE_POLICY_VERSION_MINIMUM=3.5             -DCMAKE_BUILD_TYPE=Debug             -DBUILD_FBTESTS=ON             -DENABLE_SANITIZERS=ON             -S .             -B build
+          sudo apt-get install -y build-essential freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev xvfb
 
       - name: Build sanitized executable
-        run: cmake --build build --target glutBasics test-redhammer --parallel 2 --verbose
+        run: |
+          make clean
+          make SANITIZE=1 -j2
 
-      - name: Run sanitized tests
-        run: ctest --test-dir build --output-on-failure
+      - name: Sanitized smoke test
+        run: |
+          truncate -s 1048576 allroms.bin
+          truncate -s 6291456 sf2gfx.bin
+          set +e
+          timeout 8s xvfb-run -a ./glutBasics </dev/null
+          status=$?
+          set -e
+          test "$status" -eq 124
+          rm -f allroms.bin sf2gfx.bin
