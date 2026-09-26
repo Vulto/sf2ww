@@ -4,7 +4,8 @@ Prioridade 0 — segurança/runtime
 - [ ] Substituir o smoke com ROMs zeradas por execução com ROM válida externa ao repositório.
 - [ ] Construir harness MAME/port em lockstep e registrar o primeiro frame divergente.
 - [ ] Mapear o vetor de estado lógico no MAME e no port.
-- [ ] Cobrir crashes/segfaults e UB em todos os caminhos de jogo acessíveis.\n- [ ] Auditar índices de tilemap e acesso a ROM em todos os caminhos gráficos, incluindo rotinas atualmente desativadas.
+- [ ] Cobrir crashes/segfaults e UB em todos os caminhos de jogo acessíveis.
+- [ ] Auditar índices de tilemap e acesso a ROM em todos os caminhos gráficos, incluindo rotinas atualmente desativadas.
 
 Prioridade 1 — cobertura funcional
 - [ ] Attract/demo determinístico.
@@ -24,12 +25,15 @@ Prioridade 2 — validação audiovisual
 - [x] Added a per-frame port state CSV probe.
 - [x] Added a current-MAME Lua frame probe for the original machine state.
 - [x] Added a launcher that keeps MAME ROMs outside the repository.
+- [x] Encapsulated the MAME + native port + first-divergence comparison in a reusable composite action.
 - [ ] Connect the probes with the external/private ROM fixture and produce the first real lockstep report.
 - [ ] Mount the private ROM fixture on a trusted runner and turn the scheduled full-MAME job from blocked to active.
 - [ ] Resolve the first real state divergence reported by the comparator.
+
 ### Harness acceptance notes
 
 - [x] Full-MAME CI invokes the existing MAME state probe through Xvfb so the scheduled regression does not depend on a physical display.
+- [x] The full-MAME job delegates MAME/port/diff execution to `.github/actions/mame-lockstep`.
 - [ ] Mount the private/original ROM fixture on a trusted runner and execute the first real MAME/port lockstep comparison.
 - [x] Smoke gates reject premature clean exits and crashes by requiring the expected timeout status.
 - [x] Smoke verifies forward frame progress in addition to process liveness.
