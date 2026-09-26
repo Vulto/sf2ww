@@ -588,7 +588,8 @@ void PSCBPowerGuile(Player *ply) {		/* 2fe26 */
 						PLAYERTICK;
 						break;
 					case 4:
-						if (--ply->LocalTimer >= 0) {
+						--ply->LocalTimer;
+						if ((signed char)ply->LocalTimer >= 0) {
 							PLAYERTICK;
 						} else {
 							_GuileExitStand(ply);
