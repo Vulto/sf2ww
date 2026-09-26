@@ -1,3 +1,10 @@
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#pragma GCC diagnostic ignored "-Wold-style-declaration"
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+#endif
 /* actions.c */
 
 #include <stdio.h>
@@ -52,9 +59,6 @@ static void action_NN(Object *obj) {
 static void _draw_portrait_scr2(const SimpleImage *a1, short d1, u16 **gfx_p);
 static POINT16 Act23RandomSmallOffset(void);
 static Player *sub_1e7ae(Object *obj);
-static void sub_1e59a(Object *obj);
-static void sub_1e84c(Object *obj);
-static void Act23SMBlood(Object *obj);
 
 static void action_0(Object *obj);
 static void action_1(Object *obj);	/* cb2a */
@@ -79,7 +83,6 @@ static void action_13(Object *obj);
 static void action_14(Object *obj);
 static void action_15(Object *obj);
 extern void action_16(Object *obj);
-static void action_17(Object *obj);
 static void action_18(Object *obj);
 static void action_19(Object *obj);
 static void action_1a(Object *obj);
@@ -92,7 +95,6 @@ static void action_20(Object *obj);
 static void action_21(Object *obj);
 static void action_22(Object *obj);
 void action_1e420(Object *obj);			// action_23
-static void action_24(Object *obj);
 
 extern void action_29(Object *obj);
 
@@ -309,7 +311,7 @@ static void action_1(Object *obj) {	/* cb2a */
 	}	
 }
 
-#pragma mark ACT03 Das Boat
+
 
 static void action_3(Object *obj) {    /* d81e Das Boat */
     switch(obj->mode0) {
@@ -334,7 +336,7 @@ static void action_3(Object *obj) {    /* d81e Das Boat */
     }
 }
 
-#pragma mark Action_04
+
 
 static void sub_dac2(Player *ply) {
 	ply->x01ad = ply->x01ae ? TRUE : FALSE;		/* dade inlined */
@@ -374,7 +376,7 @@ static void action_4(Object *obj) {     /* da72 */
 	}
 }
 
-#pragma mark Act05
+
 
 static void action_05(Object *obj) {	//daf6
 	switch (obj->mode0) {
@@ -399,7 +401,7 @@ static void action_05(Object *obj) {	//daf6
 	}
 }
 
-#pragma mark Act06
+
 static void action_06(Object *obj) {		//db5a
 	Object *obj2;
 	int i;
@@ -457,8 +459,8 @@ static void action_06(Object *obj) {		//db5a
 	}
 }
 
-#pragma mark Act07 Dhalsim Elephants
-#pragma mark Act08
+
+
 static void action_08(Object *obj) {		//f13a
 	switch (obj->mode0) {
 		case 0:
@@ -481,7 +483,7 @@ static void action_08(Object *obj) {		//f13a
 	}
 }
 
-#pragma mark Act09	 EHonda Bathwater
+
 static void sub_f664(Object *obj) {
 	UD09 *ud = (UD09 *)&obj->UserData;
 	int i;
@@ -572,7 +574,7 @@ static void action_09(Object *obj) {	// f568
 	}
 }
 
-#pragma mark Act0A
+
 static void action_0a(Object *obj) {		// f91c
 	Object2 *newobj;
 	switch (obj->mode0) {
@@ -603,7 +605,7 @@ static void action_0a(Object *obj) {		// f91c
 	}
 }
 
-#pragma mark Act0B
+
 static void action_0b(Object *obj) {	// fa12 Ryu Stage Bird
 	UD0B *ud = (UD0B *)&obj->UserData;
 
@@ -675,7 +677,7 @@ static void action_0b(Object *obj) {	// fa12 Ryu Stage Bird
 	}
 }
 
-#pragma mark Act0C
+
 static void action_0c(Object *obj) {		// fd1a
 	switch (obj->mode0) {
 		case 0:
@@ -701,7 +703,7 @@ static void action_0c(Object *obj) {		// fd1a
 	}
 }
 
-#pragma mark Act0D
+
 static void action_0d(Object *obj) {			//1045e
 	switch(obj->mode0) {
 		case 0:
@@ -740,7 +742,7 @@ static void action_0d(Object *obj) {			//1045e
 	}
 }
 
-#pragma mark Act0E
+
 static void action_0e(Object *obj) {		// 10756
 	UD0E *ud = (UD0E *)&obj->UserData;
 	
@@ -795,7 +797,7 @@ static void action_0e(Object *obj) {		// 10756
 	}
 }
 
-#pragma mark Act0F
+
 static void action_0f(Object *obj) {		// 10b44 Another Bird
 	switch (obj->mode0) {
 		case 0:
@@ -851,7 +853,7 @@ static void action_0f(Object *obj) {		// 10b44 Another Bird
 	}
 }
 
-#pragma mark Act10 10c66
+
 
 static void action_10(Object *obj) {
 	char data_10c9e[]={
@@ -912,15 +914,15 @@ static void action_10(Object *obj) {
 	}
 }
 
-#pragma mark ACT11  10ff4 Barely noticable bat 
+
 
 static void action_11(Object *obj) {
 	UD11 *ud = (UD11 *)&obj->UserData;
 	int d0;
 	Object *nobj;
 	
-	const static u16 data_1104e[] = {0x02a0, 0x02a0, 0x02b0, 0x02d0, 0x02f0, 0x0310, 0x0320, 0x0340};
-	const static u16 data_1105e[] = {0xa8, 0xd0, 0xc0, 0xb8, 0xd0, 0xa0, 0xd8, 0xb0};
+	static const u16 data_1104e[] = {0x02a0, 0x02a0, 0x02b0, 0x02d0, 0x02f0, 0x0310, 0x0320, 0x0340};
+	static const u16 data_1105e[] = {0xa8, 0xd0, 0xc0, 0xb8, 0xd0, 0xa0, 0xd8, 0xb0};
 	
 	switch (obj->mode0) {
 		case 0:
@@ -962,7 +964,7 @@ static void action_11(Object *obj) {
 	}
 }
 
-#pragma mark Act12
+
 
 static void sub_11516(Object *obj) {
 	UD12 *ud = (UD12 *)&obj->UserData;
@@ -1107,7 +1109,7 @@ static void action_12(Object *obj) {		// "Street Fighter" logo
 	}
 }
 
-#pragma mark mark
+
 
 static void sub_15dae(u16 **gfx_p, u32 cp){
 	OBJECT_DRAW(*gfx_p, CP_X, CP_Y, TILE_FRAMECORNER2, 0x1f | ATTR_X_FLIP);
@@ -1135,10 +1137,10 @@ static void DrawFighterPortrait(u16 **gfx_p, short fighterid, short flip) {	//15
 
 void PrintPlayerPic(Player *ply, short side, short fighterid) {	
 	// fighterid %d3
-	const static u16 data_15f14[8]={
+	static const u16 data_15f14[8]={
 		310, 288, 288, 295, 308, 285, 288, 288, 
 	};
-	const static u16 data_15f6a[8]={
+	static const u16 data_15f6a[8]={
 		23, 0, 0, 9, 20, 0, 0, 0, 
 	};
 
@@ -1222,7 +1224,7 @@ void action_print_chant() {			/* 15a2a */
 	}
 }
 
-#pragma mark Act13 Ryu Sign fragments
+
 
 static void action_13(Object *obj) {  // 119ee
 	switch (obj->mode0) {
@@ -1275,7 +1277,7 @@ static void action_13(Object *obj) {  // 119ee
 	}
 }
 
-#pragma mark Act14
+
 static void action_14(Object *obj) {
 	// doesn't call FreeActor(), needs to be wiped out.
 	
@@ -1302,7 +1304,7 @@ static void action_14(Object *obj) {
 
 }
 
-#pragma mark Act15 Chun Li stage anims
+
 static void action_15(Object *obj) {
 	switch (obj->mode0) {
 		case 0:
@@ -1326,9 +1328,9 @@ static void action_15(Object *obj) {
 	}
 }
 
-#pragma mark Act16
-#pragma mark Act17
-#pragma mark Act18
+
+
+
 
 static int sub_12fe6(Object *obj) {
 	if (obj->SubSel) {
@@ -1397,7 +1399,7 @@ static void action_18(Object *obj) {
 }
 
 
-#pragma mark Act19 Guile Plane Tail
+
 static void action_19(Object *obj) {     // 1322c
 	switch (obj->mode0) {
 		case 0:
@@ -1415,8 +1417,8 @@ static void action_19(Object *obj) {     // 1322c
 	}
 }
 
-#pragma mark Car Collision
-#pragma mark Act1A
+
+
 
 static Object *sub_13bf8(void)
 {
@@ -1876,7 +1878,7 @@ static void action_1a(Object *obj) {		// 13a3a
 	}
 }
 
-#pragma mark Act1B 
+
 
 //13f18
 static void action_1b(Object *obj) {
@@ -1922,7 +1924,7 @@ static void action_1b(Object *obj) {
 	}
 }
 
-#pragma mark Act1C wooden crate fragments
+
 static void action_1c(Object *obj) {
 	switch (obj->mode0) {
 		case 0:
@@ -2002,7 +2004,7 @@ static void action_1c(Object *obj) {
 	}
 }
 
-#pragma mark Act1D
+
 static void sub_15cf2(u16 *gfx_p_a3, int d2, int d3) {
 	// todo
 }
@@ -2046,7 +2048,7 @@ static void action_1d(Object *obj) {		//16232
 }
 
 
-#pragma mark MARK
+
 
 void action_1ab8a() {		/* 1ab8a */
 	int i;
@@ -2089,7 +2091,7 @@ void action_1606c() {
 
 
 
-#pragma mark Act1f Player Select Cursor
+
 static void action_1f(Object *obj) {		//18e7e
 	Player *ply = obj->SubSel ? PLAYER2 : PLAYER1;
 	switch (obj->mode0) {
@@ -2122,7 +2124,7 @@ static void action_1f(Object *obj) {		//18e7e
 	}
 }
 
-#pragma mark ACTION 0x20 hitstun splashes
+
 static void action_20(Object *obj) {
 	// 0-2 = blue splashes, 3 = big red splash, 4-5=fireballsplash
 	static const POINT16 data_1de94[4] = {{ -2, 0}, {2, -2}, {0, 0}, {-2, 2}};
@@ -2171,7 +2173,7 @@ static void action_20(Object *obj) {
 	}
 }
 
-#pragma mark Act21
+
 
 void action_start_21(void) {		//1152a
 	Object *obj;
@@ -2243,7 +2245,7 @@ static void action_21(Object *obj) {    // 1153e
 	}
 }
 
-#pragma mark Act22 RoundXFight!
+
 
 void action_start_22(void) { //  1abc6  round X .. fight!
 	Object *obj;
@@ -2399,12 +2401,12 @@ static void action_22(Object *obj) {		// 1ac16
 }
 	
 
-#pragma mark ACTION 0x23 diziness, pukes
+
 /* Vomit, birds, stars etc */
 // gone to reels.c
-#pragma mark ----
 
-#pragma mark Act24
+
+
 /*
 static void sub_1b14e(Object *obj) {
 	obj->mode1 = 0;
@@ -2458,7 +2460,7 @@ void action_1cd3c(Player *ply) {
 	/* XXX vegas claw falls off */
 }
 
-#pragma mark MARK
+
 
 static void _draw_portrait_beaten(u16 **scr_p, char d2, char d3) {		//15cf2
    	/* anti-copying wierdness, fuck it */
@@ -2545,12 +2547,12 @@ void draw_portraits_postfight(void) {	/* 15c2e after a fight, one beaten up */
 }
 
 
-#pragma mark Act2C Playerselect something
 
-#pragma mark Act2E Plane
+
+
 //act2e_plane.c
 
-#pragma mark Act2f	Attract sequence fighters
+
 static void skyskraperanim_00(Object *obj) {		// 1d176
 	UD2F *ud = (UD2F *)obj->UserData;
 
@@ -2809,7 +2811,7 @@ void action_2f(Object *obj) {		// 1d160
 	}
 }
 
-#pragma mark Act30 cheering people on skycraper fight
+
 
 static void action_30(Object *obj) {		// 1da4a
 	switch (obj->mode0) {
@@ -2832,7 +2834,7 @@ static void action_30(Object *obj) {		// 1da4a
 	}
 }
 
-#pragma mark Act32 car shake
+
 
 static void action_1f406(Object *obj)
 {
@@ -2877,7 +2879,7 @@ static void action_32(Object *obj)       // 1f3c6
     }
 }
 
-#pragma mark Act33 random stage decor
+
 static void action_33(Object *obj) {
 	switch (obj->mode0) {
 		case 0:
@@ -2897,7 +2899,7 @@ static void action_33(Object *obj) {
 }
 
 
-#pragma mark Act35 Ground Dust
+
 
 void ActStartGroundDust(Player *ply) {			// 1f980
 	Object *obj;
@@ -2970,7 +2972,7 @@ static void action_35(Object *obj) {			//1f9fa
 }
 
 
-#pragma mark Act36 ScreenWobble
+
 
 void ActStartScreenWobble(void){			// 1fd9e
 	Object *obj;
@@ -3074,7 +3076,7 @@ void action_36(Object *obj) {		/* 1fdc4 */
 	
 }
 
-#pragma mark Act37
+
 
 static void action_37(Object *obj) {	//1fc84
 	switch (obj->mode0) {
@@ -3106,7 +3108,7 @@ static void action_37(Object *obj) {	//1fc84
 }
 
 
-#pragma mark Act38 TimeWarp
+
 
 static void action_38(Object *obj) {		// 1fd50
 	if (g.OnBonusStage) {
@@ -3128,7 +3130,7 @@ static void action_38(Object *obj) {		// 1fd50
 	}
 }
 
-#pragma mark Act39 Nametiles
+
 
 static void action_39(Object *obj) {	// 1fec2
 	Player *ply = obj->SubSel ? PLAYER2 : PLAYER1;
@@ -3154,7 +3156,7 @@ static void action_39(Object *obj) {	// 1fec2
 	
 }
 
-#pragma mark Act3A Cape
+
 
 static void action_3a(Object *obj) {		// 201a0
 	switch (obj->mode0) {
@@ -3208,7 +3210,7 @@ static void action_3a(Object *obj) {		// 201a0
 }
 
 
-#pragma mark Act3B Score Counters
+
 
 #define ACT3B_TIME_BONUS_BUSY  1
 #define ACT3B_VITAL_BONUS_BUSY 2
@@ -3234,7 +3236,7 @@ static void _init_counter_image(Object *obj) {		//20610
 	int i;
 
 	/* all same anyway  sf2ua: 20640  original ROM uses three the same   */
-	const static u16 blank_counter_image[] = {0x1, 0xd, 0x2d, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, SF2_TILE_LARGE_HEX_ZERO};
+	static const u16 blank_counter_image[] = {0x1, 0xd, 0x2d, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, SF2_TILE_LARGE_HEX_ZERO};
     
 	switch (obj->SubSel) {
 		case 0:
@@ -3403,7 +3405,7 @@ static void action_3b(Object *obj) {	//203ba
 		FATALDEFAULT;
 	}
 }
-#pragma mark Act40 20de8
+
 static void sub_20f10(Object *obj, Player *ply) {
     sub_bcd_32(0x400, &ply->x015c);
     if (ply->x015c > 0) {
@@ -3498,7 +3500,7 @@ static void action_40(Object *obj)      // 20de8
     
 }
 
-#pragma mark Act41
+
 static void action_41(Object *obj)
 {
     switch (obj->SubSel) {
@@ -3802,11 +3804,11 @@ static void action_41(Object *obj)
     }
 }
 
-#pragma mark Projectile 207f0
+
 // see barrels.c
 
 
-#pragma mark Act43
+
 static void action_43(Object *obj) {        //219ce
 	if (obj->SubSel) {
 		//21adc todo
@@ -3920,7 +3922,7 @@ static void action_43(Object *obj) {        //219ce
 }
 
 
-#pragma mark Act44
+
 static void sub_2224c(Object *obj_a4, Object_G2 *obj_a2) {
 	obj_a4->exists = TRUE;
 	obj_a4->Sel    = 0x44;
@@ -4095,7 +4097,7 @@ static void action_44(Object *obj) {
 }
 
 
-#pragma mark Act48 Speak You Win/Lose + Graphic
+
 
 static void sub_22746(Object *obj) {
 	UD48 *ud = (UD48 *)obj->UserData;
@@ -4155,3 +4157,7 @@ static void action_48(Object *obj) {		//226b6
 	}
 }
 
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
