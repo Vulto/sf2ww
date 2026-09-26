@@ -80,6 +80,7 @@ jobs:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           permission-profile: ":workspace"
           safety-strategy: drop-sudo
+          allow-bots: true
           effort: high
           prompt: |
             You are the autonomous engineering agent for Vulto/sf2ww.
@@ -117,10 +118,16 @@ jobs:
             If a subsystem is already green, audit adjacent paths rather than stopping.
             Keep working until the completion criteria in AGENTS.md are objectively satisfied.
 
-      - name: Validate generated diff
+      - name: Capture agent changes
+        id: changes
         run: |
           set -euo pipefail
           git diff --check
+          if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
           git status --short
 
       - name: Build and test changed tree
@@ -166,16 +173,17 @@ jobs:
           mame-set: sf2ua
 
       - name: Record validation evidence
+        if: steps.changes.outputs.changed == 'true'
         run: |
           set -euo pipefail
-          mkdir -p .agent
+          mkdir -p "$RUNNER_TEMP/sf2-agent"
           {
             echo "run_id=${{ github.run_id }}"
             echo "commit=$(git rev-parse HEAD)"
             echo "jtcps=$(cat .agent/reference/JTCPS_COMMIT)"
             echo "mame=$(cat .agent/reference/MAME_COMMIT)"
             if [ -d .agent/rom ]; then echo "real_rom_lockstep=available"; else echo "real_rom_lockstep=unavailable"; fi
-          } > .agent/last-validation.txt
+          } > "$RUNNER_TEMP/sf2-agent/last-validation.txt"
 
       - name: Commit validated progress
         id: commit
@@ -207,7 +215,7 @@ jobs:
             agent_smoke.csv
             mame_state.csv
             port_state.csv
-            .agent/last-validation.txt
+            ${{ runner.temp }}/sf2-agent/last-validation.txt
             build/Testing/Temporary/LastTest.log
           if-no-files-found: ignore
           retention-days: 7
