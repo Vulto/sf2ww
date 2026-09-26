@@ -3,7 +3,7 @@ CSTD ?= c99
 WARNINGS ?= -Wall -Wextra -Werror
 OPT ?= -O2
 DEBUG ?= -g
-CPPFLAGS += -MMD -MP
+CPPFLAGS += -D_POSIX_C_SOURCE=200809L -MMD -MP
 CFLAGS += -std=$(CSTD) $(WARNINGS) $(OPT) $(DEBUG)
 LDFLAGS +=
 LDLIBS += -lGL -lGLU -lglut -lpthread -lm
