@@ -442,7 +442,7 @@ static void (*const PL_CB_SETSTATUS1[])(Player *ply, short status)={
     pl_cb_setstatus1_ehonda,
     pl_cb_setstatus1_blanka,
     pl_cb_setstatus1_guile,
-    pl_cb_setstatus1_ryu,
+    pl_cb_setstatus1_ken,
     pl_cb_setstatus1_chunli,
     pl_cb_setstatus1_zangeif,
     pl_cb_setstatus1_dhalsim,
