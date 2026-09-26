@@ -31,7 +31,7 @@ int PLCBCrouchZangeif(Player *ply);
 int PLCBJumpZangeif(Player *ply);
 int PLCBPowerZangeif(Player *ply);
 void pl_cb_setstatus1_zangeif(Player *ply, short status);
-void pl_cb_setstatus2_zangeif(Player *ply, short status);
+void pl_cb_setstatus2_zangeif(Player *ply, short status, int argd0);
 void pl_cb_setstatus3_zangeif(Player *ply, short status);
 
 
@@ -40,7 +40,7 @@ int PLCBCrouchDhalsim(Player *ply);
 int PLCBJumpDhalsim(Player *ply);
 int PLCBPowerDhalsim(Player *ply);
 void pl_cb_setstatus1_dhalsim(Player *ply, short status);
-void pl_cb_setstatus2_dhalsim(Player *ply, short status);
+void pl_cb_setstatus2_dhalsim(Player *ply, short status, int argd0);
 void pl_cb_setstatus3_dhalsim(Player *ply, short status);
 
 
@@ -286,7 +286,7 @@ void ply_thrown(Player *ply) {
 }
 
 void random_damage_adjust_1(Player *ply, int damage_d0, int damage_d1) {
-    const static char data_3fb8[32]={
+    static const char data_3fb8[32]={
         0, -6, -3, 0, 0, 0, 0, -3,
         0, 0, -9, 0, 0, 0, -6, -9,
         0, 0, 0, 0, 0, -3, 0, 0,
@@ -299,7 +299,7 @@ void random_damage_adjust_1(Player *ply, int damage_d0, int damage_d1) {
 }
 
 void random_damage_adjust_2(Player *ply, int damage) {
-    const static char data_3f98[32]={
+    static const char data_3f98[32]={
         0, -12, -6, 0, 0, 0, 0, -6,
         0, 0, 0, 0, -9, -6, 0, 0,
         0, -9, 0, -6, 0, 0, -9, 0,
@@ -361,61 +361,61 @@ void proc_player_actions(void) {
     }
 }
 
-#pragma mark Callbacks to per-Avatar code
+
 
 void check_powermove_input(Player *ply) {
-    static void (* const data_2a7fa[])(Player *)={
+    static int (* const data_2a7fa[])(Player *)={
         PLCBPowerRyu,
         PLCBPowerEHonda,
         PLCBPowerBlanka,
         PLCBPowerGuile,
         PLCBPowerRyu,
-        (void (*const)(Player *))PLCBPowerChunLi,
-        (void (*const)(Player *))PLCBPowerZangeif,
-        (void (*const)(Player *))PLCBPowerDhalsim
+        PLCBPowerChunLi,
+        PLCBPowerZangeif,
+        PLCBPowerDhalsim
     };
     return data_2a7fa[ply->FighterID](ply);
 }
 
 short ply_cb_standmove(Player *ply) {
-    static short (* const data_2a82a[])(Player *)={
+    static int (* const data_2a82a[])(Player *)={
         PLCBStandRyu,
         PLCBStandEHonda,
         PLCBStandBlanka,
         PLCBStandGuile,
         PLCBStandRyu,
-        (short (*const)(Player *))PLCBStandChunLi,
-        (short (*const)(Player *))PLCBStandZangeif,
-        (short (*const)(Player *))PLCBStandDhalsim,
+        PLCBStandChunLi,
+        PLCBStandZangeif,
+        PLCBStandDhalsim,
     };
     return data_2a82a[ply->FighterID](ply);
 }
 
 short ply_cb_crouchmove(Player *ply) {
-    static short (* const data_2a85a[])(Player *)={
+    static int (* const data_2a85a[])(Player *)={
         PLCBCrouchRyu,
         PLCBCrouchEHonda,
         PLCBCrouchBlanka,
         PLCBCrouchGuile,
         PLCBCrouchRyu,
-        (short (*const)(Player *))PLCBCrouchChunLi,
-        (short (*const)(Player *))PLCBCrouchZangeif,
-        (short (*const)(Player *))PLCBCrouchDhalsim,
+        PLCBCrouchChunLi,
+        PLCBCrouchZangeif,
+        PLCBCrouchDhalsim,
     };
     
     return data_2a85a[ply->FighterID](ply);
 }
 
 short ply_cb_jumpmove(Player *ply) {
-    static short (* const data_2a88a[])(Player *)={
+    static int (* const data_2a88a[])(Player *)={
         PLCBJumpRyu,
         PLCBJumpEHonda,
         PLCBJumpBlanka,
         PLCBJumpGuile,
         PLCBJumpRyu,
-        (short (*const)(Player *))PLCBJumpChunLi,
-        (short (*const)(Player *))PLCBJumpZangeif,
-        (short (*const)(Player *))PLCBJumpDhalsim,
+        PLCBJumpChunLi,
+        PLCBJumpZangeif,
+        PLCBJumpDhalsim,
     };
     
     return data_2a88a[ply->FighterID](ply);
@@ -442,9 +442,9 @@ static void (*const PL_CB_SETSTATUS2[])(Player *ply, short status, int argd0)={
     pl_cb_setstatus2_guile,
     pl_cb_setstatus2_ken,
     pl_cb_setstatus2_chunli,
-    (void (*const)(Player *, short, int))pl_cb_setstatus2_zangeif,
-    (void (*const)(Player *, short, int))pl_cb_setstatus2_dhalsim,
-    (void (*const)(Player *, short, int))pl_cb_setstatus2_mbison,
+    pl_cb_setstatus2_zangeif,
+    pl_cb_setstatus2_dhalsim,
+    pl_cb_setstatus2_mbison,
     NULL,
     NULL,
     NULL,
