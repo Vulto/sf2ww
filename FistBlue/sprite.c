@@ -1047,7 +1047,7 @@ static void sub_7eea2(Object *obj, const u16 *tilep, const short *offsets, short
 	}
 }
 
-static void sub_7f244 (Object *obj, u16 tiles_in_image, const Image *image, short x, short y ) {
+static void sub_7f244 (Object *obj, u16 tiles_in_image, u32 action_offset, u32 image_offset, short x, short y ) {
 	u16 tile;
 	u16 attr;
 	const u16 *tilep;
@@ -1058,20 +1058,24 @@ static void sub_7f244 (Object *obj, u16 tiles_in_image, const Image *image, shor
 	if (g.ObjTileBudget < tiles_in_image)		{ return; }
 	g.ObjTileBudget -= tiles_in_image;
 	g_tilecount -= tiles_in_image;
-	attr = RHSwapWord(image->Attr) & 0xe0;	/* Only flips */
-	offsets = sub_7f224(RHSwapWord(image->Dimensions));
-	g.DSOffsetX = RHSwapWord(image->OffsetX);
-	g.DSOffsetY = RHSwapWord(image->OffsetY);
-	if (obj->ActionScript->FlipBits & 0x3) {
-        attr ^= (obj->ActionScript->FlipBits & 0x3) << 5;      /* apply flips */
-        g.DSOffsetY += (obj->ActionScript->YOffset & 0xff);
+	attr = RHWordOffset(image_offset, 1) & 0xe0;	/* Only flips */
+	offsets = sub_7f224(RHWordOffset(image_offset, 2));
+	g.DSOffsetX = (short)RHWordOffset(image_offset, 3);
+	g.DSOffsetY = (short)RHWordOffset(image_offset, 4);
+	{
+        u8 flip_bits = RHByteOffset(action_offset, offsetof(FBAction, FlipBits));
+        char y_offset = (char)RHByteOffset(action_offset, offsetof(FBAction, YOffset));
+        if (flip_bits & 0x3) {
+            attr ^= (flip_bits & 0x3) << 5;      /* apply flips */
+            g.DSOffsetY += y_offset;
+        }
     }
 	g.DSOffsetX += obj->DSOffsetX;
 	if (obj->Draw1 > 0) {
 		attr &= 0xffe0;
 		attr |= obj->Draw2.part.integer;
 	}
-	tilep = &image->Tiles[0];
+	tilep = (const u16 *)RHCodePtrRange(image_offset + 10u, (size_t)tiles_in_image * sizeof(u16));
 	
 	attr ^= ((obj->Flip & 0x3) << 5);
 	if (attr & ATTR_X_FLIP) {
@@ -1081,7 +1085,7 @@ static void sub_7f244 (Object *obj, u16 tiles_in_image, const Image *image, shor
 			x += g.DSOffsetX;
 			y -= g.DSOffsetY;
 			for (i=0; i<tiles_in_image; i++) {
-				if (RHSwapWord(*tilep) == 0) {
+				if (RHReadWordPtr(tilep) == 0) {
 					tilep+=2;
 					offsets+=2;
 					continue;
@@ -1095,8 +1099,8 @@ static void sub_7f244 (Object *obj, u16 tiles_in_image, const Image *image, shor
 					continue;
 				}
 				sy = (y - *offsets++ -16) & 0x1ff;
-				tile = RHSwapWord(*tilep++);
-				OBJECT_DRAW_SINGLE(DSObjCur_g, sx, sy, tile, attr ^ (RHSwapWord(*tilep++)));
+				tile = RHReadWordPtr(tilep++);
+				OBJECT_DRAW_SINGLE(DSObjCur_g, sx, sy, tile, attr ^ (RHReadWordPtr(tilep++)));
 				OBJ_CURSOR_BUMP(DSObjCur_g);
 			}
 		} else {
@@ -1104,7 +1108,7 @@ static void sub_7f244 (Object *obj, u16 tiles_in_image, const Image *image, shor
 			y += g.DSOffsetY;
 			/* 7f3b2 */
 			for (i=0; i<tiles_in_image; i++) {
-				if (RHSwapWord(*tilep) == 0) {
+				if (RHReadWordPtr(tilep) == 0) {
 					tilep+=2;
 					offsets+=2;
 					continue;
@@ -1118,8 +1122,8 @@ static void sub_7f244 (Object *obj, u16 tiles_in_image, const Image *image, shor
 					continue;
 				}
 				sy = (y + *offsets++) & 0x1ff;
-				tile = RHSwapWord(*tilep++);
-				OBJECT_DRAW_SINGLE(DSObjCur_g, sx, sy, tile, attr ^ (RHSwapWord(*tilep++)));
+				tile = RHReadWordPtr(tilep++);
+				OBJECT_DRAW_SINGLE(DSObjCur_g, sx, sy, tile, attr ^ (RHReadWordPtr(tilep++)));
 				OBJ_CURSOR_BUMP(DSObjCur_g);
 			}
 		}
@@ -1130,7 +1134,7 @@ static void sub_7f244 (Object *obj, u16 tiles_in_image, const Image *image, shor
 		y -= g.DSOffsetY;
 		
 		for (i=0; i < tiles_in_image; i++) {
-			if (RHSwapWord(*tilep) == 0) {
+			if (RHReadWordPtr(tilep) == 0) {
 				tilep += 2;
 				offsets += 2;
 				continue;
@@ -1144,8 +1148,8 @@ static void sub_7f244 (Object *obj, u16 tiles_in_image, const Image *image, shor
 				continue;
 			}
 			sy = (y + *offsets++) & 0x1ff;
-			tile = RHSwapWord(*tilep++);
-			OBJECT_DRAW_SINGLE(DSObjCur_g, sx, sy, tile, attr ^ (RHSwapWord(*tilep++)));
+			tile = RHReadWordPtr(tilep++);
+			OBJECT_DRAW_SINGLE(DSObjCur_g, sx, sy, tile, attr ^ (RHReadWordPtr(tilep++)));
 			OBJ_CURSOR_BUMP(DSObjCur_g);
 		}		
 	} else {
@@ -1155,7 +1159,7 @@ static void sub_7f244 (Object *obj, u16 tiles_in_image, const Image *image, shor
 		if(obj->Draw1 < 0) {
 			/* sub_7f316()  sincos */
 			for (i=0; i<tiles_in_image; i++) {
-				if (RHSwapWord(*tilep) == 0) {
+				if (RHReadWordPtr(tilep) == 0) {
 					tilep+=2;
 					offsets+=2;
 				} else {
@@ -1168,16 +1172,16 @@ static void sub_7f244 (Object *obj, u16 tiles_in_image, const Image *image, shor
 					sysin = sy * data_trig[obj->Step][2] / 256;
 					sycos = sx * data_trig[obj->Step][3] / 256;
 					
-					tile = RHSwapWord(*tilep++);
+					tile = RHReadWordPtr(tilep++);
 					OBJECT_DRAW_SINGLE(DSObjCur_g, sxcos + sysin - 8, sxsin + sycos - 8,
-									   tile, attr ^ (RHSwapWord(*tilep++)));
+									   tile, attr ^ (RHReadWordPtr(tilep++)));
 					OBJ_CURSOR_BUMP(DSObjCur_g);
 				}
 			}
 			return;
 		}
 		for (i = 0; i < tiles_in_image; i++) {
-			if (RHSwapWord(*tilep) == 0) {
+			if (RHReadWordPtr(tilep) == 0) {
 				tilep   += 2;
 				offsets += 2;
 			} else {
@@ -1190,8 +1194,8 @@ static void sub_7f244 (Object *obj, u16 tiles_in_image, const Image *image, shor
 					continue;
 				}
 				sy = (y + offsets[1]) & 0x1ff;
-				tile = RHSwapWord(*tilep++);
-				OBJECT_DRAW_SINGLE(DSObjCur_g, sx, sy, tile, attr ^ (RHSwapWord(*tilep++)));
+				tile = RHReadWordPtr(tilep++);
+				OBJECT_DRAW_SINGLE(DSObjCur_g, sx, sy, tile, attr ^ (RHReadWordPtr(tilep++)));
 				OBJ_CURSOR_BUMP(DSObjCur_g);
 				offsets += 2;
 			}
