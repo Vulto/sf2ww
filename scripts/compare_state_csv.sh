@@ -19,7 +19,7 @@ skip_rows="${3:-0}"
 awk -F, -v skip="$skip_rows" '
 function emit_expected(    i, key) {
     key = ""
-    for (i = 2; i <= NF; ++i) key = key "|" $i
+    for (i = 2; i <= NF; ++i) if (expected_name[i] != "game_tick" && expected_name[i] != "time_ticks") key = key "|" $i
     if (key != last_expected) {
         expected_events[++expected_count] = key
         expected_frames[expected_count] = $1
@@ -28,7 +28,7 @@ function emit_expected(    i, key) {
 }
 function emit_actual(    i, key) {
     key = ""
-    for (i = 2; i <= NF; ++i) key = key "|" $i
+    for (i = 2; i <= NF; ++i) if (expected_name[i] != "game_tick" && expected_name[i] != "time_ticks") key = key "|" $i
     if (key != last_actual) {
         actual_events[++actual_count] = key
         actual_frames[actual_count] = $1
