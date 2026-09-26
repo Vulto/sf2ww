@@ -86,6 +86,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install MAME
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mame xvfb
+          mame -version
+          mame -listfull sf2ua | grep -q '^sf2ua '
       - name: Validate state comparator
         run: |
           printf '%s\n' 'frame,game_mode,game_tick,stage' '1,2,3,4' '2,2,4,4' > expected.csv
@@ -104,6 +110,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install MAME
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mame freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb
+          mame -version
+          mame -listfull sf2ua | grep -q '^sf2ua '
       - name: Check private ROM fixture
         id: fixture
         run: |
@@ -113,11 +125,11 @@ jobs:
           else
             echo "available=true" >> "$GITHUB_OUTPUT"
           fi
-      - name: Install dependencies
+      - name: Install port dependencies
         if: steps.fixture.outputs.available == 'true'
         run: |
           sudo apt-get update
-          sudo apt-get install -y mame freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb
+          sudo apt-get install -y freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libcmocka-dev xvfb
       - name: Configure and build port
         if: steps.fixture.outputs.available == 'true'
         run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_FBTESTS=ON -S . -B build && cmake --build build --parallel
