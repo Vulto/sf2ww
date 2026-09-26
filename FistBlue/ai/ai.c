@@ -1445,7 +1445,7 @@ static short sub_2bcbc(Player *ply) {		/* 2bcbc */
 	if (ply->AIForceDefensive == FALSE) {
 		return 1;
 	} else {
-		if (0x00002007 && 1 << ply->YokeSaved) {
+		if (0x00002007 & (1 << ply->YokeSaved)) {
 			return 0;
 		}
 	}
