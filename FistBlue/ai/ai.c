@@ -962,9 +962,9 @@ void AIInitDefensive(Player *ply) {				// 2b82a
 	/* range of YokeSaved is 0-15 */
 
 	if (0xff07 & (1 << ply->YokeSaved) && ply->Energy <= data_2b8a4[(unsigned char)RAND16] ) {		
-		ply->AIStratDef = DS->codes[DS->low_energy[RAND32]];
+		ply->AIStratDef = DS->codes[DS->low_energy[(unsigned char)RAND32]];
 	} else {
-		ply->AIStratDef = DS->codes[DS->high_energy[RAND32]];	
+		ply->AIStratDef = DS->codes[DS->high_energy[(unsigned char)RAND32]];	
 	}
 		
 	ply->AITypeDef = ply->AIStratDef[0];
