@@ -607,8 +607,8 @@ glEnd();
 	int i,j, blockx, blocky, pal, bys, bxs ;
 	GLfloat x,y;
 	int tile, flip;
-	GLfloat master = (gemu.PalObject[0][0] & PALETTE_MASK_BRIGHTNESS) / TILE_BRIGHT_TO_FLOAT;
-	glColor3f(master, 1.0, master);
+	/* Palette conversion already applies CPS RGBM brightness. Keep the texture unmodulated. */
+	glColor3f(1.0, 1.0, 1.0);
 	
 	
 	glEnable(GL_TEXTURE_2D);
