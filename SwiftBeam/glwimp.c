@@ -44,6 +44,8 @@ int gDragDeltaY;
 GLfloat gWimpScale = 1.0f;
 
 void render_text_view (GLint window_width, GLint window_height) {
+	(void)window_width;
+	(void)window_height;
 	
 }
 
@@ -211,6 +213,7 @@ void DrawNull(LBView *view) {
 
 
 int WindowButtonClicked(LBView *view) {
+	(void)view;
 	gGameInWindow = FALSE;
 	return TRUE;
 }
@@ -222,6 +225,9 @@ void mouseZoom(int x, int y) {
 	glutPostRedisplay();
 }
 int RootViewClick(LBView *view, int button, int state, int x, int y, int scrx, int scry) {
+	(void)view;
+	(void)x;
+	(void)y;
 	if ((button == GLUT_RIGHT_BUTTON) && (state == GLUT_DOWN)) {
 		glutMotionFunc(mouseZoom);
 		gDragDeltaX = scrx;
@@ -232,7 +238,7 @@ int RootViewClick(LBView *view, int button, int state, int x, int y, int scrx, i
 	//printf("Clicked in the root view!\n");
 	return TRUE;
 }
-int ClickNull(LBView *view) { return TRUE; }
+int ClickNull(LBView *view) { (void)view; return TRUE; }
 void mouseDrag(int x, int y) {
 	(void)x;
 	(void)y;
@@ -242,6 +248,8 @@ void mouseDrag(int x, int y) {
 	glutPostRedisplay();
 }
 int DragBarClicked(LBView *view, int button, int state, int x, int y, int scrx, int scry) {
+	(void)x;
+	(void)y;
 	if ((button == GLUT_LEFT_BUTTON) && (state == GLUT_DOWN)) {
 		glutMotionFunc(mouseDrag);
 		printf("drag begins\n");
