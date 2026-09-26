@@ -20,7 +20,7 @@ extern ScrollState gstate_Scroll3;
 extern RowScrollState gstate_RowScroll;    /* cd2 - d51 */
 extern CPSGFXEMU gemu;
 
-#pragma mark ---- Scroll Maint ----
+
 
 extern Game g;
 
@@ -310,7 +310,7 @@ void GSMaintScroll2(ScrollState *gstate){      /* 831ca was nextlevel_dosetups *
     }
 }
 
-#pragma mark ---- Coordinate Calculators ----
+
 
 static u16 *_GSCoordsScroll1(CP cp){            //83dec checked
     return gemu.Tilemap_Scroll1[
