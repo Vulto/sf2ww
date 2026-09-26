@@ -66,6 +66,9 @@ void RHActionTick(Object *obj) {
     }
 }
 void setaction_list(Object *obj, const Action **list, short sel) {
+    (void)obj;
+    (void)list;
+    (void)sel;
     FBPanic(99);
 }
 void setaction_direct(Object *obj, const Action *act) {
