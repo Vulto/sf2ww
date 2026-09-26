@@ -134,20 +134,23 @@ int lookup_damage_and_score(Player *ply, Player *vict, const HitBoxAct *a3) { /*
 	static const u16 data_995a6[4]={0x200a, 0x200a, 0x2022, 0x2022,  };
 	
 	
+    const u8 damageIndex = a3->Damage & 0x7f;
+    const u8 specialIndex = damageIndex - 0x20;
+
     g_d5=vict->MoreBoxes[vict->Difficulty];
-    if((a3->Damage & 0x7f) < 0x20) {
-        g.GPPointsReward = data_99544[ a3->Damage ];
-        return data_99324[ a3->Damage ][ ply->Difficulty ];
-    } 
-	g.GPPointsReward = data_995a6[ a3->Damage - 0x20 ];
-	
-	if(ply->Energy < data_99566[ a3->Damage - 0x20 ][ 1 ]) {
-		return data_99566[ a3->Damage - 0x20 ][2];
-	}
-	if(ply->Energy >= data_99566[ a3->Damage - 0x20 ][ 3 ]) {
-		return data_99566[ a3->Damage - 0x20 ][4];
-	}
-	return (vict->Energy - (vict->Energy >> data_99566[ a3->Damage - 0x20 ][0]));
+    if(damageIndex < 0x20) {
+        g.GPPointsReward = data_99544[damageIndex];
+        return data_99324[damageIndex][ply->Difficulty];
+    }
+    g.GPPointsReward = data_995a6[specialIndex];
+
+    if(ply->Energy < data_99566[specialIndex][1]) {
+        return data_99566[specialIndex][2];
+    }
+    if(ply->Energy >= data_99566[specialIndex][3]) {
+        return data_99566[specialIndex][4];
+    }
+    return (vict->Energy - (vict->Energy >> data_99566[specialIndex][0]));
 }
 int damage_multiplier(Player *vict, int d6) {   /* 7d40e */
     int xx;
