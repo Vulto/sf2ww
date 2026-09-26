@@ -22,7 +22,7 @@ struct UserData_Act2e {
 	POINT16 destination;
 	//
 	short	sound;	// 0096
-};
+} __attribute__((packed));
 
 
 #endif
