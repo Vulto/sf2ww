@@ -126,7 +126,7 @@ static const u16 *_GSRealignScroll2A(ScrollState *gs, u16 **gfx_p) {
     return &data_e0000[ RHWordOffset(gs->TileMaps, gs->Index / 2) ][gs->XCoarse/2];
 }
 
-#pragma mark ---- Tilemap Lookup ----
+
 
 static short _GSCalcBlockIndex(ScrollState *gs, CP cp) {
     /* 0x83ee6 x and y div by 256 was cacl_gstate_2022 */
@@ -234,7 +234,7 @@ static void gstate_nextlevel_scroll3 (void) {
  */
 
 
-#pragma mark ---- Tilemap Fillers ----
+
 void GSFillScroll2(ScrollState *gs) {  /* 0x83ae0 fill scroll2 from tilemap */
     int i,j;
     CPSCOORD gfx_p;
