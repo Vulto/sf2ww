@@ -263,7 +263,7 @@ void gemu_cache_scroll1(u16 tile, short palette) {
 	}
 }
 void gemu_cache_scroll2(u16 tile, short palette) {
-    if (tile >= TEXTURE_CACHE_SIZE || palette < 0 || palette >= 32) { return; }
+    if (palette < 0 || palette >= 32) { return; }
 	static GLubyte tempmap[16][16][4];
 	if (TC.text_scr2[tile][0] && TC.text_scr2[tile][1] != (GLuint)palette) {
 		glDeleteTextures(1, &TC.text_scr2[tile][0]);
