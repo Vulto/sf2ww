@@ -7,8 +7,9 @@ MAME_SET="\${SF2_MAME_SET:-sf2ua}"
 MAX_FRAMES="\${SF2_REVERSE_MAX_FRAMES:-7200}"
 
 rm -f reverse_frames.csv reverse_memory_reads.csv reverse_memory_writes.csv
-rm -f reverse_ram_changes.csv reverse_memory_map.csv reverse_manifest.csv
-rm -f reverse_68000.tr
+rm -f reverse_ram_changes.csv reverse_memory_map.csv reverse_manifest.csv reverse_registers.csv
+rm -f reverse_audiocpu_reads.csv reverse_audiocpu_writes.csv reverse_sound_commands.csv
+rm -f reverse_68000.tr reverse_z80.tr
 
 SF2_REVERSE_MAX_FRAMES="$MAX_FRAMES" \
 SF2_REVERSE_TRACE_INSTRUCTIONS="\${SF2_REVERSE_TRACE_INSTRUCTIONS:-1}" \
