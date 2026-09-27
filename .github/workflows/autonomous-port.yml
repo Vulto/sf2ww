@@ -2,8 +2,6 @@ name: Autonomous SF2 Port Agent
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "17 * * * *"
 
 concurrency:
   group: sf2-autonomous-main
