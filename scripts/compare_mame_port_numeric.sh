@@ -41,7 +41,7 @@ NR==1 {
 {
     for(i=1;i<=n;i++) {
         if(!(h[i] in col)) exit 20
-        printf ",%s", $(col[h[i]]) > out
+        printf "%s%s", (i==1 ? "" : ","), $(col[h[i]]) > out
     }
     printf "\n" > out
 }
