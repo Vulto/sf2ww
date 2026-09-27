@@ -30,7 +30,6 @@ jobs:
       - name: Checkout main
         uses: actions/checkout@v4
         with:
-        deep-trace: ${{ github.event_name == 'schedule' }}
           ref: main
           fetch-depth: 0
           persist-credentials: true
@@ -262,6 +261,7 @@ jobs:
           port-executable: ./glutBasics
           mame-bin: mame
           mame-set: sf2ua
+          deep-trace: ${{ github.event_name == 'schedule' }}
 
       - name: Record validation evidence
         if: steps.changes.outputs.changed == 'true'
