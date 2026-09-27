@@ -8,6 +8,8 @@ REQUIRED = {
     "reverse_memory_writes.csv": ["seq", "arcade_time_ns", "arcade_cpu_cycles", "pc", "address", "data", "mem_mask"],
     "reverse_ram_changes.csv": ["frame", "arcade_time_ns", "arcade_cpu_cycles", "address", "value"],
     "reverse_registers.csv": ["frame", "arcade_time_ns", "arcade_cpu_cycles", "name", "value"],
+    "reverse_audiocpu_reads.csv": ["seq", "arcade_time_ns", "cpu", "address", "data", "mem_mask", "pc"],
+    "reverse_audiocpu_writes.csv": ["seq", "arcade_time_ns", "cpu", "address", "data", "mem_mask", "pc"],
     "reverse_registers.csv": ["frame", "arcade_time_ns", "arcade_cpu_cycles", "name", "value"],
 }
 
@@ -75,7 +77,7 @@ missing_modes = required_modes - modes
 if missing_modes:
     fail("ATTRACT_SEQUENCE_INCOMPLETE missing_modes=" + ",".join(hex(value) for value in sorted(missing_modes)))
 
-for filename in ("reverse_memory_reads.csv", "reverse_memory_writes.csv"):
+for filename in ("reverse_memory_reads.csv", "reverse_memory_writes.csv", "reverse_audiocpu_reads.csv", "reverse_audiocpu_writes.csv"):
     with Path(filename).open(newline="") as handle:
         for row in csv.DictReader(handle):
             address = int(row["address"])
