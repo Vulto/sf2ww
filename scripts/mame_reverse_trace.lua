@@ -31,6 +31,7 @@ local audioReadOut = open_file("reverse_audiocpu_reads.csv")
 local audioWriteOut = open_file("reverse_audiocpu_writes.csv")
 local registersOut = open_file("reverse_registers.csv")
 local soundCommandOut = open_file("reverse_sound_commands.csv")
+local audioChipWriteOut = open_file("reverse_audio_chip_writes.csv")
 
 frameOut:write("frame,arcade_time_ns,arcade_cpu_cycles,pc,sr,d0,d1,d2,d3,d4,d5,d6,d7,a0,a1,a2,a3,a4,a5,a6,a7,game_mode,game_tick,stage,round_cnt,time_bcd,time_ticks,fight_over,rng1,rng2\n")
 readOut:write("seq,arcade_time_ns,arcade_cpu_cycles,pc,sr,address,data,mem_mask\n")
@@ -42,6 +43,7 @@ mapOut:write("kind,owner,space,address_start,address_end,mirror,mask,cswidth,lan
 manifestOut:write("key,value\n")
 registersOut:write("frame,arcade_time_ns,arcade_cpu_cycles,name,value\n")
 soundCommandOut:write("seq,arcade_time_ns,arcade_cpu_cycles,pc,sr,address,data,mem_mask\n")
+audioChipWriteOut:write("seq,arcade_time_ns,arcade_cpu_cycles,pc,address,data,device\n")
 
 local function state_value(name)
     local entry = state[name]
@@ -121,7 +123,18 @@ if audioCpu ~= nil and audioCpu.spaces["program"] ~= nil then
     end)
     audioMem:install_write_tap(0x0000, audioMem.address_mask, "sf2ww_reverse_audio_write", function(offset, data, memMask)
         audioWriteSeq = audioWriteSeq + 1
-        audioWriteOut:write(string.format("%u,%u,audiocpu,%u,%u,%u,%u\n", audioWriteSeq, elapsed_time_ns(), offset, data, memMask, audioStateValue("CURPC")))
+        audioWriteOut:write(string.format("%u,%u,audiocpu,%u,%u,%u,%u\\n", audioWriteSeq, elapsed_time_ns(), offset, data, memMask, audioStateValue("CURPC")))
+        if offset >= 0xf000 and offset <= 0xf006 then
+            local device = offset == 0xf000 and "ym2151_address" or
+                          offset == 0xf001 and "ym2151_data" or
+                          offset == 0xf002 and "okim6295" or
+                          offset == 0xf004 and "sound_bank" or
+                          offset == 0xf006 and "oki_pin7" or "audio_io"
+            audioChipWriteOut:write(string.format("%u,%u,%u,%u,%u,%u,%s\\n",
+                audioWriteSeq, elapsed_time_ns(), cpu_cycles(),
+                audioStateValue("CURPC"), offset, data, device))
+            audioChipWriteOut:flush()
+        end
         if (audioWriteSeq % 4096) == 0 then audioWriteOut:flush() end
     end)
 end
@@ -257,6 +270,7 @@ local function sample()
         soundCommandOut:close()
         audioReadOut:close()
         audioWriteOut:close()
+        audioChipWriteOut:close()
         machine:exit()
     end
 end
