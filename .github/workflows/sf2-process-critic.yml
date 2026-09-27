@@ -1,0 +1,49 @@
+name: SF2 Process Critic
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "47 * * * *"
+concurrency:
+  group: sf2-process-critic
+  cancel-in-progress: false
+permissions:
+  contents: read
+  actions: read
+  issues: write
+jobs:
+  critique:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 50}
+      - name: Gather process evidence
+        env: {GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p .agent/critic
+          gh run list --repo "$GITHUB_REPOSITORY" --limit 50 --json databaseId,name,status,conclusion,headSha,createdAt,updatedAt > .agent/critic/runs.json
+          gh issue list --repo "$GITHUB_REPOSITORY" --state all --limit 200 --json number,title,state,labels,createdAt,updatedAt > .agent/critic/issues.json
+          git log -50 --oneline --decorate > .agent/critic/commits.txt
+      - name: Process Critic agent
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY || secrets.CODEX_OPENAI_API_KEY }}
+          permission-profile: ":workspace"
+          safety-strategy: drop-sudo
+          allow-users: "Vulto"
+          effort: high
+          prompt: |
+            You are Agent 4, Process Critic and Systems Auditor.
+            Observe Agents 1-3 and their handoffs. Critique determinism, empirical validity,
+            ROM coverage, oracle completeness, causal diagnosis, issue quality, regressions,
+            concurrency, artifact integrity and blind spots. Never weaken acceptance criteria.
+            Produce .agent/critic/recommendation.md only when a concrete improvement is supported
+            by evidence. Identify which agent should implement it and give a validation plan.
+      - name: Publish recommendation
+        env: {GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ -s .agent/critic/recommendation.md ]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "Process critique: autonomous pipeline improvement" --body-file .agent/critic/recommendation.md
+          fi
