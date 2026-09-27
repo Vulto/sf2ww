@@ -47,7 +47,7 @@ out:write("arcade_time_ns,arcade_cpu_cycles,p1_x,p1_y,p1_mode0,p1_mode1,p1_mode2
 local previous = nil
 local seq = 0
 local frame = 0
-local MAX_FRAMES = 900
+local MAX_FRAMES = tonumber(os.getenv("SF2_NUMERIC_MAX_FRAMES") or "900")
 local base_seconds = nil
 local base_nsec = nil
 
