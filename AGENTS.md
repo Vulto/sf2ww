@@ -68,7 +68,6 @@ O build nativo usa exclusivamente `make` com GCC, C99 e OpenGL. CMake, cmocka e 
 Manter um pipeline central, preferencialmente `.github/workflows/ci.yml`, contendo:
 - `build-and-lint` em push/PR;
 - `smoke-compare` em PR;
-- `full-mame-regression` em merge para `main` e cron noturno;
 - action composta reutilizável para lógica comum MAME + port + diff.
 
 Novas dimensões de teste devem ser steps/jobs desse pipeline, não workflows paralelos. A ROM do MAME é fixture obrigatória do CI/CD. Deve ser disponibilizada ao runner por armazenamento privado e referenciada por `SF2_MAME_ROM_URL` como secret; nunca por conteúdo versionado ou artefato público.
@@ -119,3 +118,68 @@ A ROM original continua fora do Git. Quando `SF2_MAME_ROM_URL` estiver configura
 O agente não cria branches, não faz force-push e não reescreve histórico. O Codex modifica o workspace; o wrapper valida, commita e envia as mudanças para `main`.
 
 O loop imediato usa `workflow_dispatch` porque pushes feitos com `GITHUB_TOKEN` não disparam novamente workflows de `push`.
+
+
+## 13. Contrato do agente de melhoria contínua
+
+Cada iteração deve tratar o MAME e o port como duas execuções observáveis do mesmo cenário, nunca como duas implementações a serem aproximadas por inspeção.
+
+### Ciclo obrigatório por iteração
+
+1. Executar uma baseline limpa do MAME `sf2ua` e uma baseline limpa do port.
+2. Coletar, no mínimo:
+   - estado lógico;
+   - transições de estado;
+   - tempo arcade;
+   - ciclos do CPU de referência;
+   - PC/registradores quando disponíveis;
+   - acessos de memória relevantes;
+   - mudanças de RAM;
+   - framebuffer;
+   - eventos de áudio;
+   - crashes, sanitizers e erros de execução.
+3. Encontrar a primeira divergência observável.
+4. Preservar uma janela de evidência antes/depois da divergência.
+5. Formular uma hipótese causal falsificável.
+6. Verificar a hipótese contra MAME, código do driver, JTCPS/hardware ou outra evidência primária disponível.
+7. Implementar a menor correção de causa raiz no port.
+8. Acrescentar uma regressão que falhe no estado anterior e passe no estado corrigido.
+9. Executar novamente MAME e port.
+10. Só então permitir commit.
+11. Registrar causa, evidência, teste e resultado em `FINDINGS.md`.
+12. Auditar o próprio método: se a divergência não puder ser localizada com confiança, ampliar a coleta antes de alterar o port.
+
+### Testes são fonte de verdade
+
+Os oráculos de comparação são protegidos contra enfraquecimento.
+
+É permitido ampliar a observação ou adicionar novos casos. Não é permitido:
+- remover uma asserção para obter PASS;
+- aumentar limiar de tolerância sem evidência independente;
+- transformar erro em warning;
+- adicionar `|| true` a uma validação;
+- ocultar divergência, reduzir o intervalo observado ou reduzir a duração para escapar de uma falha;
+- substituir MAME por dados sintéticos em um teste que já possui fixture real;
+- alterar o resultado esperado somente porque o port ainda não o reproduz.
+
+Quando o método de teste estiver errado, o agente deve primeiro demonstrar o defeito do teste com um caso de regressão independente e documentar a correção. Uma correção do oráculo não pode ser usada simultaneamente para justificar uma alteração do port.
+
+### Áudio
+
+Áudio é parte do comportamento do jogo, não uma exceção cosmética.
+
+O agente deve reproduzir:
+- comandos/eventos de som;
+- música e efeitos;
+- sequência temporal;
+- origem dos eventos no estado do jogo;
+- escrita/leitura das interfaces de áudio observadas no MAME;
+- comportamento durante attract, demo fight, rank display e gameplay.
+
+Formato de áudio, dispositivo de saída e reamostragem podem diferir quando documentados, mas a sequência lógica e o timing dos eventos devem ser comparados.
+
+### Recursão
+
+Se houver progresso validado, o workflow dispara a próxima iteração automaticamente. Se não houver progresso, o agente deve mudar de hipótese ou ampliar a instrumentação; nunca encerrar simplesmente porque não encontrou uma correção.
+
+A ausência de divergência em um cenário não autoriza declarar o port concluído. O agente deve expandir cobertura por personagens, estágios, golpes, IA, áudio, renderização, attract e decisões de round/match.
