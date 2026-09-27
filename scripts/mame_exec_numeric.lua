@@ -42,7 +42,7 @@ local function vector()
 end
 
 local out = assert(io.open("mame_exec_numeric.csv", "w"))
-out:write("arcade_time_ns,arcade_cpu_cycles,p1_x,p1_y,p1_mode0,p1_mode1,p1_mode2,p1_anim,p1_energy,p1_move,p1_stand_squat,p2_x,p2_y,p2_mode0,p2_mode1,p2_mode2,p2_anim,p2_energy,p2_move,p2_stand_squat,stage,round_cnt,fight_over,rng1,rng2\n")
+out:write("arcade_time_ns,arcade_cpu_cycles,pc,sr,d0,d1,d2,d3,d4,d5,d6,d7,a0,a1,a2,a3,a4,a5,a6,a7,p1_x,p1_y,p1_mode0,p1_mode1,p1_mode2,p1_anim,p1_energy,p1_move,p1_stand_squat,p2_x,p2_y,p2_mode0,p2_mode1,p2_mode2,p2_anim,p2_energy,p2_move,p2_stand_squat,stage,round_cnt,fight_over,rng1,rng2\n")
 
 local previous = nil
 local seq = 0
@@ -67,7 +67,7 @@ local function sample()
     local current = vector()
     if current ~= previous then
         seq = seq + 1
-        out:write(elapsed_ns .. "," .. cycles .. "," .. current .. "\n")
+        out:write(elapsed_ns .. "," .. cycles .. "," .. state_value("CURPC") .. "," .. state_value("CURFLAGS") .. "," .. state_value("D0") .. "," .. state_value("D1") .. "," .. state_value("D2") .. "," .. state_value("D3") .. "," .. state_value("D4") .. "," .. state_value("D5") .. "," .. state_value("D6") .. "," .. state_value("D7") .. "," .. state_value("A0") .. "," .. state_value("A1") .. "," .. state_value("A2") .. "," .. state_value("A3") .. "," .. state_value("A4") .. "," .. state_value("A5") .. "," .. state_value("A6") .. "," .. state_value("A7") .. "," .. current .. "\n")
         out:flush()
         previous = current
     end
