@@ -41,6 +41,19 @@ frame,arcade_time_ns,arcade_cpu_cycles,p1_x,p1_y
 3,33536000,335360,13,1310720
 CSV
 
+cat > "$tmp/port_missing.csv" <<'CSV'
+frame,arcade_time_ns,arcade_cpu_cycles,p1_x,p1_y
+1,0,0,10,1310720
+2,16768000,167680,11,1310720
+CSV
+
+cat > "$tmp/port_bad_timing.csv" <<'CSV'
+frame,arcade_time_ns,arcade_cpu_cycles,p1_x,p1_y
+1,0,0,10,1310720
+2,not-a-number,167680,11,1310720
+3,33536000,335360,12,1310720
+CSV
+
 runExpectedFailure() {
     local name="$1"
     local input="$2"
@@ -63,5 +76,7 @@ python3 "$root/scripts/compare_semantic_frames.py" "$tmp/mame.csv" "$tmp/port_ma
 runExpectedFailure "extra-transition-detected" "$tmp/port_extra.csv" "TRANSITION_COUNT_MISMATCH mame=3 port=4"
 runExpectedFailure "timing-divergence-detected" "$tmp/port_timing.csv" "FIRST_TIMING_DIVERGENCE transition=3"
 runExpectedFailure "semantic-divergence-detected" "$tmp/port_semantic.csv" "FIRST_SEMANTIC_DIVERGENCE transition=3"
+runExpectedFailure "missing-transition-detected" "$tmp/port_missing.csv" "TRANSITION_COUNT_MISMATCH mame=3 port=2"
+runExpectedFailure "malformed-timing-rejected" "$tmp/port_bad_timing.csv" "INVALID_ARCADE_TIME"
 
 echo "SEMANTIC_COMPARATOR_REGRESSIONS_OK"
