@@ -42,7 +42,7 @@ runs:
         SF2_MAME_SET: ${{ inputs.mame-set }}
       run: |
         set -euo pipefail
-        rm -f mame_state.csv mame_exec_numeric.csv
+        rm -f mame_state.csv mame_exec_numeric.csv reverse_sound_commands.csv native_audio_events.csv
         SF2_MAME_STATE_SCRIPT="scripts/mame_state_dump.lua" xvfb-run -a bash scripts/run_mame_state.sh
         test -s mame_state.csv
         SF2_MAME_STATE_SCRIPT="scripts/mame_exec_numeric.lua" xvfb-run -a bash scripts/run_mame_state.sh
@@ -57,6 +57,22 @@ runs:
         cat mame_demo_probe.csv | tail -20
         head -20 mame_seed_probe.csv
 
+    - name: Deep reverse-engineering trace
+      if: inputs.deep-trace == 'true'
+      shell: bash
+      env:
+        SF2_MAME_ROMPATH: ${{ inputs.rom-root }}/roms
+        MAME_BIN: ${{ inputs.mame-bin }}
+        SF2_MAME_SET: ${{ inputs.mame-set }}
+        SF2_REVERSE_MAX_FRAMES: 7200
+        SF2_REVERSE_TRACE_INSTRUCTIONS: 1
+      run: |
+        set -euo pipefail
+        rm -f reverse_frames.csv reverse_memory_reads.csv reverse_memory_writes.csv reverse_ram_changes.csv reverse_memory_map.csv reverse_manifest.csv reverse_registers.csv reverse_audiocpu_reads.csv reverse_audiocpu_writes.csv reverse_sound_commands.csv reverse_68000.tr reverse_z80.tr
+        xvfb-run -a bash scripts/run_mame_reverse_trace.sh
+        test -s reverse_sound_commands.csv
+        test -s reverse_audiocpu_reads.csv
+        test -s reverse_audiocpu_writes.csv
     - name: Run native port probes
       shell: bash
       env:
@@ -150,6 +166,14 @@ runs:
           visual_comparison.csv
           mame_exec_attract.csv
           reverse_audiocpu_reads.csv
+          reverse_sound_commands.csv
+          reverse_frames.csv
+          reverse_memory_reads.csv
+          reverse_memory_writes.csv
+          reverse_ram_changes.csv
+          reverse_memory_map.csv
+          reverse_manifest.csv
+          reverse_registers.csv
           reverse_audiocpu_writes.csv
           reverse_68000.tr
           reverse_z80.tr
