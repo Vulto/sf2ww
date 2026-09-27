@@ -618,28 +618,15 @@ glEnd();
 			pal    = gemu.Tilemap_Object[i][3] & 0x1f;
 			flip   = (gemu.Tilemap_Object[i][3] &   0x60) >>  5;
 			/*
-			 * CPS1 object coordinates are stored in the same transformed
-			 * representation used by gemuObjectDrawIDCoords():
-			 *   X is biased by +0x40
-			 *   Y is stored as (-Y) in 8-bit CPS object coordinates
-			 *
-			 * MAME renders the decoded object at:
-			 *   screen_x = X + 49
-			 *   screen_y = 256 - Y - 16
-			 *
-			 * Decode that hardware representation before converting to the
-			 * native 384x224 OpenGL coordinate system. Treating the stored
-			 * values as already-decoded coordinates doubled/offset object
-			 * positions and made large portions of the attract-mode sprites
-			 * disappear.
+			 * Tilemap_Object contains CPS1 hardware object RAM format.
+			 * Both OBJECT_DRAW and OBJECT_DRAW_COORDS ultimately materialize
+			 * the values expected by the CPS1 object generator. The hardware
+			 * presents sprites at X+49 and Y=240-Yraw in the 384x224 frame.
 			 */
-			unsigned screen_x = ((unsigned)gemu.Tilemap_Object[i][0] & 0x01ffu);
-			unsigned stored_y = ((unsigned)gemu.Tilemap_Object[i][1] & 0x00ffu);
-			unsigned screen_y;
-			screen_x = (screen_x - 0x40u) & 0x01ffu;
-			screen_y = (0x100u - stored_y) & 0x00ffu;
-			screen_x += 49u;
-			screen_y = 240u - screen_y;
+			const unsigned raw_x = (unsigned)gemu.Tilemap_Object[i][0] & 0x01ffu;
+			const unsigned raw_y = (unsigned)gemu.Tilemap_Object[i][1] & 0x01ffu;
+			const unsigned screen_x = raw_x + 49u;
+			const unsigned screen_y = 240u - raw_y;
 			x = ((GLfloat)screen_x - 192.0f) / 32.0f;
 			y = ((GLfloat)screen_y - 112.0f) / 32.0f;
 
