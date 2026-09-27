@@ -220,6 +220,7 @@ jobs:
           make SANITIZE=1 -j2
           make clean
           make -j2
+          make semantic-test
           bash scripts/validate_golden_traces.sh
 
       - name: Re-materialize immutable lockstep fixture after agent
