@@ -10,29 +10,36 @@ expected="$1"
 actual="$2"
 skip_rows="${3:-0}"
 
-# Compare semantic numeric execution state, not frame or clock numbers.
-# Consecutive identical semantic state vectors are collapsed into one transition event.
-# Arcade timing is validated separately by compare_timing_csv.sh.
-# This makes the comparison sensitive to measured state changes while avoiding
-# a false requirement that native and MAME advance on identical host/frame
-# boundaries.
-
 awk -F, -v skip="$skip_rows" '
-function emit_expected(    i, key) {
+function semantic_key(    i, key) {
     key = ""
-    for (i = 2; i <= NF; ++i) if (expected_name[i] != "game_tick" && expected_name[i] != "time_ticks" && expected_name[i] != "arcade_time_ns" && expected_name[i] != "arcade_cpu_cycles") key = key "|" $i
+    for (i = 2; i <= NF; ++i) {
+        if (name[i] != "game_tick" && name[i] != "time_ticks" &&
+            name[i] != "arcade_time_ns" && name[i] != "arcade_cpu_cycles") {
+            key = key "|" $i
+        }
+    }
+    return key
+}
+function emit_expected(    key) {
+    key = semantic_key()
     if (key != last_expected) {
-        expected_events[++expected_count] = key
-        expected_frames[expected_count] = $1
+        ++expected_count
+        expected_events[expected_count] = key
+        expected_time[expected_count] = $2
+        expected_cycles[expected_count] = $3
+        expected_rows[expected_count] = FNR
         last_expected = key
     }
 }
-function emit_actual(    i, key) {
-    key = ""
-    for (i = 2; i <= NF; ++i) if (expected_name[i] != "game_tick" && expected_name[i] != "time_ticks") key = key "|" $i
+function emit_actual(    key) {
+    key = semantic_key()
     if (key != last_actual) {
-        actual_events[++actual_count] = key
-        actual_frames[actual_count] = $1
+        ++actual_count
+        actual_events[actual_count] = key
+        actual_time[actual_count] = $2
+        actual_cycles[actual_count] = $3
+        actual_rows[actual_count] = FNR
         last_actual = key
     }
 }
@@ -40,7 +47,7 @@ NR == FNR {
     if (FNR == 1) {
         header = $0
         expected_columns = NF
-        for (i = 1; i <= NF; ++i) expected_name[i] = $i
+        for (i = 1; i <= NF; ++i) name[i] = $i
         next
     }
     if ((FNR - 1) <= skip) next
@@ -49,14 +56,18 @@ NR == FNR {
 }
 FNR == 1 {
     if ($0 != header) {
-        printf("HEADER_MISMATCH\nexpected: %s\nactual:   %s\n", header, $0)
+        printf("HEADER_MISMATCH
+expected: %s
+actual:   %s
+", header, $0)
         exit 10
     }
     next
 }
 {
     if (NF != expected_columns) {
-        printf("COLUMN_COUNT_MISMATCH row=%d expected=%d actual=%d\n",
+        printf("COLUMN_COUNT_MISMATCH row=%d expected=%d actual=%d
+",
                FNR - 1, expected_columns, NF)
         exit 12
     }
@@ -65,7 +76,8 @@ FNR == 1 {
 }
 END {
     if (actual_count < expected_count) {
-        printf("NUMERIC_EVENT_COUNT_MISMATCH: expected at least %d transitions, actual %d\n",
+        printf("NUMERIC_EVENT_COUNT_MISMATCH: expected at least %d transitions, actual %d
+",
                expected_count, actual_count)
         exit 14
     }
@@ -76,18 +88,37 @@ END {
             split(actual_events[event], a, "|")
             for (i = 2; i <= expected_columns; ++i) {
                 if (e[i] != a[i]) {
-                    printf("FIRST_NUMERIC_DIVERGENCE event=%d expected_row=%s actual_row=%s field=%s expected=%s actual=%s\n",
-                           event, expected_frames[event], actual_frames[event],
-                           expected_name[i], e[i], a[i])
+                    printf("FIRST_NUMERIC_DIVERGENCE event=%d expected_row=%d actual_row=%d field=%s expected=%s actual=%s expected_time_ns=%s actual_time_ns=%s
+",
+                           event, expected_rows[event], actual_rows[event],
+                           name[i], e[i], a[i], expected_time[event], actual_time[event])
                     exit 13
                 }
             }
-            printf("FIRST_NUMERIC_DIVERGENCE event=%d expected_row=%s actual_row=%s\n",
-                   event, expected_frames[event], actual_frames[event])
+            printf("FIRST_NUMERIC_DIVERGENCE event=%d expected_row=%d actual_row=%d expected_time_ns=%s actual_time_ns=%s
+",
+                   event, expected_rows[event], actual_rows[event], expected_time[event], actual_time[event])
             exit 13
+        }
+
+        if (expected_time[event] != actual_time[event]) {
+            printf("FIRST_TIMING_DIVERGENCE event=%d expected_row=%d actual_row=%d expected_time_ns=%s actual_time_ns=%s delta_ns=%d
+",
+                   event, expected_rows[event], actual_rows[event],
+                   expected_time[event], actual_time[event],
+                   actual_time[event] - expected_time[event])
+            exit 15
+        }
+        if (expected_cycles[event] != actual_cycles[event]) {
+            printf("FIRST_TIMING_DIVERGENCE event=%d expected_row=%d actual_row=%d expected_cycles=%s actual_cycles=%s delta_cycles=%d
+",
+                   event, expected_rows[event], actual_rows[event],
+                   expected_cycles[event], actual_cycles[event],
+                   actual_cycles[event] - expected_cycles[event])
+            exit 16
         }
     }
 }
 ' "$expected" "$actual"
 
-echo "NUMERIC_STATE_MATCH: all state-transition vectors are identical"
+echo "NUMERIC_STATE_AND_ARCADE_TIMING_MATCH: all state-transition vectors occur at identical arcade time/cycle positions"
