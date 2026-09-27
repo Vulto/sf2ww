@@ -78,13 +78,13 @@ jobs:
           cp .agent/private-rom/sf2ua.zip "$SF2_ROM_ROOT/rom.zip"
           printf '%s  %s\n' \
             "385d7a21b8e983e6aabccaf0f6a12d55fd991f08defc7bbd837f592c48eee156" \
-            ""$SF2_ROM_ROOT/rom.zip"" | sha256sum -c -
-          unzip -q -o .agent/rom/rom.zip -d .agent/rom/roms
+            "$SF2_ROM_ROOT/rom.zip" | sha256sum -c -
+          unzip -q -o "$SF2_ROM_ROOT/rom.zip" -d "$SF2_ROM_ROOT/roms"
           rm -f allroms.bin sf2gfx.bin
-          ./bin/prepare-rom.sh .agent/rom/rom.zip
-          cp allroms.bin .agent/rom/allroms.bin
-          cp sf2gfx.bin .agent/rom/sf2gfx.bin
-          rm -f allroms.bin sf2gfx.bin .agent/rom/rom.zip
+          ./bin/prepare-rom.sh "$SF2_ROM_ROOT/rom.zip"
+          cp allroms.bin "$SF2_ROM_ROOT/allroms.bin"
+          cp sf2gfx.bin "$SF2_ROM_ROOT/sf2gfx.bin"
+          rm -f allroms.bin sf2gfx.bin "$SF2_ROM_ROOT/rom.zip"
           test -s "$SF2_ROM_ROOT/allroms.bin"
           test -s "$SF2_ROM_ROOT/sf2gfx.bin"
           test -n "$(find "$SF2_ROM_ROOT/roms" -type f -print -quit)"
@@ -93,9 +93,9 @@ jobs:
       - name: Gate autonomous agent on immutable real ROM fixture
         run: |
           set -euo pipefail
-          test -s .agent/rom/allroms.bin
-          test -s .agent/rom/sf2gfx.bin
-          test -n "$(find .agent/rom/roms -type f -print -quit)"
+          test -s "$SF2_ROM_ROOT/allroms.bin"
+          test -s "$SF2_ROM_ROOT/sf2gfx.bin"
+          test -n "$(find "$SF2_ROM_ROOT/roms" -type f -print -quit)"
           mame -listxml sf2ua >/dev/null
           {
             echo "ROM fixture manifest"
@@ -168,7 +168,7 @@ jobs:
               - Use MAME source/docs and JTCPS/JTFRAME as independent evidence. Do not guess constants.
               - Every fix requires an observed divergence, a falsifiable hypothesis and a regression.
               - Preserve integer/fixed-point semantics.
-              - The real ROM fixture gate has already passed before you start. The fixture is outside the workspace at $SF2_ROM_ROOT and must never be replaced or regenerated. Do not modify gameplay/graphics logic, do not commit code changes, and do not describe validation as successful.
+              - The real ROM fixture gate has already passed before you start. The fixture is outside the workspace at $SF2_ROM_ROOT and must never be replaced or regenerated. If it becomes unavailable, stop behavioral work and report the validation failure.
               - Never create branches, force-push, weaken tests, or hide divergences.
               - Do not commit or push; the wrapper validates and commits.
 
