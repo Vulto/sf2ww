@@ -12,17 +12,17 @@ The autonomous validation loop uses the original ROM fixture supplied in the pri
 
 ## CI authentication
 
-GitHub Actions must have the repository secret `SF2WWROM_TOKEN` with read access to `Vulto/sf2wwrom`. The workflows deliberately do not fall back to a generated, checked-in, or alternate ROM.
+The repository history already established the working mechanism: GitHub Actions checks out `Vulto/sf2wwrom` with the workflow's existing `github.token` authorization. The autonomous loop must reuse that mechanism; it must not introduce a new ROM credential or secret name.
 
-The Guardian and Issue Resolver both use authenticated `actions/checkout` of the private repository and fail closed if the fixture cannot be obtained or its SHA-256 does not match.
+The Guardian, Issue Resolver, and legacy validation workflow fail closed if the fixture cannot be obtained or its SHA-256 does not match.
 
 ## Integrity rules
 
 1. Never commit the ROM or derived ROM blobs to `Vulto/sf2ww`.
 2. Never substitute another SF2 ROM set.
 3. Never regenerate or patch the fixture.
-4. Verify the ZIP SHA-256 before every oracle/lockstep validation.
+4. Verify the ZIP SHA-256 before oracle/lockstep validation.
 5. The native port is accepted only against MAME using this exact fixture.
-6. A missing credential or checksum mismatch is a validation failure, not a reason to skip the oracle.
+6. A missing fixture or checksum mismatch is a validation failure, not a reason to skip the oracle.
 
-The fixture path is ignored by git via `.agent/private-rom/`.
+The historical CI implementation that established the private checkout is commit `7dc01741230695dd6c9de3c18d5b9fb1fcd0ced4`, which uses `actions/checkout@v4` with `token: ${{ github.token }}`.
