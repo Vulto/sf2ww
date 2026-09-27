@@ -80,6 +80,8 @@ jobs:
             "385d7a21b8e983e6aabccaf0f6a12d55fd991f08defc7bbd837f592c48eee156" \
             "$SF2_ROM_ROOT/rom.zip" | sha256sum -c -
           unzip -q -o "$SF2_ROM_ROOT/rom.zip" -d "$SF2_ROM_ROOT/roms"
+          mkdir -p "$SF2_ROM_ROOT/roms/sf2ua"
+          find "$SF2_ROM_ROOT/roms" -type f ! -path "$SF2_ROM_ROOT/roms/sf2ua/*" -exec cp {} "$SF2_ROM_ROOT/roms/sf2ua/" \;
           rm -f allroms.bin sf2gfx.bin
           ./bin/prepare-rom.sh "$SF2_ROM_ROOT/rom.zip"
           cp allroms.bin "$SF2_ROM_ROOT/allroms.bin"
@@ -87,8 +89,9 @@ jobs:
           rm -f allroms.bin sf2gfx.bin "$SF2_ROM_ROOT/rom.zip"
           test -s "$SF2_ROM_ROOT/allroms.bin"
           test -s "$SF2_ROM_ROOT/sf2gfx.bin"
-          test -n "$(find "$SF2_ROM_ROOT/roms" -type f -print -quit)"
-          mame -listxml sf2ua >/dev/null
+          test -d "$SF2_ROM_ROOT/roms/sf2ua"
+          test -n "$(find "$SF2_ROM_ROOT/roms/sf2ua" -type f -print -quit)"
+          mame -rompath "$SF2_ROM_ROOT/roms" -verifyroms sf2ua
 
       - name: Gate autonomous agent on immutable real ROM fixture
         run: |
@@ -230,6 +233,8 @@ jobs:
             "385d7a21b8e983e6aabccaf0f6a12d55fd991f08defc7bbd837f592c48eee156" \
             "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip" | sha256sum -c -
           unzip -q -o "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip" -d "$RUNNER_TEMP/sf2-lockstep-rom/roms"
+          mkdir -p "$RUNNER_TEMP/sf2-lockstep-rom/roms/sf2ua"
+          find "$RUNNER_TEMP/sf2-lockstep-rom/roms" -type f ! -path "$RUNNER_TEMP/sf2-lockstep-rom/roms/sf2ua/*" -exec cp {} "$RUNNER_TEMP/sf2-lockstep-rom/roms/sf2ua/" \;
           rm -f allroms.bin sf2gfx.bin
           ./bin/prepare-rom.sh "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip"
           cp allroms.bin "$RUNNER_TEMP/sf2-lockstep-rom/allroms.bin"
@@ -237,7 +242,9 @@ jobs:
           rm -f allroms.bin sf2gfx.bin "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip"
           test -s "$RUNNER_TEMP/sf2-lockstep-rom/allroms.bin"
           test -s "$RUNNER_TEMP/sf2-lockstep-rom/sf2gfx.bin"
-          test -n "$(find "$RUNNER_TEMP/sf2-lockstep-rom/roms" -type f -print -quit)"
+          test -d "$RUNNER_TEMP/sf2-lockstep-rom/roms/sf2ua"
+          test -n "$(find "$RUNNER_TEMP/sf2-lockstep-rom/roms/sf2ua" -type f -print -quit)"
+          mame -rompath "$RUNNER_TEMP/sf2-lockstep-rom/roms" -verifyroms sf2ua
           chmod -R a-w "$RUNNER_TEMP/sf2-lockstep-rom"
           {
             echo "FINAL LOCKSTEP ROM FIXTURE"
