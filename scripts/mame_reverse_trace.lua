@@ -62,6 +62,8 @@ local function hex(value)
     return string.format("%08x", value)
 end
 
+local audioReadSeq = 0
+local audioWriteSeq = 0
 local function writeMemoryMap()
     local entries = mem.map and mem.map.entries
     if entries ~= nil then
@@ -125,8 +127,6 @@ local previousRam = mem:read_range(RAM_START, RAM_END, 8)
 local frame = 0
 local readSeq = 0
 local writeSeq = 0
-local audioReadSeq = 0
-local audioWriteSeq = 0
 
 local function captureMemoryAccess(kind, address, data, memMask)
     local now = elapsed_time_ns()
