@@ -82,6 +82,8 @@ runs:
         fi
         test -s port_state_input.csv
         test -s port_timing_input.csv
+        SF2_AUDIO_EVENT_LOG=1 SF2_MAX_FRAMES=12000 timeout 230s xvfb-run -a "$PORT_EXECUTABLE" </dev/null >/tmp/sf2-native-audio.log 2>&1
+        test -s native_audio_events.csv
 
     - name: "Visual lockstep: MAME attract mode versus native framebuffer"
       shell: bash
@@ -147,6 +149,11 @@ runs:
           port_timing.csv
           visual_comparison.csv
           mame_exec_attract.csv
+          reverse_audiocpu_reads.csv
+          reverse_audiocpu_writes.csv
+          reverse_68000.tr
+          reverse_z80.tr
+          native_audio_events.csv
           port_state_attract.csv
           port_timing_attract.csv
           visual_modes.csv
