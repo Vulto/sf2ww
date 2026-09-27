@@ -107,6 +107,9 @@ $(TARGET): $(OBJECTS)
 test: $(TARGET) semantic-test
 	@echo "Native executable build/test target: $(TARGET)"
 
+semantic-test:
+	bash tests/test_compare_semantic_frames.sh
+
 sanitize:
 	$(MAKE) clean
 	$(MAKE) SANITIZE=1
