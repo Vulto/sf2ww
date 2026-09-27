@@ -7,6 +7,7 @@ REQUIRED = {
     "reverse_memory_reads.csv": ["seq", "arcade_time_ns", "arcade_cpu_cycles", "pc", "address", "data", "mem_mask"],
     "reverse_memory_writes.csv": ["seq", "arcade_time_ns", "arcade_cpu_cycles", "pc", "address", "data", "mem_mask"],
     "reverse_ram_changes.csv": ["frame", "arcade_time_ns", "arcade_cpu_cycles", "address", "value"],
+    "reverse_registers.csv": ["frame", "arcade_time_ns", "arcade_cpu_cycles", "name", "value"],
 }
 
 def fail(message):
@@ -44,6 +45,20 @@ with Path("reverse_frames.csv").open(newline="") as handle:
     frames = sum(1 for _ in csv.DictReader(handle))
 if frames < 3600:
     fail(f"REVERSE_TRACE_TOO_SHORT frames={frames} required=3600")
+
+with Path("reverse_registers.csv").open(newline="") as handle:
+    register_names = set()
+    for row in csv.DictReader(handle):
+        register_names.add(row["name"])
+    if "CURPC" not in register_names or "D0" not in register_names or "A7" not in register_names:
+        fail("INCOMPLETE_CPU_REGISTER_TRACE")
+
+with Path("reverse_frames.csv").open(newline="") as handle:
+    modes = {int(row["game_mode"], 0) for row in csv.DictReader(handle)}
+required_modes = {0x0, 0x2, 0x4, 0x6, 0x8, 0xA, 0xC, 0xE, 0x10, 0x12}
+missing_modes = required_modes - modes
+if missing_modes:
+    fail("ATTRACT_SEQUENCE_INCOMPLETE missing_modes=" + ",".join(hex(value) for value in sorted(missing_modes)))
 
 for filename in ("reverse_memory_reads.csv", "reverse_memory_writes.csv"):
     with Path(filename).open(newline="") as handle:
