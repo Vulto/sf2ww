@@ -23,30 +23,30 @@ function semantic_key(    i, key) {
 }
 function emit_expected(    key) {
     key = semantic_key()
-    if (key != last_expected) {
-        ++expected_count
-        expected_events[expected_count] = key
-        expected_time[expected_count] = $2
-        expected_cycles[expected_count] = $3
-        expected_rows[expected_count] = FNR
-        last_expected = key
+    if (key != lastExpected) {
+        ++expectedCount
+        expectedEvents[expectedCount] = key
+        expectedTime[expectedCount] = $2
+        expectedCycles[expectedCount] = $3
+        expectedRows[expectedCount] = FNR
+        lastExpected = key
     }
 }
 function emit_actual(    key) {
     key = semantic_key()
-    if (key != last_actual) {
-        ++actual_count
-        actual_events[actual_count] = key
-        actual_time[actual_count] = $2
-        actual_cycles[actual_count] = $3
-        actual_rows[actual_count] = FNR
-        last_actual = key
+    if (key != lastActual) {
+        ++actualCount
+        actualEvents[actualCount] = key
+        actualTime[actualCount] = $2
+        actualCycles[actualCount] = $3
+        actualRows[actualCount] = FNR
+        lastActual = key
     }
 }
 NR == FNR {
     if (FNR == 1) {
         header = $0
-        expected_columns = NF
+        expectedColumns = NF
         for (i = 1; i <= NF; ++i) name[i] = $i
         next
     }
@@ -65,56 +65,56 @@ actual:   %s
     next
 }
 {
-    if (NF != expected_columns) {
+    if (NF != expectedColumns) {
         printf("COLUMN_COUNT_MISMATCH row=%d expected=%d actual=%d
 ",
-               FNR - 1, expected_columns, NF)
+               FNR - 1, expectedColumns, NF)
         exit 12
     }
     if ((FNR - 1) <= skip) next
     emit_actual()
 }
 END {
-    if (actual_count < expected_count) {
+    if (actualCount < expectedCount) {
         printf("NUMERIC_EVENT_COUNT_MISMATCH: expected at least %d transitions, actual %d
 ",
-               expected_count, actual_count)
+               expectedCount, actualCount)
         exit 14
     }
 
-    for (event = 1; event <= expected_count; ++event) {
-        if (expected_events[event] != actual_events[event]) {
-            split(expected_events[event], e, "|")
-            split(actual_events[event], a, "|")
-            for (i = 2; i <= expected_columns; ++i) {
+    for (event = 1; event <= expectedCount; ++event) {
+        if (expectedEvents[event] != actualEvents[event]) {
+            split(expectedEvents[event], e, "|")
+            split(actualEvents[event], a, "|")
+            for (i = 2; i <= expectedColumns; ++i) {
                 if (e[i] != a[i]) {
-                    printf("FIRST_NUMERIC_DIVERGENCE event=%d expected_row=%d actual_row=%d field=%s expected=%s actual=%s expected_time_ns=%s actual_time_ns=%s
+                    printf("FIRST_NUMERIC_DIVERGENCE event=%d expected_row=%d actual_row=%d field=%s expected=%s actual=%s expectedTime_ns=%s actualTime_ns=%s
 ",
-                           event, expected_rows[event], actual_rows[event],
-                           name[i], e[i], a[i], expected_time[event], actual_time[event])
+                           event, expectedRows[event], actualRows[event],
+                           name[i], e[i], a[i], expectedTime[event], actualTime[event])
                     exit 13
                 }
             }
-            printf("FIRST_NUMERIC_DIVERGENCE event=%d expected_row=%d actual_row=%d expected_time_ns=%s actual_time_ns=%s
+            printf("FIRST_NUMERIC_DIVERGENCE event=%d expected_row=%d actual_row=%d expectedTime_ns=%s actualTime_ns=%s
 ",
-                   event, expected_rows[event], actual_rows[event], expected_time[event], actual_time[event])
+                   event, expectedRows[event], actualRows[event], expectedTime[event], actualTime[event])
             exit 13
         }
 
-        if (expected_time[event] != actual_time[event]) {
-            printf("FIRST_TIMING_DIVERGENCE event=%d expected_row=%d actual_row=%d expected_time_ns=%s actual_time_ns=%s delta_ns=%d
+        if (expectedTime[event] != actualTime[event]) {
+            printf("FIRST_TIMING_DIVERGENCE event=%d expected_row=%d actual_row=%d expectedTime_ns=%s actualTime_ns=%s delta_ns=%d
 ",
-                   event, expected_rows[event], actual_rows[event],
-                   expected_time[event], actual_time[event],
-                   actual_time[event] - expected_time[event])
+                   event, expectedRows[event], actualRows[event],
+                   expectedTime[event], actualTime[event],
+                   actualTime[event] - expectedTime[event])
             exit 15
         }
-        if (expected_cycles[event] != actual_cycles[event]) {
-            printf("FIRST_TIMING_DIVERGENCE event=%d expected_row=%d actual_row=%d expected_cycles=%s actual_cycles=%s delta_cycles=%d
+        if (expectedCycles[event] != actualCycles[event]) {
+            printf("FIRST_TIMING_DIVERGENCE event=%d expected_row=%d actual_row=%d expectedCycles=%s actualCycles=%s delta_cycles=%d
 ",
-                   event, expected_rows[event], actual_rows[event],
-                   expected_cycles[event], actual_cycles[event],
-                   actual_cycles[event] - expected_cycles[event])
+                   event, expectedRows[event], actualRows[event],
+                   expectedCycles[event], actualCycles[event],
+                   actualCycles[event] - expectedCycles[event])
             exit 16
         }
     }
