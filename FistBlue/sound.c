@@ -103,4 +103,5 @@ void setstagemusic(void) {
 
 void sound_cq_f7_ff(void) {
 	soundTraceEvent("f7ff", 0xf7ff);
+	soundBackendEnqueue(0xf7ffu);
 }
