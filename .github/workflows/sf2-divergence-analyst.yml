@@ -1,0 +1,54 @@
+name: SF2 Divergence Analyst
+on:
+  workflow_dispatch:
+    inputs:
+      oracle_run_id: {required: true, type: string}
+concurrency:
+  group: sf2-divergence-analyst
+  cancel-in-progress: false
+permissions:
+  contents: read
+  actions: read
+  issues: write
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - name: Download oracle evidence
+        env: {GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p .agent/oracle
+          gh run download "${{ inputs.oracle_run_id }}" --repo "$GITHUB_REPOSITORY" -n sf2-oracle-evidence -D .agent/oracle
+      - name: Divergence Analyst agent
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY || secrets.CODEX_OPENAI_API_KEY }}
+          permission-profile: ":workspace"
+          safety-strategy: drop-sudo
+          allow-users: "Vulto"
+          effort: high
+          prompt: |
+            You are Agent 2, Divergence Analyst. Analyze only empirical oracle evidence.
+            Read .agent/oracle/oracle_diagnostic.md first and then paired traces.
+            For every independent divergence find the earliest causal mismatch, not the visual symptom.
+            Correlate state, cycles/time, PC/registers, RAM/memory evidence, RNG, video and audio.
+            Verify interpretations against MAME/JTCPS. Do not modify implementation or acceptance criteria.
+            Create one detailed .agent/issues/issue-*.md per root cause or instrumentation gap.
+            Include exact scenario, transition/frame/scanline/cycle, expected/observed/delta,
+            preceding matching checkpoint, causal evidence, addresses/PC when known, references,
+            falsifiable hypothesis, reproduction, required regression and uncertainty.
+      - name: Create issues
+        env: {GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p .agent/issues
+          while IFS= read -r f; do
+            test -s "$f"
+            title=$(sed -n 's/^# Title: *//p' "$f" | head -1)
+            test -n "$title"
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file "$f"
+          done < <(find .agent/issues -type f -name 'issue-*.md' | sort)
