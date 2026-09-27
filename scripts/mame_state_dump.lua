@@ -2,7 +2,7 @@
 -- The semantic fields are the project's documented CPS RAM map.
 -- The timing axis is relative emulated time converted to the 10 MHz main CPU clock.
 
-local BASE = 0xff0000
+local BASE = 0xff8000
 local P1 = BASE + 0x03c6
 local P2 = BASE + 0x06c6
 local MAX_FRAMES = 900
