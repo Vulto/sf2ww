@@ -228,6 +228,10 @@ jobs:
           fi
           git status --short
 
+      - name: Protect test oracles
+        run: |
+          bash scripts/validate_test_oracle_integrity.sh
+
       - name: Build and validate changed tree
         run: |
           set -euo pipefail
