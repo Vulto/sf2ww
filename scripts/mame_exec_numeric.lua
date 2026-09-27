@@ -27,17 +27,15 @@ end
 
 local function vector()
     return table.concat({
-        pc_value(), state_value("D0"), state_value("D1"),
-        state_value("A0"), state_value("A1"),
         mem:read_i32(P1 + 0x06), mem:read_i32(P1 + 0x08),
         mem:read_u8(P1 + 0x02), mem:read_u8(P1 + 0x03), mem:read_u8(P1 + 0x04),
-        mem:read_u8(P1 + 0x14), mem:read_u16(P1 + 0x2a),
-        mem:read_u16(P1 + 0x180), mem:read_u8(P1 + 0x188),
+        mem:read_u16(P1 + 0x14), mem:read_i16(P1 + 0x2a),
+        mem:read_i8(P1 + 0x180), mem:read_i8(P1 + 0x188),
         mem:read_i32(P2 + 0x06), mem:read_i32(P2 + 0x08),
         mem:read_u8(P2 + 0x02), mem:read_u8(P2 + 0x03), mem:read_u8(P2 + 0x04),
-        mem:read_u8(P2 + 0x14), mem:read_u16(P2 + 0x2a),
-        mem:read_u16(P2 + 0x180), mem:read_u8(P2 + 0x188),
-        mem:read_u8(BASE + 0x09e4), mem:read_u8(BASE + 0x0a4c),
+        mem:read_u16(P2 + 0x14), mem:read_i16(P2 + 0x2a),
+        mem:read_i8(P2 + 0x180), mem:read_i8(P2 + 0x188),
+        mem:read_u16(BASE + 0x09e4), mem:read_u16(BASE + 0x0a4c),
         mem:read_u8(BASE + 0x0ae1), mem:read_u8(BASE + 0x02c4),
         mem:read_u8(BASE + 0x02c5)
     }, ",")
@@ -69,7 +67,7 @@ local function sample()
     local current = vector()
     if current ~= previous then
         seq = seq + 1
-        out:write(seq .. "," .. elapsed_ns .. "," .. cycles .. "," .. current .. "\n")
+        out:write(elapsed_ns .. "," .. cycles .. "," .. current .. "\n")
         out:flush()
         previous = current
     end
@@ -79,4 +77,4 @@ local function sample()
     end
 end
 
-emu.register_frame_done(sample, "frame")
+emu.register_frame_done(sample)

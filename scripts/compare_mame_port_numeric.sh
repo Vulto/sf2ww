@@ -35,12 +35,10 @@ awk -F, -v header="$common" '
 NR==1 {
     for(i=1;i<=NF;i++) col[$i]=i
     n=split(header,h,",")
-    printf "seq,%s\n", header > out
+    printf "%s\n", header > out
     next
 }
 {
-    seq++
-    printf "%d", seq > out
     for(i=1;i<=n;i++) {
         if(!(h[i] in col)) exit 20
         printf ",%s", $(col[h[i]]) > out
