@@ -511,7 +511,8 @@ int main (int argc, const char * argv[])
             fprintf(gStateLog,
                     "frame,arcade_time_ns,arcade_cpu_cycles,game_mode,game_tick,stage,round_cnt,time_bcd,time_ticks,fight_over,rng1,rng2,"
                     "p1_x,p1_y,p1_mode0,p1_mode1,p1_mode2,p1_anim,p1_energy,p1_move,p1_stand_squat,"
-                    "p2_x,p2_y,p2_mode0,p2_mode1,p2_mode2,p2_anim,p2_energy,p2_move,p2_stand_squat\n");
+                    "p2_x,p2_y,p2_mode0,p2_mode1,p2_mode2,p2_anim,p2_energy,p2_move,p2_stand_squat,"
+                    "scroll1_x,scroll1_y,scroll2_x,scroll2_y,scroll3_x,scroll3_y\n");
         }
     }
     {
