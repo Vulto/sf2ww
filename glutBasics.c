@@ -148,7 +148,22 @@ static void dump_visual_frame(void) {
                     ++count;
                 }
             }
-            fprintf(objlog, "count=%d\n", count);
+            fprintf(objlog, "count=%d disp=%04x s1x=%04x s1y=%04x s2x=%04x s2y=%04x s3x=%04x s3y=%04x\n", count,
+                    g.CPS.DispEna, g.CPS.Scroll1X, g.CPS.Scroll1Y,
+                    g.CPS.Scroll2X, g.CPS.Scroll2Y, g.CPS.Scroll3X, g.CPS.Scroll3Y);
+            for (int layer = 1; layer <= 3; ++layer) {
+                unsigned nonblank = 0;
+                unsigned nonzero = 0;
+                for (unsigned ti = 0; ti < CPS1_OTHER_SIZE; ++ti) {
+                    u16 tile = layer == 1 ? gemu.Tilemap_Scroll1[ti][0] :
+                               (layer == 2 ? gemu.Tilemap_Scroll2[ti][0] : gemu.Tilemap_Scroll3[ti][0]);
+                    u16 blank = layer == 1 ? TILE_BLANK_SCR1 :
+                                (layer == 2 ? TILE_BLANK_SCR2 : TILE_BLANK_SCR3);
+                    if (tile != blank) ++nonblank;
+                    if (tile != 0) ++nonzero;
+                }
+                fprintf(objlog, "layer%d nonblank=%u nonzero=%u\n", layer, nonblank, nonzero);
+            }
             fclose(objlog);
         }
     }
