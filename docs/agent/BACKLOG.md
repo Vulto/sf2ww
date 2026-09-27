@@ -57,3 +57,11 @@ Prioridade 2 — validação audiovisual
 - [ ] Validate normal and high-damage throws against MAME, including KO/time-warp behavior.
 
 - [ ] Validate flagged hitbox damage values through normal/special collision paths under sanitizer CI.
+
+### Validation gate status — 2026-09-27
+
+- [x] Numeric transition comparator enforces arcade-time and 68000-equivalent cycle equality.
+- [x] CI regression test detects one-nanosecond and one-cycle comparator divergence.
+- [x] Autonomous commit gate blocks unverified gameplay changes when the private ROM fixture is unavailable.
+- [ ] Execute the first real MAME/native lockstep with the private sf2ua fixture.
+- [ ] Diagnose and correct the first numeric divergence from the real ROM trace.

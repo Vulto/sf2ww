@@ -140,3 +140,18 @@
 - Restored the original ROM object palette `0x0c` during `init_fightgfx()` and refresh the HUD once per fight tick after collision/damage processing.
 - The refresh is necessary because `redraw_fight_dsk()` was otherwise only called during initialization, so `EnergyCursor` could never track subsequent damage.
 - CI build, tests, deterministic regression, and ASan/UBSan remain green after the fix. Visual/MAME acceptance remains pending the private ROM fixture.
+
+
+## 2026-09-27 — Arcade-time transition oracle audit
+
+- The numeric lockstep comparator previously projected the semantic fields but deliberately excluded arcade_time_ns and arcade_cpu_cycles from the transition identity and never compared those values.
+- This allowed an identical sequence of semantic states to pass even when a transition occurred at a different arcade execution position.
+- The comparator now keeps semantic transition identity independent of frame numbers while requiring every matched transition to have identical arcade nanoseconds and 10 MHz-equivalent CPU cycles.
+- MAME's current Lua API documents machine.time as emulated time and attotime:as_ticks(frequency) as whole periods at a specified frequency; the probe uses these APIs for the 10 MHz timing axis.
+- A CI regression test now proves that a one-nanosecond or one-cycle transition shift fails the comparator.
+
+## 2026-09-27 — Real-ROM validation gate
+
+- The autonomous workflow could previously commit gameplay changes after build/sanitizer/smoke validation even when the private original ROM fixture was absent and the real-MAME lockstep step was skipped.
+- The commit wrapper now rejects changes outside validation infrastructure/documentation when the private ROM fixture is unavailable.
+- Therefore build/sanitizer success alone can no longer promote unverified gameplay changes to main.
