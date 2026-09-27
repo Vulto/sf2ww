@@ -81,6 +81,8 @@ jobs:
           bash scripts/validate_golden_traces.sh
           git config user.name sf2-oracle-agent
           git config user.email sf2-oracle-agent@users.noreply.github.com
+          git fetch origin main
+          git rebase origin/main
           find . -type f -name "*.d" -delete
           git add -A
           if git diff --cached --quiet; then exit 0; fi
