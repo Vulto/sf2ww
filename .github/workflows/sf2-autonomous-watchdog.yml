@@ -1,0 +1,46 @@
+name: SF2 Autonomous Watchdog
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 * * * *"
+
+concurrency:
+  group: sf2-autonomous-watchdog
+  cancel-in-progress: false
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Ensure autonomous chain is alive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          repo="$GITHUB_REPOSITORY"
+
+          runs="$(gh run list --repo "$repo" --limit 100 --json databaseId,name,status,conclusion,workflowName,createdAt,updatedAt)"
+
+          guardian_active="$(printf '%s' "$runs" | jq '[.[] | select(.workflowName=="SF2 Oracle Guardian" and (.status=="in_progress" or .status=="queued"))] | length')"
+          analyst_active="$(printf '%s' "$runs" | jq '[.[] | select(.workflowName=="SF2 Divergence Analyst" and (.status=="in_progress" or .status=="queued"))] | length')"
+
+          if [ "$guardian_active" -eq 0 ]; then
+            echo "Oracle Guardian is not active; starting a new iteration."
+            gh workflow run oracle-guardian.yml --repo "$repo" --ref main
+          else
+            echo "Oracle Guardian active: $guardian_active"
+          fi
+
+          if [ "$analyst_active" -eq 0 ]; then
+            echo "No active analyst run. Guardian will supply the next evidence handoff."
+          else
+            echo "Divergence Analyst active: $analyst_active"
+          fi
+
+          echo "Watchdog completed; failures in individual agents are not allowed to permanently stop the chain."
