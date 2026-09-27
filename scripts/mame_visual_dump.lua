@@ -18,7 +18,7 @@ local function sample()
     frame = frame + 1
     local mode = machine.devices[":maincpu"].spaces["program"]:read_u16(0xff0000)
     if mode ~= last_mode then
-        mode_file:write(string.format("%d,%d\\n", frame, mode))
+        mode_file:write(string.format("%d,%d\n", frame, mode))
         mode_file:flush()
         last_mode = mode
     end
