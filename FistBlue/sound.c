@@ -14,7 +14,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 extern Game g;
 
@@ -44,7 +43,7 @@ static void soundTraceOpen(void) {
 	soundTraceInitialized = 1;
 	if (getenv("SF2_AUDIO_EVENT_LOG") != NULL) {
 		soundTrace = fopen("native_audio_events.csv", "w");
-		if (soundTrace != NULL) fprintf(soundTrace, "sequence,host_time_ns,event,data,game_tick\n");
+		if (soundTrace != NULL) fprintf(soundTrace, "sequence,arcade_time_ns,arcade_cpu_cycles,event,data,game_tick\n");
 	}
 }
 
