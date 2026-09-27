@@ -72,3 +72,9 @@ Prioridade 2 — validação audiovisual
 - [ ] Diagnose native attract transition stream divergence: MAME 1000 transitions vs native 1752; first unexpected native transition at 68,983,552,000 ns.
 - [ ] Compare the pre-agent MAME/native transition window and identify the first causal field, timer, input, audio event, or mode transition responsible.
 - [ ] Add a deterministic regression for the discovered root cause without weakening the real-MAME oracle.
+
+
+## Completed implementation correction
+
+- Fixed gstate_update_scroll2() so CPS Scroll2Y is sourced from gs->position.y, not gs->position.x. Commit: bb6d898f97de9a109de3b4281e868117f196687b.
+- Numeric oracle now captures Scroll1/2/3 X/Y on both MAME and native traces.
