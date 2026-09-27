@@ -57,6 +57,7 @@ static FILE *gTimingLog;
 static unsigned long gStateFrame;
 static unsigned long gMaxFrames;
 static unsigned long gVisualEvery;
+static int gVisualFast;
 static unsigned long gLastVisualFrame;
 static char gVisualDir[512];
 
@@ -393,7 +394,9 @@ void timerFunc(int value) {
         fflush(gTimingLog);
     }
 
-    glutPostRedisplay();
+    if (gVisualEvery == 0 || (gStateFrame % gVisualEvery) == 0) {
+        glutPostRedisplay();
+    }
 
     if (gMaxFrames != 0 && gStateFrame >= gMaxFrames) {
         if (gStateLog != NULL) {
@@ -418,7 +421,9 @@ void timerFunc(int value) {
 
     delay_ns = timespec_diff_ns(&gNextFrame, &now);
     delay_ms = (unsigned)((delay_ns + 999999L) / 1000000L);
-    if (delay_ms == 0) {
+    if (gVisualFast) {
+        delay_ms = 1;
+    } else if (delay_ms == 0) {
         delay_ms = 1;
     }
     glutTimerFunc(delay_ms, timerFunc, 0);
@@ -445,6 +450,7 @@ int main (int argc, const char * argv[])
         }
     }
 
+    gVisualFast = (getenv("SF2_VISUAL_FAST") != NULL);
     const char *max_frames = getenv("SF2_MAX_FRAMES");
     if (max_frames != NULL && max_frames[0] != '\0') {
         char *end = NULL;
