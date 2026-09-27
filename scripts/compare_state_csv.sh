@@ -8,7 +8,7 @@ fi
 
 expected="$1"
 actual="$2"
-skipRows="\${3:-0}"
+skipRows="${3:-0}"
 
 awk -F, -v skip="$skipRows" '
 function semanticKey(    i, key) {
