@@ -10,6 +10,7 @@ local mem = cpu.spaces["program"]
 local P1 = 0xff83c6
 local P2 = 0xff86c6
 local BASE = 0xff8000
+local CPS_A = 0x800100
 
 local function state_value(name)
     local entry = state[name]
@@ -37,7 +38,10 @@ local function vector()
         mem:read_i8(P2 + 0x180), mem:read_i8(P2 + 0x188),
         mem:read_u16(BASE + 0x09e4), mem:read_u16(BASE + 0x0a4c),
         mem:read_u8(BASE + 0x0ae1), mem:read_u8(BASE + 0x02c4),
-        mem:read_u8(BASE + 0x02c5)
+        mem:read_u8(BASE + 0x02c5),
+        mem:read_u16(CPS_A + 0x0c), mem:read_u16(CPS_A + 0x0e),
+        mem:read_u16(CPS_A + 0x10), mem:read_u16(CPS_A + 0x12),
+        mem:read_u16(CPS_A + 0x14), mem:read_u16(CPS_A + 0x16)
     }, ",")
 end
 
