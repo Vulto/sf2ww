@@ -20,6 +20,7 @@ extern Game g;
 
 static FILE *soundTrace;
 static int soundTraceInitialized;
+static unsigned soundTraceSequence;
 
 static void soundTraceOpen(void) {
 	if (soundTraceInitialized) return;
@@ -36,7 +37,7 @@ static void soundTraceEvent(const char *event, int data) {
 	if (soundTrace == NULL) return;
 	clock_gettime(CLOCK_MONOTONIC, &value);
 	fprintf(soundTrace, "%u,%llu,%s,%d,%u\n",
-		(unsigned)(++g.SoundTraceSequence),
+		(unsigned)(++soundTraceSequence),
 		(unsigned long long)value.tv_sec * 1000000000ull + (unsigned long long)value.tv_nsec,
 		event, data, (unsigned)g.tick);
 	fflush(soundTrace);
