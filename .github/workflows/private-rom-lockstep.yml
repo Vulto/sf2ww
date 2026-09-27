@@ -34,7 +34,7 @@ jobs:
       - name: Install toolchain and MAME
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev xvfb mame mame-tools git unzip
+          sudo apt-get install -y build-essential freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev xvfb mame mame-tools git unzip python3-pil
           mame -version
           mame -listxml sf2ua >/dev/null
 
