@@ -617,10 +617,31 @@ glEnd();
 		if (tile != 0) {
 			pal    = gemu.Tilemap_Object[i][3] & 0x1f;
 			flip   = (gemu.Tilemap_Object[i][3] &   0x60) >>  5;
-			x      = ((short)gemu.Tilemap_Object[i][0] &  TILE_MASK_OFFSET) / 16.0;
-			y      = ((short)gemu.Tilemap_Object[i][1] &  TILE_MASK_OFFSET) / 16.0;			
-			x     -= 16.0;
-			y	  -=  8.0;
+			/*
+			 * CPS1 object coordinates are stored in the same transformed
+			 * representation used by gemuObjectDrawIDCoords():
+			 *   X is biased by +0x40
+			 *   Y is stored as (-Y) in 8-bit CPS object coordinates
+			 *
+			 * MAME renders the decoded object at:
+			 *   screen_x = X + 49
+			 *   screen_y = 256 - Y - 16
+			 *
+			 * Decode that hardware representation before converting to the
+			 * native 384x224 OpenGL coordinate system. Treating the stored
+			 * values as already-decoded coordinates doubled/offset object
+			 * positions and made large portions of the attract-mode sprites
+			 * disappear.
+			 */
+			unsigned screen_x = ((unsigned)gemu.Tilemap_Object[i][0] & 0x01ffu);
+			unsigned stored_y = ((unsigned)gemu.Tilemap_Object[i][1] & 0x00ffu);
+			unsigned screen_y;
+			screen_x = (screen_x - 0x40u) & 0x01ffu;
+			screen_y = (0x100u - stored_y) & 0x00ffu;
+			screen_x += 49u;
+			screen_y = 240u - screen_y;
+			x = ((GLfloat)screen_x - 192.0f) / 32.0f;
+			y = ((GLfloat)screen_y - 112.0f) / 32.0f;
 
 			if (gemu.Tilemap_Object[i][3] & TILE_MASK_BLOCK) {
 				// handle blocking
