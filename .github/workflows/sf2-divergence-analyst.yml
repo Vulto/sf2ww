@@ -42,17 +42,33 @@ jobs:
             Include exact scenario, transition/frame/scanline/cycle, expected/observed/delta,
             preceding matching checkpoint, causal evidence, addresses/PC when known, references,
             falsifiable hypothesis, reproduction, required regression and uncertainty.
-      - name: Create issues
+      - name: Queue diagnosed and outstanding issues
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p .agent/issues
+
+          # Publish this run's newly diagnosed root causes.
           while IFS= read -r f; do
             test -s "$f"
             title=$(sed -n 's/^# Title: *//p' "$f" | head -1)
             test -n "$title"
             issue_url=$(gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file "$f")
             issue_number=$(basename "$issue_url")
+            gh issue comment "$issue_number" --repo "$GITHUB_REPOSITORY" --body '<!-- sf2-agent-queued -->'
             gh workflow run sf2-issue-resolver.yml --repo "$GITHUB_REPOSITORY" --ref main -f issue_number="$issue_number"
           done < <(find .agent/issues -type f -name 'issue-*.md' | sort)
+
+          # A failed pipeline must not strand previously discovered work.
+          resolver_active=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow sf2-issue-resolver.yml --limit 20 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress")] | length')
+          if [ "$resolver_active" -eq 0 ]; then
+            gh issue list --repo "$GITHUB_REPOSITORY" --state open --limit 100 --json number,comments \
+              --jq '.[] | select(.comments | map(.body // "") | any(. == "<!-- sf2-agent-queued -->") | not) | .number' |
+            while IFS= read -r issue_number; do
+              test -n "$issue_number"
+              gh issue comment "$issue_number" --repo "$GITHUB_REPOSITORY" --body '<!-- sf2-agent-queued -->'
+              gh workflow run sf2-issue-resolver.yml --repo "$GITHUB_REPOSITORY" --ref main -f issue_number="$issue_number"
+              break
+            done
+          fi
