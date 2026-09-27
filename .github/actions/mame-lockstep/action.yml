@@ -25,7 +25,8 @@ runs:
         ROM_ROOT: ${{ inputs.rom-root }}
       run: |
         set -euo pipefail
-        test -d "$ROM_ROOT/roms"
+        test -d "$ROM_ROOT/roms/sf2ua"
+        test -n "$(find "$ROM_ROOT/roms/sf2ua" -type f -print -quit)"
         test -f "$ROM_ROOT/allroms.bin"
         test -f "$ROM_ROOT/sf2gfx.bin"
 
