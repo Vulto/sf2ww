@@ -38,11 +38,21 @@ jobs:
             Never compensate timestamps, weaken assertions/tolerances, shorten observation windows,
             replace ROM evidence, or change tests merely to obtain PASS.
             Document root cause and evidence. Do not create branches. The wrapper validates and commits.
-      - name: Materialize real ROM for resolver validation
+      - name: Checkout original private ROM for resolver validation
+        uses: actions/checkout@v4
+        with:
+          repository: Vulto/sf2wwrom
+          ref: main
+          token: ${{ secrets.SF2WWROM_TOKEN }}
+          path: .agent/private-rom
+          sparse-checkout: |
+            sf2ua.zip
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Verify and materialize original ROM for resolver validation
         run: |
           set -euo pipefail
-          git clone --depth 1 --filter=blob:none --sparse https://github.com/Vulto/sf2wwrom.git .agent/private-rom
-          git -C .agent/private-rom sparse-checkout set sf2ua.zip
+          test -s .agent/private-rom/sf2ua.zip
           mkdir -p "$RUNNER_TEMP/sf2-lockstep-rom/roms"
           cp .agent/private-rom/sf2ua.zip "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip"
           printf '%s  %s\n' "385d7a21b8e983e6aabccaf0f6a12d55fd991f08defc7bbd837f592c48eee156" "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip" | sha256sum -c -
