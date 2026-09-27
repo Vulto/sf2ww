@@ -137,6 +137,15 @@ jobs:
           set -euo pipefail
           sha256sum scripts/validate_test_oracle_integrity.sh > "$RUNNER_TEMP/oracle-guard.sha256"
 
+      - name: Collect pre-agent MAME lockstep evidence
+        continue-on-error: true
+        uses: ./.github/actions/mame-lockstep
+        with:
+          rom-root: ${{ env.SF2_ROM_ROOT }}
+          port-executable: ./glutBasics
+          mame-bin: mame
+          mame-set: sf2ua
+          deep-trace: "false"
       - name: Run Codex agent
         uses: openai/codex-action@v1
         continue-on-error: true
@@ -181,12 +190,12 @@ jobs:
               - Do not commit or push; the wrapper validates and commits.
 
             Autonomous iteration protocol:
-              1. Read all persistent state and previous findings before changing code.
+              1. Read all persistent state, previous findings, and the pre-agent lockstep evidence files already present in the workspace before changing code.
               2. Run BOTH sides from clean state: the immutable private sf2ua MAME fixture and the current native port.
               3. Collect the largest useful observation set available without weakening determinism:
                  logical state, transitions, arcade time, CPU cycles, PC/register context, memory accesses, RAM changes, framebuffer and audio events.
               4. Cover the entire attract cycle before accepting a partial attract result: disclaimer/boot, Capcom/SF2 logo, title/opening, demo fight, transitions and rank/high-score display.
-              5. Compare the two runs and locate the FIRST causal divergence, not merely the first visible symptom.
+              5. Compare mame_exec_attract.csv, port_state_attract.csv, port_timing_attract.csv, visual_comparison.csv, visual_modes.csv and native_audio_events.csv. Locate the FIRST causal divergence, not merely the first visible symptom.
               6. Preserve a bounded evidence window around the divergence and record the exact field/address/PC/cycle/input responsible when available.
               7. Form one falsifiable hypothesis and verify it against MAME source, JTCPS/hardware documentation or a controlled experiment.
               8. Implement the smallest root-cause correction in the native port. Never compensate timestamps or mask a mismatch.
