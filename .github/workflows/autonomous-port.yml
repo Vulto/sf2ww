@@ -146,6 +146,29 @@ jobs:
           mame-bin: mame
           mame-set: sf2ua
           deep-trace: "false"
+      - name: Build deterministic oracle briefing
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p .agent/oracle
+          if [ -s mame_exec_attract.csv ] && [ -s port_state_attract.csv ]; then
+            python3 scripts/build_oracle_diagnostic.py \
+              mame_exec_attract.csv port_state_attract.csv .agent/oracle/oracle_diagnostic.md
+          elif [ -s mame_exec_numeric.csv ] && [ -s port_state.csv ]; then
+            python3 scripts/build_oracle_diagnostic.py \
+              mame_exec_numeric.csv port_state.csv .agent/oracle/oracle_diagnostic.md
+          else
+            printf '%s\n' \
+              '# Oracle diagnostic' '' \
+              'The pre-agent oracle run did not produce the required paired traces.' '' \
+              'The agent must treat this as missing evidence, not as a pass, and investigate why collection failed.' \
+              > .agent/oracle/oracle_diagnostic.md
+          fi
+          {
+            echo '## Available oracle evidence'
+            find . -maxdepth 2 -type f \( -name 'mame_exec_*.csv' -o -name 'port_state*.csv' -o -name 'port_timing*.csv' -o -name 'visual_comparison.csv' -o -name 'visual_modes.csv' -o -name 'native_audio_events.csv' \) -print | sort
+          } >> .agent/oracle/oracle_diagnostic.md
+
       - name: Run Codex agent
         uses: openai/codex-action@v1
         continue-on-error: true
@@ -161,6 +184,7 @@ jobs:
             Mission: continue on main until the fixed arcade target is behaviorally reproduced by the native C/OpenGL port. Do not stop at a green build.
 
             Read first:
+              .agent/oracle/oracle_diagnostic.md
               AGENTS.md
               docs/agent/BACKLOG.md
               docs/agent/FINDINGS.md
@@ -196,6 +220,8 @@ jobs:
                  logical state, transitions, arcade time, CPU cycles, PC/register context, memory accesses, RAM changes, framebuffer and audio events.
               4. Cover the entire attract cycle before accepting a partial attract result: disclaimer/boot, Capcom/SF2 logo, title/opening, demo fight, transitions and rank/high-score display.
               5. Compare mame_exec_attract.csv, port_state_attract.csv, port_timing_attract.csv, visual_comparison.csv, visual_modes.csv and native_audio_events.csv. Locate the FIRST causal divergence, not merely the first visible symptom.
+              5a. Treat .agent/oracle/oracle_diagnostic.md as the first structured diagnostic input. It is generated from the same fail-closed oracle and does not relax acceptance criteria.
+              5b. If it reports a divergence, begin diagnosis from that exact transition/field/value pair and work backwards to the earliest causal operation using PC/register/memory evidence. Do not choose a visually convenient symptom instead.
               6. Preserve a bounded evidence window around the divergence and record the exact field/address/PC/cycle/input responsible when available.
               7. Form one falsifiable hypothesis and verify it against MAME source, JTCPS/hardware documentation or a controlled experiment.
               8. Implement the smallest root-cause correction in the native port. Never compensate timestamps or mask a mismatch.
@@ -233,6 +259,7 @@ jobs:
           rm -f mame_exec_attract.csv port_state_attract.csv port_timing_attract.csv
           rm -f visual_comparison.csv visual_modes.csv native_visual_objects.txt
           rm -rf mame_visual native_visual
+          rm -rf .agent/oracle
           if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
