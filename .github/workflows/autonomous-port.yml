@@ -177,14 +177,31 @@ jobs:
               - Never create branches, force-push, weaken tests, or hide divergences.
               - Do not commit or push; the wrapper validates and commits.
 
-            Loop continuously:
-              1. inspect diagnostics and current comparison;
-              2. find the first causal numeric divergence;
-              3. verify it against MAME/JTCPS evidence;
-              4. make the smallest root-cause correction;
-              5. add a regression;
-              6. run make, sanitizer, smoke and real-MAME comparison when available;
-              7. record evidence and repeat.
+            Autonomous iteration protocol:
+              1. Read all persistent state and previous findings before changing code.
+              2. Run BOTH sides from clean state: the immutable private sf2ua MAME fixture and the current native port.
+              3. Collect the largest useful observation set available without weakening determinism:
+                 logical state, transitions, arcade time, CPU cycles, PC/register context, memory accesses, RAM changes, framebuffer and audio events.
+              4. Cover the entire attract cycle before accepting a partial attract result: disclaimer/boot, Capcom/SF2 logo, title/opening, demo fight, transitions and rank/high-score display.
+              5. Compare the two runs and locate the FIRST causal divergence, not merely the first visible symptom.
+              6. Preserve a bounded evidence window around the divergence and record the exact field/address/PC/cycle/input responsible when available.
+              7. Form one falsifiable hypothesis and verify it against MAME source, JTCPS/hardware documentation or a controlled experiment.
+              8. Implement the smallest root-cause correction in the native port. Never compensate timestamps or mask a mismatch.
+              9. Add or strengthen a regression that demonstrates the old behavior fails and the corrected behavior passes.
+              10. Never weaken an existing oracle. Do not remove assertions, increase tolerances, shorten observation windows, ignore errors, or replace real MAME evidence with synthetic fixtures.
+              11. Treat audio as a first-class target. The current port has unimplemented sound paths; trace MAME audio-command writes/CPU behavior and implement the native equivalent, then compare event sequence and timing.
+              12. Run build, -Werror, sanitizer, smoke, semantic, visual, audio and real-MAME gates.
+              13. If a test fails, investigate and fix the port or improve the observation method with an independently failing regression. Never modify a test merely to obtain PASS.
+              14. Record evidence, root cause, changed files, regressions and remaining uncertainty in docs/agent/FINDINGS.md and update BACKLOG.md.
+              15. Audit the method itself after each iteration: identify blind spots and add instrumentation/tests when they prevent causal diagnosis.
+              16. Continue until the iteration produces validated progress; then let the wrapper commit and dispatch the next iteration automatically.
+              17. If blocked, change the investigation strategy and continue. Stop only for an external permission/fixture problem that the repository and runner cannot solve.
+
+            Sound-specific mandate:
+              - Inspect FistBlue/sound.c before any gameplay correction that emits sound.
+              - Replace the current no-op sound queue paths with a native audio backend only after observing the MAME command/event protocol.
+              - Preserve command ordering, duplicates, stage music selection, sound effects, and attract/demo gating.
+              - Add deterministic audio-event traces on both sides before using waveform output as the primary oracle.
 
       - name: Capture agent changes
         id: changes
