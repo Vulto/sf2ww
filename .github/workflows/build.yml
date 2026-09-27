@@ -67,6 +67,9 @@ jobs:
           awk -F, 'NR > 1 { n++ } END { if (n < 300) exit 1 }' agent_smoke.csv
           rm -f agent_smoke.csv agent_timing.csv allroms.bin sf2gfx.bin
 
+      - name: Validate comparator timing
+        run: bash scripts/test_compare_state_csv.sh
+
       - name: Validate golden traces
         run: bash scripts/validate_golden_traces.sh
 
