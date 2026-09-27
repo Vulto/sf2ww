@@ -9,7 +9,7 @@ on:
 
 concurrency:
   group: sf2-autonomous-main
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
