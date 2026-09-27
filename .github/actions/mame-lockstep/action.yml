@@ -119,6 +119,7 @@ runs:
           port_state.csv
           port_timing.csv
           visual_comparison.csv
+          visual_modes.csv
           mame_visual/
           native_visual/
         if-no-files-found: ignore
