@@ -104,7 +104,7 @@ $(TARGET): $(OBJECTS)
 %.o: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-test: $(TARGET)
+test: $(TARGET) semantic-test
 	@echo "Native executable build/test target: $(TARGET)"
 
 sanitize:
