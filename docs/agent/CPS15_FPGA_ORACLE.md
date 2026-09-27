@@ -89,3 +89,10 @@ A framebuffer mismatch without an upstream data mismatch is allowed only when th
 ## Current building clue
 
 FistBlue/scrolls/gstate.c currently assigns Scroll2Y from Scroll2 X position inside gstate_update_scroll2(). The same file identifies _GSDrawScroll2C() as the path apparently used by the attract building/skyscraper. This is a hypothesis to test against FPGA/MAME numeric traces, not a pre-approved code change.
+
+## Pinned external references
+
+- JTCPS CPS1/CPS1.5 README: https://github.com/jotego/jtcores/blob/master/cores/cps1/README.md
+- CPS1.5 game top level: https://github.com/jotego/jtcores/blob/master/cores/cps15/hdl/jtcps15_game.v
+- CPS1 scroll/tilemap RTL: https://github.com/jotego/jtcores/tree/master/cores/cps1/hdl
+- JTFRAME debug/verification checklist: https://github.com/jotego/jtcores/blob/master/modules/jtframe/doc/debug_list.md
