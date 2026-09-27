@@ -140,7 +140,7 @@ static void dump_visual_frame(void) {
         if (objlog != NULL) {
             int count = 0;
             for (int oi = 0; oi < 256; ++oi) {
-                if (gemu.Tilemap_Object[oi][3] == TILE_OBJECT_END_TAG) break;
+                if (gemu.Tilemap_Object[oi][3] == 0xff00) break;
                 if (gemu.Tilemap_Object[oi][2] != 0) {
                     fprintf(objlog, "%d,%u,%u,%u,%u\n", oi,
                             gemu.Tilemap_Object[oi][0], gemu.Tilemap_Object[oi][1],
