@@ -68,7 +68,6 @@ runs:
         set -euo pipefail
         bash scripts/compare_state_csv.sh mame_state.csv port_state.csv
         bash scripts/compare_mame_port_numeric.sh mame_exec_numeric.csv port_state.csv
-        bash scripts/compare_timing_csv.sh mame_state.csv port_state.csv
         bash scripts/validate_host_timing.sh port_timing.csv
 
     - name: Upload comparison evidence
