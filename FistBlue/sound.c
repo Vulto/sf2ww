@@ -12,13 +12,41 @@
 #include "structs.h"
 #include "sound.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 extern Game g;
+
+static FILE *soundTrace;
+static int soundTraceInitialized;
+
+static void soundTraceOpen(void) {
+	if (soundTraceInitialized) return;
+	soundTraceInitialized = 1;
+	if (getenv("SF2_AUDIO_EVENT_LOG") != NULL) {
+		soundTrace = fopen("native_audio_events.csv", "w");
+		if (soundTrace != NULL) fprintf(soundTrace, "sequence,host_time_ns,event,data,game_tick\n");
+	}
+}
+
+static void soundTraceEvent(const char *event, int data) {
+	struct timespec value;
+	soundTraceOpen();
+	if (soundTrace == NULL) return;
+	clock_gettime(CLOCK_MONOTONIC, &value);
+	fprintf(soundTrace, "%u,%llu,%s,%d,%u\n",
+		(unsigned)(++g.SoundTraceSequence),
+		(unsigned long long)value.tv_sec * 1000000000ull + (unsigned long long)value.tv_nsec,
+		event, data, (unsigned)g.tick);
+	fflush(soundTrace);
+}
 
 
 
 void sound_cq_addto(short data) {	/* 62ac */
-	(void)data;
-	/* sound unimplemented */
+	soundTraceEvent("command", data);
+	/* sound backend is implemented separately from the original command protocol. */
 }
 
 void sound_cq_1(short data) {	/* 629a */
@@ -47,8 +75,8 @@ void quirkysound(short data) {		// 6300
 	/* was full of tamper protection - removed */
 }
 void queuesound(int data) {			// 62f2
-	(void)data;
-	/* todo unimplemented */
+	soundTraceEvent("queue", data);
+	/* audio backend consumes the command stream. */
 }
 void setstagemusic(void) {
 	sound_cq_1( (u16 []){1,2,3,5,4,6,7,8,12,11,9,10,13,13,13}[g.CurrentStage] );
@@ -56,5 +84,5 @@ void setstagemusic(void) {
 
 
 void sound_cq_f7_ff(void) {
-	/* unimplemented */
+	soundTraceEvent("f7ff", 0xf7ff);
 }
