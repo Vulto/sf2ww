@@ -105,9 +105,12 @@ jobs:
         run: |
           truncate -s 1048576 allroms.bin
           truncate -s 6291456 sf2gfx.bin
+          truncate -s 32768 sf2_09.bin
+          truncate -s 262144 sf2_18.bin
+          truncate -s 262144 sf2_19.bin
           set +e
           timeout 8s xvfb-run -a ./glutBasics </dev/null
           status=$?
           set -e
           test "$status" -eq 124
-          rm -f allroms.bin sf2gfx.bin
+          rm -f allroms.bin sf2gfx.bin sf2_09.bin sf2_18.bin sf2_19.bin
