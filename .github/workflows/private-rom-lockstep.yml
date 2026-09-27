@@ -50,7 +50,7 @@ jobs:
             "385d7a21b8e983e6aabccaf0f6a12d55fd991f08defc7bbd837f592c48eee156" \
             ".agent/rom/rom.zip" | sha256sum -c -
           unzip -q -o .agent/rom/rom.zip -d .agent/rom/unpacked
-          find .agent/rom/unpacked -type f -exec cp -f {} .agent/rom/roms/sf2ua/ +
+          find .agent/rom/unpacked -type f -print0 | while IFS= read -r -d "" file; do cp -f "$file" .agent/rom/roms/sf2ua/; done
           rm -f allroms.bin sf2gfx.bin
           ./bin/prepare-rom.sh .agent/rom/rom.zip
           cp allroms.bin .agent/rom/allroms.bin
