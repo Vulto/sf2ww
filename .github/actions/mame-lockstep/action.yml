@@ -97,9 +97,16 @@ runs:
         test -n "$(find mame_visual -name 'frame_*.png' -print -quit)"
         echo "MAME_ATTRACT_MODE_TRANSITIONS"
         cat visual_modes.csv
+        set +e
         SF2_MAX_FRAMES=12000 SF2_STATE_LOG=port_state_attract.csv SF2_TIMING_LOG=port_timing_attract.csv SF2_VISUAL_DIR="$PWD/native_visual" SF2_VISUAL_EVERY=60 SF2_VISUAL_MAX_FRAMES=12000 \
           timeout 230s xvfb-run -a ./glutBasics \
           </dev/null >/tmp/sf2-native-visual.log 2>&1
+        native_status=$?
+        set -e
+        cat /tmp/sf2-native-visual.log | tail -100
+        if [ "$native_status" -ne 0 ]; then
+          exit "$native_status"
+        fi
         test -n "$(find native_visual -name 'frame_*.ppm' -print -quit)"
         echo "NATIVE_OBJECTS_AT_1380"
         cat native_visual_objects.txt
