@@ -150,7 +150,7 @@ static void sub_6704(void) {		// SF2 logo, spinning and scaling
 		 * selected through sf2rand() here; doing so advances the game RNG
 		 * ~235 ms after boot and creates a real lockstep divergence.
 		 */
-		obj->SubSel = 1;
+		obj->SubSel = 2;
 	}
 }
 
