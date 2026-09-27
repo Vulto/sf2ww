@@ -54,11 +54,21 @@ def main():
         raise SystemExit("no common visual frames")
 
     rows = []
+    key_frames = {60, 600, 1200, 1380, 1800, 2400, 3000, 6000, 9000, 11940}
     for key in common:
         a = load_mame(mame[key])
         b = load_native(native[key])
         mae, pixels, ratio = metrics(a, b)
         rows.append((key, mae, pixels, ratio))
+        frame_no = int(key.split("_")[1])
+        if frame_no in key_frames:
+            astat = ImageStat.Stat(a)
+            bstat = ImageStat.Stat(b)
+            print(
+                f"VISUAL_FRAME frame={frame_no} ratio={ratio:.6f} mae={mae:.3f} "
+                f"mame_rgb={tuple(round(x,1) for x in astat.mean)} "
+                f"native_rgb={tuple(round(x,1) for x in bstat.mean)}"
+            )
 
     with open(args.out, "w", newline="") as f:
         w = csv.writer(f)
@@ -73,7 +83,20 @@ def main():
     print(f"VISUAL_MAX_MAE={max(mae_values):.3f}")
     print(f"VISUAL_MEAN_MAE={statistics.mean(mae_values):.3f}")
     print(f"VISUAL_MAX_PIXEL_DIFF_RATIO={max(ratios):.6f}")
+    # Report contiguous divergent frame ranges so long-running attract-mode
+    # failures are visible without downloading the image artifact.
     if divergent:
+        nums = [int(r[0].split("_")[1]) for r in divergent]
+        ranges = []
+        start = prev = nums[0]
+        for n in nums[1:]:
+            if n == prev + 60:
+                prev = n
+            else:
+                ranges.append((start, prev))
+                start = prev = n
+        ranges.append((start, prev))
+        print("VISUAL_DIVERGENCE_RANGES=" + ",".join(f"{a}-{b}" for a,b in ranges))
         first = divergent[0]
         worst = max(divergent, key=lambda r: r[3])
         print(f"VISUAL_FIRST_DIVERGENCE={first[0]} ratio={first[3]:.6f} mae={first[1]:.3f}")
