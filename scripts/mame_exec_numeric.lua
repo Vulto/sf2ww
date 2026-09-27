@@ -48,6 +48,8 @@ out:write("seq,arcade_time_ns,arcade_cpu_cycles,pc,d0,d1,a0,a1,p1_x,p1_y,p1_mode
 
 local previous = nil
 local seq = 0
+local frame = 0
+local MAX_FRAMES = 900
 local base_seconds = nil
 local base_nsec = nil
 
@@ -61,6 +63,7 @@ local function elapsed_time_ns()
 end
 
 local function sample()
+    frame = frame + 1
     local elapsed_ns = elapsed_time_ns()
     local cycles = emu.attotime.from_nsec(elapsed_ns):as_ticks(10000000)
     local current = vector()
@@ -70,9 +73,9 @@ local function sample()
         out:flush()
         previous = current
     end
-    if seq >= 1000 then
+    if frame >= MAX_FRAMES or seq >= 1000 then
         out:close()
-        emu.stop()
+        machine:exit()
     end
 end
 
