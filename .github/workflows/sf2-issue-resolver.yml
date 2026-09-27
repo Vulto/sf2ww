@@ -64,6 +64,9 @@ jobs:
           ./bin/prepare-rom.sh "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip"
           cp allroms.bin "$RUNNER_TEMP/sf2-lockstep-rom/allroms.bin"
           cp sf2gfx.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2gfx.bin"
+          cp sf2_09.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2_09.bin"
+          cp sf2_18.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2_18.bin"
+          cp sf2_19.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2_19.bin"
           chmod -R a-w "$RUNNER_TEMP/sf2-lockstep-rom"
       - name: Validate resolver work
         run: |
