@@ -51,13 +51,13 @@ jobs:
           git -C .agent/reference/jtcps rev-parse HEAD | tee .agent/reference/JTCPS_COMMIT
           git -C .agent/reference/mame rev-parse HEAD | tee .agent/reference/MAME_COMMIT
 
-      - name: Checkout private ROM fixture
+      - name: Checkout original private ROM fixture
         uses: actions/checkout@v4
         with:
           repository: Vulto/sf2wwrom
           ref: main
           path: .agent/private-rom
-          token: ${{ github.token }}
+          token: ${{ secrets.SF2WWROM_TOKEN }}
           sparse-checkout: |
             sf2ua.zip
           sparse-checkout-cone-mode: false
