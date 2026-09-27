@@ -1,0 +1,88 @@
+name: Private ROM lockstep validation
+
+on:
+  workflow_call:
+    inputs:
+      port-ref:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  lockstep:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout port
+        uses: actions/checkout@v4
+        with:
+          repository: Vulto/sf2ww
+          ref: ${{ inputs.port-ref }}
+          fetch-depth: 0
+
+      - name: Checkout private ROM repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.ref_name }}
+          path: .agent/private-rom
+          token: ${{ github.token }}
+          fetch-depth: 1
+
+      - name: Install toolchain and MAME
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev xvfb mame mame-tools git unzip
+          mame -version
+          mame -listxml sf2ua >/dev/null
+
+      - name: Materialize private ROM fixture
+        run: |
+          set -euo pipefail
+          rm -rf .agent/rom
+          mkdir -p .agent/rom/roms
+          romZip="$(find .agent/private-rom -type f -name 'sf2ua.zip' -print -quit)"
+          test -n "$romZip"
+          cp "$romZip" .agent/rom/rom.zip
+          unzip -q -o .agent/rom/rom.zip -d .agent/rom/roms
+          rm -f allroms.bin sf2gfx.bin
+          ./bin/prepare-rom.sh .agent/rom/rom.zip
+          cp allroms.bin .agent/rom/allroms.bin
+          cp sf2gfx.bin .agent/rom/sf2gfx.bin
+          rm -f allroms.bin sf2gfx.bin .agent/rom/rom.zip
+          test -s .agent/rom/allroms.bin
+          test -s .agent/rom/sf2gfx.bin
+          test -d .agent/rom/roms
+
+      - name: Build native port
+        run: |
+          set -euo pipefail
+          make clean
+          make -j2
+          make clean
+          make SANITIZE=1 -j2
+          make clean
+          make -j2
+
+      - name: Run real MAME/native lockstep
+        uses: ./.github/actions/mame-lockstep
+        with:
+          rom-root: .agent/rom
+          port-executable: ./glutBasics
+          mame-bin: mame
+          mame-set: sf2ua
+
+      - name: Upload lockstep evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: private-rom-lockstep-${{ github.run_id }}
+          path: |
+            mame_state.csv
+            mame_exec_numeric.csv
+            port_state.csv
+            port_timing.csv
+          if-no-files-found: ignore
+          retention-days: 14
