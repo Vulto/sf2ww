@@ -132,6 +132,11 @@ jobs:
             fi
           } > "$RUNNER_TEMP/sf2-compile-summary.md"
 
+      - name: Freeze oracle guard
+        run: |
+          set -euo pipefail
+          sha256sum scripts/validate_test_oracle_integrity.sh > "$RUNNER_TEMP/oracle-guard.sha256"
+
       - name: Run Codex agent
         uses: openai/codex-action@v1
         continue-on-error: true
@@ -228,6 +233,9 @@ jobs:
 
       - name: Protect test oracles
         run: |
+          set -euo pipefail
+          test -s "$RUNNER_TEMP/oracle-guard.sha256"
+          sha256sum -c "$RUNNER_TEMP/oracle-guard.sha256"
           bash scripts/validate_test_oracle_integrity.sh
 
       - name: Build and validate changed tree
