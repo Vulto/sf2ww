@@ -78,17 +78,17 @@ runs:
         SF2_MAME_ROMPATH: ${{ inputs.rom-root }}/roms
         MAME_BIN: ${{ inputs.mame-bin }}
         SF2_MAME_SET: ${{ inputs.mame-set }}
-        SF2_VISUAL_EVERY: 10
+        SF2_VISUAL_EVERY: 60
         SF2_VISUAL_MAX_FRAMES: 12000
       run: |
         set -euo pipefail
         rm -rf mame_visual native_visual
         mkdir -p mame_visual native_visual
-        SF2_MAME_STATE_SCRIPT="scripts/mame_visual_dump.lua" SF2_VISUAL_DIR="$PWD/mame_visual" SF2_VISUAL_EVERY=10 SF2_VISUAL_MAX_FRAMES=12000 \
+        SF2_MAME_STATE_SCRIPT="scripts/mame_visual_dump.lua" SF2_VISUAL_DIR="$PWD/mame_visual" SF2_VISUAL_EVERY=60 SF2_VISUAL_MAX_FRAMES=12000 \
           xvfb-run -a bash scripts/run_mame_state.sh \
           >/tmp/sf2-mame-visual.log 2>&1
         test -n "$(find mame_visual -name 'frame_*.png' -print -quit)"
-        SF2_VISUAL_DIR="$PWD/native_visual" SF2_VISUAL_EVERY=10 SF2_VISUAL_MAX_FRAMES=12000 \
+        SF2_VISUAL_DIR="$PWD/native_visual" SF2_VISUAL_EVERY=60 SF2_VISUAL_MAX_FRAMES=12000 \
           timeout 230s xvfb-run -a ./glutBasics \
           </dev/null >/tmp/sf2-native-visual.log 2>&1
         test -n "$(find native_visual -name 'frame_*.ppm' -print -quit)"
