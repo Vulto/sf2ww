@@ -12,8 +12,16 @@ def load(path):
         rows = list(r)
         return r.fieldnames, rows
 
+def normalized(row, key):
+    value = row[key]
+    # The CPS RAM map stores player Y as integer pixels in MAME's view,
+    # while the native port stores the same coordinate as 16.16 fixed point.
+    if key in {"p1_y", "p2_y"}:
+        return str(int(value) << 16)
+    return value
+
 def semantic(row, fields):
-    return tuple(row[k] for k in fields if k not in IGNORE)
+    return tuple(normalized(row, k) for k in fields if k not in IGNORE)
 
 mf, mame = load(sys.argv[1])
 pf, port = load(sys.argv[2])
