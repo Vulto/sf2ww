@@ -45,6 +45,9 @@ runs:
         test -s mame_exec_numeric.csv
         SF2_MAME_STATE_SCRIPT="scripts/mame_exec_input.lua" xvfb-run -a bash scripts/run_mame_state.sh
         test -s mame_exec_input.csv
+        SF2_MAME_STATE_SCRIPT="scripts/mame_seed_probe.lua" xvfb-run -a bash scripts/run_mame_state.sh
+        test -s mame_seed_probe.csv
+        cat mame_seed_probe.csv | head -20
 
     - name: Run native port probes
       shell: bash
