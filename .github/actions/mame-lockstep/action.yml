@@ -37,10 +37,11 @@ runs:
         SF2_MAME_SET: ${{ inputs.mame-set }}
       run: |
         set -euo pipefail
-        rm -f mame_state.csv mame_execution.csv
-        xvfb-run -a bash scripts/run_mame_state.sh
+        rm -f mame_state.csv mame_exec_numeric.csv
+        SF2_MAME_STATE_SCRIPT="scripts/mame_state_dump.lua" xvfb-run -a bash scripts/run_mame_state.sh
         test -s mame_state.csv
-        test -s mame_execution.csv
+        SF2_MAME_STATE_SCRIPT="scripts/mame_exec_numeric.lua" xvfb-run -a bash scripts/run_mame_state.sh
+        test -s mame_exec_numeric.csv
 
     - name: Run native port probes
       shell: bash
@@ -66,6 +67,7 @@ runs:
       run: |
         set -euo pipefail
         bash scripts/compare_state_csv.sh mame_state.csv port_state.csv
+        bash scripts/compare_mame_port_numeric.sh mame_exec_numeric.csv port_state.csv
         bash scripts/compare_timing_csv.sh mame_state.csv port_state.csv
         bash scripts/validate_host_timing.sh port_timing.csv
 
@@ -76,7 +78,7 @@ runs:
         name: mame-lockstep-evidence-${{ github.run_id }}
         path: |
           mame_state.csv
-          mame_execution.csv
+          mame_exec_numeric.csv
           port_state.csv
           port_timing.csv
         if-no-files-found: ignore
