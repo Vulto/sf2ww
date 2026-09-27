@@ -10,8 +10,9 @@ expected="$1"
 actual="$2"
 skip_rows="${3:-0}"
 
-# Compare the numeric execution trajectory, not frame numbers.
-# Consecutive identical state vectors are collapsed into one transition event.
+# Compare semantic numeric execution state, not frame or clock numbers.
+# Consecutive identical semantic state vectors are collapsed into one transition event.
+# Arcade timing is validated separately by compare_timing_csv.sh.
 # This makes the comparison sensitive to measured state changes while avoiding
 # a false requirement that native and MAME advance on identical host/frame
 # boundaries.
@@ -19,7 +20,7 @@ skip_rows="${3:-0}"
 awk -F, -v skip="$skip_rows" '
 function emit_expected(    i, key) {
     key = ""
-    for (i = 2; i <= NF; ++i) if (expected_name[i] != "game_tick" && expected_name[i] != "time_ticks") key = key "|" $i
+    for (i = 2; i <= NF; ++i) if (expected_name[i] != "game_tick" && expected_name[i] != "time_ticks" && expected_name[i] != "arcade_time_ns" && expected_name[i] != "arcade_cpu_cycles") key = key "|" $i
     if (key != last_expected) {
         expected_events[++expected_count] = key
         expected_frames[expected_count] = $1
