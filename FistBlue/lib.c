@@ -27,6 +27,7 @@
 #include "collision.h"
 #include "effects.h"
 #include "sm.h"
+#include "reverse_trace.h"
 
 #ifdef REDHAMMER
 #include "demo.h"
@@ -525,6 +526,7 @@ void sf2_interrupt (void) {
     _refresh_jumpers();   /* reread some jumpers, some debug stuff */
 	
     g.tick++;
+    FBReverseTraceTick();
 #ifdef CPS
     //Exec.x820e = -1;
 #endif
