@@ -98,6 +98,8 @@ runs:
           timeout 230s xvfb-run -a ./glutBasics \
           </dev/null >/tmp/sf2-native-visual.log 2>&1
         test -n "$(find native_visual -name 'frame_*.ppm' -print -quit)"
+        echo "NATIVE_OBJECTS_AT_1380"
+        cat native_visual_objects.txt
         bash scripts/compare_mame_port_numeric.sh mame_exec_attract.csv port_state_attract.csv
         python3 scripts/compare_visual_frames.py \
           --mame-dir mame_visual \
