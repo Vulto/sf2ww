@@ -155,3 +155,11 @@
 - The autonomous workflow could previously commit gameplay changes after build/sanitizer/smoke validation even when the private original ROM fixture was absent and the real-MAME lockstep step was skipped.
 - The commit wrapper now rejects changes outside validation infrastructure/documentation when the private ROM fixture is unavailable.
 - Therefore build/sanitizer success alone can no longer promote unverified gameplay changes to main.
+
+
+## 2026-09-27 — First full real-ROM lockstep divergence after harness repair
+
+- The private `sf2ua` fixture is now executing in the GitHub lockstep gate; Pillow dependency failures were removed by installing the runner package `python3-pil` in the composite action.
+- The real MAME/native visual anchors pass at frame 300 (MAE 0.202, ratio 0.012742) and frame 1500 (MAE 1.958, ratio 0.056373).
+- The semantic oracle then reports the first hard behavioral mismatch at the attract trace boundary: MAME has 1000 transitions while the native port has 1752; first unexpected native transition is transition 1001 at arcade time 68,983,552,000 ns.
+- This is not a visual-threshold failure and must not be hidden by changing comparator tolerances. The next iteration must use the pre-agent real lockstep evidence to identify why the native state vector continues producing distinct transitions after MAME's transition stream has stabilized/ended.
