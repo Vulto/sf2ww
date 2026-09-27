@@ -1,6 +1,10 @@
 name: MAME lockstep
 description: Run the private MAME state/execution probe and native port probes, then compare numeric arcade-time state.
 inputs:
+  deep-trace:
+    description: "Run exhaustive reverse-engineering observation of the full attract cycle"
+    required: false
+    default: "false"
   rom-root:
     description: Private fixture root containing roms/, allroms.bin and sf2gfx.bin.
     required: true
