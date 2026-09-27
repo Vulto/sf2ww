@@ -63,29 +63,6 @@ local function hex(value)
 end
 
 local function writeMemoryMap()
-
-if audioCpu ~= nil and audioCpu.spaces["program"] ~= nil then
-    local audioMem = audioCpu.spaces["program"]
-    local audioState = audioCpu.state
-    local function audioStateValue(name)
-        local entry = audioState[name]
-        return entry and entry.value or 0
-    end
-    audioMem:install_read_tap(0x0000, audioMem.address_mask, "sf2ww_reverse_audio_read", function(offset, data, memMask)
-        audioReadSeq = audioReadSeq + 1
-        audioReadOut:write(string.format("%u,%u,audiocpu,%u,%u,%u,%u\n", audioReadSeq, elapsed_time_ns(), offset, data, memMask, audioStateValue("CURPC")))
-        if (audioReadSeq % 4096) == 0 then audioReadOut:flush() end
-    end)
-    audioMem:install_write_tap(0x0000, audioMem.address_mask, "sf2ww_reverse_audio_write", function(offset, data, memMask)
-        audioWriteSeq = audioWriteSeq + 1
-        audioWriteOut:write(string.format("%u,%u,audiocpu,%u,%u,%u,%u\n", audioWriteSeq, elapsed_time_ns(), offset, data, memMask, audioStateValue("CURPC")))
-        if (audioWriteSeq % 4096) == 0 then audioWriteOut:flush() end
-    end)
-end
-
-
-
-
     local entries = mem.map and mem.map.entries
     if entries ~= nil then
         for _, entry in ipairs(entries) do
@@ -113,26 +90,35 @@ end
             ))
         end
     end
-
     for tag, region in pairs(machine.memory.regions) do
-        mapOut:write(string.format(
-            "region,%s,,,,,,,,,,,,%u\n",
-            tostring(tag), region.size
-        ))
+        mapOut:write(string.format("region,%s,,,,,,,,,,,,%u\n", tostring(tag), region.size))
     end
     for tag, share in pairs(machine.memory.shares) do
-        mapOut:write(string.format(
-            "share,%s,,,,,,,,,,,,%u\n",
-            tostring(tag), share.size
-        ))
+        mapOut:write(string.format("share,%s,,,,,,,,,,,,%u\n", tostring(tag), share.size))
     end
     for tag, bank in pairs(machine.memory.banks) do
-        mapOut:write(string.format(
-            "bank,%s,,,,,,,,,,,,%u\n",
-            tostring(tag), bank.entry
-        ))
+        mapOut:write(string.format("bank,%s,,,,,,,,,,,,%u\n", tostring(tag), bank.entry))
     end
     mapOut:flush()
+end
+
+if audioCpu ~= nil and audioCpu.spaces["program"] ~= nil then
+    local audioMem = audioCpu.spaces["program"]
+    local audioState = audioCpu.state
+    local function audioStateValue(name)
+        local entry = audioState[name]
+        return entry and entry.value or 0
+    end
+    audioMem:install_read_tap(0x0000, audioMem.address_mask, "sf2ww_reverse_audio_read", function(offset, data, memMask)
+        audioReadSeq = audioReadSeq + 1
+        audioReadOut:write(string.format("%u,%u,audiocpu,%u,%u,%u,%u\n", audioReadSeq, elapsed_time_ns(), offset, data, memMask, audioStateValue("CURPC")))
+        if (audioReadSeq % 4096) == 0 then audioReadOut:flush() end
+    end)
+    audioMem:install_write_tap(0x0000, audioMem.address_mask, "sf2ww_reverse_audio_write", function(offset, data, memMask)
+        audioWriteSeq = audioWriteSeq + 1
+        audioWriteOut:write(string.format("%u,%u,audiocpu,%u,%u,%u,%u\n", audioWriteSeq, elapsed_time_ns(), offset, data, memMask, audioStateValue("CURPC")))
+        if (audioWriteSeq % 4096) == 0 then audioWriteOut:flush() end
+    end)
 end
 
 local previousRam = mem:read_range(RAM_START, RAM_END, 8)
