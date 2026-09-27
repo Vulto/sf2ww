@@ -65,3 +65,10 @@ Prioridade 2 — validação audiovisual
 - [x] Autonomous commit gate blocks unverified gameplay changes when the private ROM fixture is unavailable.
 - [ ] Execute the first real MAME/native lockstep with the private sf2ua fixture.
 - [ ] Diagnose and correct the first numeric divergence from the real ROM trace.
+
+
+### 2026-09-27 — First real attract divergence
+
+- [ ] Diagnose native attract transition stream divergence: MAME 1000 transitions vs native 1752; first unexpected native transition at 68,983,552,000 ns.
+- [ ] Compare the pre-agent MAME/native transition window and identify the first causal field, timer, input, audio event, or mode transition responsible.
+- [ ] Add a deterministic regression for the discovered root cause without weakening the real-MAME oracle.
