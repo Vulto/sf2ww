@@ -25,10 +25,10 @@ jobs:
       - name: Checkout private ROM repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.repository }}
+          repository: Vulto/sf2wwrom
           ref: ${{ github.ref_name }}
           path: .agent/private-rom
-          token: ${{ github.token }}
+          token: ${{ secrets.SF2_ROM_REPO_TOKEN }}
           fetch-depth: 1
 
       - name: Install toolchain and MAME
@@ -55,6 +55,9 @@ jobs:
           ./bin/prepare-rom.sh .agent/rom/rom.zip
           cp allroms.bin .agent/rom/allroms.bin
           cp sf2gfx.bin .agent/rom/sf2gfx.bin
+          cp sf2_09.bin .agent/rom/sf2_09.bin
+          cp sf2_18.bin .agent/rom/sf2_18.bin
+          cp sf2_19.bin .agent/rom/sf2_19.bin
           rm -f allroms.bin sf2gfx.bin .agent/rom/rom.zip
           test -s .agent/rom/allroms.bin
           test -s .agent/rom/sf2gfx.bin
