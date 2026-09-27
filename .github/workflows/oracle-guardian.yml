@@ -1,0 +1,109 @@
+name: SF2 Oracle Guardian
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "7 * * * *"
+concurrency:
+  group: sf2-oracle-guardian
+  cancel-in-progress: false
+permissions:
+  contents: write
+  actions: write
+  issues: write
+jobs:
+  oracle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - name: Toolchain
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y build-essential freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev xvfb mame mame-tools git unzip jq
+          make clean
+          make -j2
+      - name: Immutable ROM
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/Vulto/sf2wwrom.git .agent/private-rom
+          git -C .agent/private-rom sparse-checkout set sf2ua.zip
+          test -s .agent/private-rom/sf2ua.zip
+          mkdir -p "$RUNNER_TEMP/sf2-rom/roms"
+          cp .agent/private-rom/sf2ua.zip "$RUNNER_TEMP/sf2-rom/rom.zip"
+          printf '%s  %s\n' "385d7a21b8e983e6aabccaf0f6a12d55fd991f08defc7bbd837f592c48eee156" "$RUNNER_TEMP/sf2-rom/rom.zip" | sha256sum -c -
+          unzip -q -o "$RUNNER_TEMP/sf2-rom/rom.zip" -d "$RUNNER_TEMP/sf2-rom/roms"
+          mkdir -p "$RUNNER_TEMP/sf2-rom/roms/sf2ua"
+          find "$RUNNER_TEMP/sf2-rom/roms" -type f ! -path "$RUNNER_TEMP/sf2-rom/roms/sf2ua/*" -exec cp {} "$RUNNER_TEMP/sf2-rom/roms/sf2ua/" \;
+          ./bin/prepare-rom.sh "$RUNNER_TEMP/sf2-rom/rom.zip"
+          cp allroms.bin "$RUNNER_TEMP/sf2-rom/allroms.bin"
+          cp sf2gfx.bin "$RUNNER_TEMP/sf2-rom/sf2gfx.bin"
+          mame -rompath "$RUNNER_TEMP/sf2-rom/roms" -verifyroms sf2ua
+      - name: Collect oracle evidence
+        env:
+          SF2_MAME_ROMPATH: ${{ runner.temp }}/sf2-rom/roms
+          MAME_BIN: mame
+          SF2_MAME_SET: sf2ua
+        run: |
+          set -euo pipefail
+          SF2_NUMERIC_MAX_FRAMES=12000 SF2_MAME_STATE_SCRIPT=scripts/mame_exec_numeric.lua xvfb-run -a bash scripts/run_mame_state.sh
+          mv mame_exec_numeric.csv mame_exec_attract.csv
+          SF2_MAX_FRAMES=12000 SF2_STATE_LOG=port_state_attract.csv SF2_TIMING_LOG=port_timing_attract.csv timeout 230s xvfb-run -a ./glutBasics </dev/null
+          SF2_INPUT_TEST=1 SF2_MAX_FRAMES=900 SF2_STATE_LOG=port_state_input.csv SF2_TIMING_LOG=port_timing_input.csv timeout 30s xvfb-run -a ./glutBasics </dev/null
+          SF2_AUDIO_EVENT_LOG=1 SF2_MAX_FRAMES=12000 timeout 230s xvfb-run -a ./glutBasics </dev/null >/tmp/sf2-audio.log 2>&1
+          test -s mame_exec_attract.csv
+          test -s port_state_attract.csv
+          test -s port_state_input.csv
+          test -s native_audio_events.csv
+      - name: Oracle Guardian agent
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY || secrets.CODEX_OPENAI_API_KEY }}
+          permission-profile: ":workspace"
+          safety-strategy: drop-sudo
+          allow-users: "Vulto"
+          effort: high
+          prompt: |
+            You are Agent 1, Oracle Guardian. Maintain a deterministic, empirical, fail-closed oracle.
+            Map the complete ROM execution and observable behavior: code/data regions, RAM, CPU checkpoints,
+            memory accesses, cycles/timers/RNG, video registers, scroll/tile/object inputs, palette/priority/mixer,
+            audio commands/events, boot/attract/gameplay scenarios. Use MAME and JTCPS/JTFRAME as independent evidence.
+            Strengthen instrumentation/tests/docs only when evidence is missing. Do not fix gameplay behavior.
+            Never weaken assertions, tolerances, observation windows or real-ROM requirements.
+            Do not hide divergence. The wrapper validates and commits oracle/test/instrumentation progress.
+      - name: Validate and commit oracle work
+        run: |
+          set -euo pipefail
+          bash scripts/validate_test_oracle_integrity.sh
+          make clean && make -j2
+          make semantic-test
+          bash scripts/validate_golden_traces.sh
+          git config user.name sf2-oracle-agent
+          git config user.email sf2-oracle-agent@users.noreply.github.com
+          find . -type f -name "*.d" -delete
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "oracle: improve deterministic evidence pipeline"
+          git push origin HEAD:main
+      - name: Build diagnostic
+        run: |
+          set -euo pipefail
+          mkdir -p .agent/oracle
+          python3 scripts/build_oracle_diagnostic.py mame_exec_attract.csv port_state_attract.csv .agent/oracle/oracle_diagnostic.md
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: sf2-oracle-evidence
+          path: |
+            mame_exec_attract.csv
+            port_state_attract.csv
+            port_timing_attract.csv
+            port_state_input.csv
+            native_audio_events.csv
+            .agent/oracle/oracle_diagnostic.md
+          retention-days: 14
+      - name: Handoff to analyst
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run sf2-divergence-analyst.yml --repo "$GITHUB_REPOSITORY" --ref main -f oracle_run_id="$GITHUB_RUN_ID"
