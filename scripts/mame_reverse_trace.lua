@@ -26,6 +26,7 @@ local writeOut = open_file("reverse_memory_writes.csv")
 local ramOut = open_file("reverse_ram_changes.csv")
 local mapOut = open_file("reverse_memory_map.csv")
 local manifestOut = open_file("reverse_manifest.csv")
+local registersOut = open_file("reverse_registers.csv")
 
 frameOut:write("frame,arcade_time_ns,arcade_cpu_cycles,pc,sr,d0,d1,d2,d3,d4,d5,d6,d7,a0,a1,a2,a3,a4,a5,a6,a7,game_mode,game_tick,stage,round_cnt,time_bcd,time_ticks,fight_over,rng1,rng2\n")
 readOut:write("seq,arcade_time_ns,arcade_cpu_cycles,pc,sr,address,data,mem_mask\n")
@@ -33,6 +34,7 @@ writeOut:write("seq,arcade_time_ns,arcade_cpu_cycles,pc,sr,address,data,mem_mask
 ramOut:write("frame,arcade_time_ns,arcade_cpu_cycles,address,value\n")
 mapOut:write("kind,owner,space,address_start,address_end,mirror,mask,cswidth,lane_mask,handler_type,handler_name,tag,region,region_offset\n")
 manifestOut:write("key,value\n")
+registersOut:write("frame,arcade_time_ns,arcade_cpu_cycles,name,value\n")
 
 local function state_value(name)
     local entry = state[name]
@@ -156,10 +158,11 @@ manifestOut:write("timing_origin,absolute_machine_time_since_reset\n")
 manifestOut:write("memory_trace,program_space_000000-ffffff_read_write_taps\n")
 manifestOut:write("instruction_trace,debugger_trace_noloop_when_enabled\n")
 manifestOut:write("ram_trace,changed_bytes_at_each_frame_boundary\n")
+manifestOut:write("register_trace,all_maincpu_state_entries_at_each_frame_boundary\n")
 manifestOut:flush()
 
 if debugger ~= nil and os.getenv("SF2_REVERSE_TRACE_INSTRUCTIONS") == "1" then
-    debugger:command("trace reverse_68000.tr,maincpu,noloop,{tracelog \"PC=%06X SR=%04X D0=%08X D1=%08X D2=%08X D3=%08X D4=%08X D5=%08X D6=%08X D7=%08X A0=%08X A1=%08X A2=%08X A3=%08X A4=%08X A5=%08X A6=%08X A7=%08X \",pc,sr,d0,d1,d2,d3,d4,d5,d6,d7,a0,a1,a2,a3,a4,a5,a6,a7}")
+    debugger:command("trace reverse_68000.tr,maincpu,noloop,{tracelog \"CYCLE=%u LASTCYCLE=%u PC=%06X SR=%04X D0=%08X D1=%08X D2=%08X D3=%08X D4=%08X D5=%08X D6=%08X D7=%08X A0=%08X A1=%08X A2=%08X A3=%08X A4=%08X A5=%08X A6=%08X A7=%08X \",totalcycles,lastinstructioncycles,pc,sr,d0,d1,d2,d3,d4,d5,d6,d7,a0,a1,a2,a3,a4,a5,a6,a7}")
 end
 
 local function sample()
@@ -178,6 +181,10 @@ local function sample()
                 frame, now, cycles, RAM_START + i - 1, newValue
             ))
         end
+    end
+
+    for name, entry in pairs(state) do
+        registersOut:write(string.format("%d,%u,%u,%s,%s\n", frame, now, cycles, tostring(name), tostring(entry.value)))
     end
 
     frameOut:write(string.format(
@@ -201,6 +208,7 @@ local function sample()
 
     if (frame % 10) == 0 then
         frameOut:flush()
+        registersOut:flush()
         ramOut:flush()
     end
 
@@ -217,6 +225,7 @@ local function sample()
         ramOut:close()
         mapOut:close()
         manifestOut:close()
+        registersOut:close()
         machine:exit()
     end
 end
