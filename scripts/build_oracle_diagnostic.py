@@ -9,6 +9,7 @@ COMMON = [
     "p1_energy", "p1_move", "p1_stand_squat",
     "p2_x", "p2_y", "p2_mode0", "p2_mode1", "p2_mode2", "p2_anim",
     "p2_energy", "p2_move", "p2_stand_squat",
+    "scroll1_x", "scroll1_y", "scroll2_x", "scroll2_y", "scroll3_x", "scroll3_y",
     "stage", "round_cnt", "fight_over", "rng1", "rng2",
 ]
 SEMANTIC = [x for x in COMMON if x not in {"arcade_time_ns", "arcade_cpu_cycles"}]
