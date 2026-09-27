@@ -10,6 +10,7 @@ local cpu = machine.devices[":maincpu"]
 local mem = cpu.spaces["program"]
 local state = cpu.state
 local debugger = machine.debugger
+local audioCpu = machine.devices[":audiocpu"]
 
 local MAX_FRAMES = tonumber(os.getenv("SF2_REVERSE_MAX_FRAMES") or "7200")
 local RAM_START = 0xff0000
@@ -26,11 +27,15 @@ local writeOut = open_file("reverse_memory_writes.csv")
 local ramOut = open_file("reverse_ram_changes.csv")
 local mapOut = open_file("reverse_memory_map.csv")
 local manifestOut = open_file("reverse_manifest.csv")
+local audioReadOut = open_file("reverse_audiocpu_reads.csv")
+local audioWriteOut = open_file("reverse_audiocpu_writes.csv")
 local registersOut = open_file("reverse_registers.csv")
 
 frameOut:write("frame,arcade_time_ns,arcade_cpu_cycles,pc,sr,d0,d1,d2,d3,d4,d5,d6,d7,a0,a1,a2,a3,a4,a5,a6,a7,game_mode,game_tick,stage,round_cnt,time_bcd,time_ticks,fight_over,rng1,rng2\n")
 readOut:write("seq,arcade_time_ns,arcade_cpu_cycles,pc,sr,address,data,mem_mask\n")
 writeOut:write("seq,arcade_time_ns,arcade_cpu_cycles,pc,sr,address,data,mem_mask\n")
+audioReadOut:write("seq,arcade_time_ns,cpu,address,data,mem_mask,pc\n")
+audioWriteOut:write("seq,arcade_time_ns,cpu,address,data,mem_mask,pc\n")
 ramOut:write("frame,arcade_time_ns,arcade_cpu_cycles,address,value\n")
 mapOut:write("kind,owner,space,address_start,address_end,mirror,mask,cswidth,lane_mask,handler_type,handler_name,tag,region,region_offset\n")
 manifestOut:write("key,value\n")
@@ -58,6 +63,25 @@ local function hex(value)
 end
 
 local function writeMemoryMap()
+
+if audioCpu ~= nil and audioCpu.spaces["program"] ~= nil then
+    local audioMem = audioCpu.spaces["program"]
+    local audioState = audioCpu.state
+    local function audioStateValue(name)
+        local entry = audioState[name]
+        return entry and entry.value or 0
+    end
+    audioMem:install_read_tap(0x0000, audioMem.address_mask, "sf2ww_reverse_audio_read", function(offset, data, memMask)
+        audioReadSeq = audioReadSeq + 1
+        audioReadOut:write(string.format("%u,%u,audiocpu,%u,%u,%u,%u\\n", audioReadSeq, elapsed_time_ns(), offset, data, memMask, audioStateValue("CURPC")))
+        if (audioReadSeq % 4096) == 0 then audioReadOut:flush() end
+    end)
+    audioMem:install_write_tap(0x0000, audioMem.address_mask, "sf2ww_reverse_audio_write", function(offset, data, memMask)
+        audioWriteSeq = audioWriteSeq + 1
+        audioWriteOut:write(string.format("%u,%u,audiocpu,%u,%u,%u,%u\\n", audioWriteSeq, elapsed_time_ns(), offset, data, memMask, audioStateValue("CURPC")))
+        if (audioWriteSeq % 4096) == 0 then audioWriteOut:flush() end
+    end)
+end
     local entries = mem.map and mem.map.entries
     if entries ~= nil then
         for _, entry in ipairs(entries) do
@@ -111,6 +135,8 @@ local previousRam = mem:read_range(RAM_START, RAM_END, 8)
 local frame = 0
 local readSeq = 0
 local writeSeq = 0
+local audioReadSeq = 0
+local audioWriteSeq = 0
 
 local function captureMemoryAccess(kind, address, data, memMask)
     local now = elapsed_time_ns()
@@ -162,7 +188,10 @@ manifestOut:write("register_trace,all_maincpu_state_entries_at_each_frame_bounda
 manifestOut:flush()
 
 if debugger ~= nil and os.getenv("SF2_REVERSE_TRACE_INSTRUCTIONS") == "1" then
-    debugger:command("trace reverse_68000.tr,maincpu,noloop,{tracelog \"CYCLE=%u LASTCYCLE=%u PC=%06X SR=%04X D0=%08X D1=%08X D2=%08X D3=%08X D4=%08X D5=%08X D6=%08X D7=%08X A0=%08X A1=%08X A2=%08X A3=%08X A4=%08X A5=%08X A6=%08X A7=%08X \",totalcycles,lastinstructioncycles,pc,sr,d0,d1,d2,d3,d4,d5,d6,d7,a0,a1,a2,a3,a4,a5,a6,a7}")
+    debugger:command("trace reverse_68000.tr,maincpu,noloop,{tracelog \"CYCLE=%u PC=%06X SR=%04X D0=%08X D1=%08X D2=%08X D3=%08X D4=%08X D5=%08X D6=%08X D7=%08X A0=%08X A1=%08X A2=%08X A3=%08X A4=%08X A5=%08X A6=%08X A7=%08X \",totalcycles,pc,sr,d0,d1,d2,d3,d4,d5,d6,d7,a0,a1,a2,a3,a4,a5,a6,a7}")
+    if audioCpu ~= nil then
+        debugger:command("trace reverse_z80.tr,audiocpu,noloop,{tracelog \"CYCLE=%u PC=%04X \",totalcycles,pc}")
+    end
 end
 
 local function sample()
@@ -226,6 +255,8 @@ local function sample()
         mapOut:close()
         manifestOut:close()
         registersOut:close()
+        audioReadOut:close()
+        audioWriteOut:close()
         machine:exit()
     end
 end
