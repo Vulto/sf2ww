@@ -73,15 +73,17 @@ if audioCpu ~= nil and audioCpu.spaces["program"] ~= nil then
     end
     audioMem:install_read_tap(0x0000, audioMem.address_mask, "sf2ww_reverse_audio_read", function(offset, data, memMask)
         audioReadSeq = audioReadSeq + 1
-        audioReadOut:write(string.format("%u,%u,audiocpu,%u,%u,%u,%u\\n", audioReadSeq, elapsed_time_ns(), offset, data, memMask, audioStateValue("CURPC")))
+        audioReadOut:write(string.format("%u,%u,audiocpu,%u,%u,%u,%u\n", audioReadSeq, elapsed_time_ns(), offset, data, memMask, audioStateValue("CURPC")))
         if (audioReadSeq % 4096) == 0 then audioReadOut:flush() end
     end)
     audioMem:install_write_tap(0x0000, audioMem.address_mask, "sf2ww_reverse_audio_write", function(offset, data, memMask)
         audioWriteSeq = audioWriteSeq + 1
-        audioWriteOut:write(string.format("%u,%u,audiocpu,%u,%u,%u,%u\\n", audioWriteSeq, elapsed_time_ns(), offset, data, memMask, audioStateValue("CURPC")))
+        audioWriteOut:write(string.format("%u,%u,audiocpu,%u,%u,%u,%u\n", audioWriteSeq, elapsed_time_ns(), offset, data, memMask, audioStateValue("CURPC")))
         if (audioWriteSeq % 4096) == 0 then audioWriteOut:flush() end
     end)
 end
+
+
     local entries = mem.map and mem.map.entries
     if entries ~= nil then
         for _, entry in ipairs(entries) do
