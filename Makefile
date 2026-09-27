@@ -42,6 +42,7 @@ SOURCES := \
 	FistBlue/projectiles.c \
 	FistBlue/reactmode.c \
 	FistBlue/rules.c \
+	FistBlue/reverse_trace.c \
 	FistBlue/sm.c \
 	FistBlue/sound.c \
 	FistBlue/sprite.c \
