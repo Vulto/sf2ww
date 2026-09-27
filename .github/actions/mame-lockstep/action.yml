@@ -131,5 +131,6 @@ runs:
           visual_modes.csv
           mame_visual/
           native_visual/
+          native_visual_objects.txt
         if-no-files-found: ignore
         retention-days: 7
