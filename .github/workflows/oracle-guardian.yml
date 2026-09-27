@@ -96,6 +96,7 @@ jobs:
           mkdir -p .agent/oracle
           python3 scripts/build_oracle_diagnostic.py mame_exec_attract.csv port_state_attract.csv .agent/oracle/oracle_diagnostic.md
       - name: Upload evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: sf2-oracle-evidence
@@ -108,6 +109,14 @@ jobs:
             .agent/oracle/oracle_diagnostic.md
           retention-days: 14
       - name: Handoff to analyst
+        if: always() && hashFiles('mame_exec_attract.csv', 'port_state_attract.csv', 'port_timing_attract.csv', 'port_state_input.csv', 'native_audio_events.csv') != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run sf2-divergence-analyst.yml --repo "$GITHUB_REPOSITORY" --ref main -f oracle_run_id="$GITHUB_RUN_ID"
+      - name: Continue guardian forever
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run oracle-guardian.yml --repo "$GITHUB_REPOSITORY" --ref main
