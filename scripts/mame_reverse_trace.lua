@@ -157,11 +157,11 @@ local function captureMemoryAccess(kind, address, data, memMask)
     end
 end
 
-mem:install_read_tap(0x000000, 0xffffff, "sf2ww_reverse_read", function(offset, data, memMask)
+mem:install_read_tap(0xff0000, 0xffffff, "sf2ww_reverse_ram_read", function(offset, data, memMask)
     captureMemoryAccess("read", offset, data, memMask)
 end)
 
-mem:install_write_tap(0x000000, 0xffffff, "sf2ww_reverse_write", function(offset, data, memMask)
+mem:install_write_tap(0xff0000, 0xffffff, "sf2ww_reverse_ram_write", function(offset, data, memMask)
     captureMemoryAccess("write", offset, data, memMask)
 end)
 
@@ -180,7 +180,7 @@ manifestOut:write(string.format("ram_start,%s\n", hex(RAM_START)))
 manifestOut:write(string.format("ram_end,%s\n", hex(RAM_END)))
 manifestOut:write(string.format("max_frames,%d\n", MAX_FRAMES))
 manifestOut:write("timing_origin,absolute_machine_time_since_reset\n")
-manifestOut:write("memory_trace,program_space_000000-ffffff_read_write_taps\n")
+manifestOut:write("memory_trace,main_ram_ff0000-ffffff_read_write_taps\n")
 manifestOut:write("instruction_trace,debugger_trace_noloop_when_enabled\n")
 manifestOut:write("ram_trace,changed_bytes_at_each_frame_boundary\n")
 manifestOut:write("register_trace,all_maincpu_state_entries_at_each_frame_boundary\n")
