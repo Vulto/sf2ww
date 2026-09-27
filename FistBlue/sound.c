@@ -21,6 +21,21 @@ extern Game g;
 static FILE *soundTrace;
 static int soundTraceInitialized;
 static unsigned soundTraceSequence;
+#define SOUND_BACKEND_QUEUE_LENGTH 64
+static unsigned short soundBackendQueue[SOUND_BACKEND_QUEUE_LENGTH];
+static unsigned soundBackendRead;
+static unsigned soundBackendWrite;
+static unsigned soundBackendCount;
+
+static void soundBackendEnqueue(unsigned short data) {
+	if (soundBackendCount == SOUND_BACKEND_QUEUE_LENGTH) {
+		soundTraceEvent("overflow", data);
+		return;
+	}
+	soundBackendQueue[soundBackendWrite] = data;
+	soundBackendWrite = (soundBackendWrite + 1u) % SOUND_BACKEND_QUEUE_LENGTH;
+	++soundBackendCount;
+}
 
 static void soundTraceOpen(void) {
 	if (soundTraceInitialized) return;
