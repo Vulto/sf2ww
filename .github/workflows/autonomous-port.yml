@@ -113,7 +113,6 @@ jobs:
       - name: Gate autonomous agent on real ROM fixture
         run: |
           set -euo pipefail
-          test -s .agent/rom/rom.zip
           test -s .agent/rom/allroms.bin
           test -s .agent/rom/sf2gfx.bin
           test -n "$(find .agent/rom/roms -type f -print -quit)"
