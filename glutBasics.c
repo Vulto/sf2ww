@@ -158,7 +158,7 @@ static void dump_visual_frame(void) {
         return;
     }
 
-    fprintf(fp, "P6\\n384 224\\n255\\n");
+    fprintf(fp, "P6\n384 224\n255\n");
     for (int y = 223; y >= 0; --y) {
         fwrite(pixels + ((size_t)y * row_bytes), 1, row_bytes, fp);
     }
