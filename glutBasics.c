@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdint.h>
+#include <errno.h>
 
 #include <sys/types.h>
 
@@ -55,6 +56,9 @@ static FILE *gStateLog;
 static FILE *gTimingLog;
 static unsigned long gStateFrame;
 static unsigned long gMaxFrames;
+static unsigned long gVisualEvery;
+static unsigned long gLastVisualFrame;
+static char gVisualDir[512];
 
 typedef struct {
    GLdouble x,y,z;
@@ -125,8 +129,45 @@ void reshape (int w, int h) {
     gfx_glut_reshape(w, h);
     glutPostRedisplay();
 }
+static void dump_visual_frame(void) {
+    if (gVisualEvery == 0 || gStateFrame == 0 || (gStateFrame % gVisualEvery) != 0 || gLastVisualFrame == gStateFrame) {
+        return;
+    }
+    gLastVisualFrame = gStateFrame;
+
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    if (viewport[2] != 384 || viewport[3] != 224) {
+        return;
+    }
+
+    size_t row_bytes = 384u * 3u;
+    unsigned char *pixels = malloc(row_bytes * 224u);
+    if (pixels == NULL) {
+        return;
+    }
+
+    glReadPixels(0, 0, 384, 224, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+    char path[768];
+    snprintf(path, sizeof(path), "%s/frame_%06lu.ppm", gVisualDir, gStateFrame);
+    FILE *fp = fopen(path, "wb");
+    if (fp == NULL) {
+        free(pixels);
+        return;
+    }
+
+    fprintf(fp, "P6\\n384 224\\n255\\n");
+    for (int y = 223; y >= 0; --y) {
+        fwrite(pixels + ((size_t)y * row_bytes), 1, row_bytes, fp);
+    }
+    fclose(fp);
+    free(pixels);
+}
+
 void maindisplay(void) {
     gfx_glut_drawgame();
+    dump_visual_frame();
     glutSwapBuffers();
 }
 void mouse (int button, int state, int x, int y) {
@@ -384,6 +425,26 @@ void timerFunc(int value) {
 }
 int main (int argc, const char * argv[])
 {
+    const char *visual_every = getenv("SF2_VISUAL_EVERY");
+    if (visual_every != NULL && visual_every[0] != '\0') {
+        char *end = NULL;
+        unsigned long parsed = strtoul(visual_every, &end, 10);
+        if (*end != '\0') {
+            fprintf(stderr, "SF2_VISUAL_EVERY must be an unsigned integer\n");
+            return EXIT_FAILURE;
+        }
+        gVisualEvery = parsed;
+    }
+    {
+        const char *visual_dir = getenv("SF2_VISUAL_DIR");
+        if (visual_dir != NULL && visual_dir[0] != '\0') {
+            if (snprintf(gVisualDir, sizeof(gVisualDir), "%s", visual_dir) >= (int)sizeof(gVisualDir)) {
+                fprintf(stderr, "SF2_VISUAL_DIR is too long\n");
+                return EXIT_FAILURE;
+            }
+        }
+    }
+
     const char *max_frames = getenv("SF2_MAX_FRAMES");
     if (max_frames != NULL && max_frames[0] != '\0') {
         char *end = NULL;
@@ -426,7 +487,11 @@ int main (int argc, const char * argv[])
     glutInit(&argc, (char **)argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); 
     glutInitWindowPosition (300, 50);
-    glutInitWindowSize (900, 600);
+    if (gVisualEvery != 0) {
+        glutInitWindowSize (384, 224);
+    } else {
+        glutInitWindowSize (900, 600);
+    }
     gMainWindow = glutCreateWindow("sf2GL");
 
     init();					// standard GL init
