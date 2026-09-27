@@ -15,15 +15,19 @@ def load(path):
         return reader.fieldnames, rows
 
 
-def normalized(row, key):
+def normalized(row, key, source):
     value = row[key]
-    if key in {"p1_y", "p2_y"}:
+    if source == "mame" and key in {"p1_y", "p2_y"}:
         return str(int(value) << 16)
     return value
 
 
-def semantic(row, fields):
-    return tuple(normalized(row, key) for key in fields if key not in IGNORE)
+def semantic(row, fields, source):
+    return tuple(
+        normalized(row, key, source)
+        for key in fields
+        if key not in IGNORE
+    )
 
 
 mameFields, mameRows = load(sys.argv[1])
@@ -37,7 +41,7 @@ fields = mameFields
 portEvents = []
 previous = None
 for index, row in enumerate(portRows, 1):
-    current = semantic(row, fields)
+    current = semantic(row, fields, "port")
     if current != previous:
         portEvents.append((index, row, current))
         previous = current
@@ -72,7 +76,7 @@ if len(portEvents) != len(mameRows):
 
 for transitionIndex, mameRow in enumerate(mameRows, 1):
     _, portRow, portSemantic = portEvents[transitionIndex - 1]
-    mameSemantic = semantic(mameRow, fields)
+    mameSemantic = semantic(mameRow, fields, "mame")
 
     if mameSemantic != portSemantic:
         print(
@@ -84,8 +88,8 @@ for transitionIndex, mameRow in enumerate(mameRows, 1):
         for key in fields:
             if key in IGNORE:
                 continue
-            mameValue = normalized(mameRow, key)
-            portValue = normalized(portRow, key)
+            mameValue = normalized(mameRow, key, "mame")
+            portValue = normalized(portRow, key, "port")
             if mameValue != portValue:
                 print(
                     "FIELD_DIVERGENCE "
