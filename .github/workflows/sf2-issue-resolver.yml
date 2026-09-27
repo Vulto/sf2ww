@@ -38,6 +38,21 @@ jobs:
             Never compensate timestamps, weaken assertions/tolerances, shorten observation windows,
             replace ROM evidence, or change tests merely to obtain PASS.
             Document root cause and evidence. Do not create branches. The wrapper validates and commits.
+      - name: Materialize real ROM for resolver validation
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/Vulto/sf2wwrom.git .agent/private-rom
+          git -C .agent/private-rom sparse-checkout set sf2ua.zip
+          mkdir -p "$RUNNER_TEMP/sf2-lockstep-rom/roms"
+          cp .agent/private-rom/sf2ua.zip "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip"
+          printf '%s  %s\n' "385d7a21b8e983e6aabccaf0f6a12d55fd991f08defc7bbd837f592c48eee156" "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip" | sha256sum -c -
+          unzip -q -o "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip" -d "$RUNNER_TEMP/sf2-lockstep-rom/roms"
+          mkdir -p "$RUNNER_TEMP/sf2-lockstep-rom/roms/sf2ua"
+          find "$RUNNER_TEMP/sf2-lockstep-rom/roms" -type f ! -path "$RUNNER_TEMP/sf2-lockstep-rom/roms/sf2ua/*" -exec cp {} "$RUNNER_TEMP/sf2-lockstep-rom/roms/sf2ua/" \;
+          ./bin/prepare-rom.sh "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip"
+          cp allroms.bin "$RUNNER_TEMP/sf2-lockstep-rom/allroms.bin"
+          cp sf2gfx.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2gfx.bin"
+          chmod -R a-w "$RUNNER_TEMP/sf2-lockstep-rom"
       - name: Validate resolver work
         run: |
           set -euo pipefail
@@ -47,11 +62,21 @@ jobs:
           make clean && make -j2
           make semantic-test
           bash scripts/validate_golden_traces.sh
+      - name: Real MAME lockstep validation
+        uses: ./.github/actions/mame-lockstep
+        with:
+          rom-root: ${{ runner.temp }}/sf2-lockstep-rom
+          port-executable: ./glutBasics
+          mame-bin: mame
+          mame-set: sf2ua
+          deep-trace: "false"
       - name: Commit validated resolution
         run: |
           set -euo pipefail
           git config user.name sf2-resolver-agent
           git config user.email sf2-resolver-agent@users.noreply.github.com
+          git fetch origin main
+          git rebase origin/main
           find . -type f -name "*.d" -delete
           git add -A
           if git diff --cached --quiet; then exit 0; fi
