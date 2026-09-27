@@ -175,6 +175,11 @@ jobs:
         run: |
           set -euo pipefail
           git diff --check
+          rm -f mame_state.csv mame_exec_numeric.csv port_state.csv port_timing.csv
+          rm -f mame_exec_input.csv port_state_input.csv port_timing_input.csv
+          rm -f mame_exec_attract.csv port_state_attract.csv port_timing_attract.csv
+          rm -f visual_comparison.csv visual_modes.csv native_visual_objects.txt
+          rm -rf mame_visual native_visual
           if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
