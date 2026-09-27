@@ -1,0 +1,61 @@
+name: SF2 Issue Resolver
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number: {required: true, type: string}
+concurrency:
+  group: sf2-issue-resolver-main
+  cancel-in-progress: false
+permissions:
+  contents: write
+  issues: write
+  actions: write
+jobs:
+  resolve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - name: Read issue
+        env: {GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh issue view "${{ inputs.issue_number }}" --repo "$GITHUB_REPOSITORY" --comments > .agent_issue.md
+      - name: Resolution agent
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY || secrets.CODEX_OPENAI_API_KEY }}
+          permission-profile: ":workspace"
+          safety-strategy: drop-sudo
+          allow-users: "Vulto"
+          effort: high
+          prompt: |
+            You are Agent 3, Issue Resolver. Solve only the assigned evidence-backed issue.
+            Reproduce it first. Identify root cause, implement the smallest native correction,
+            add a deterministic regression, and validate against the real MAME oracle.
+            Never compensate timestamps, weaken assertions/tolerances, shorten observation windows,
+            replace ROM evidence, or change tests merely to obtain PASS.
+            Document root cause and evidence. Do not create branches. The wrapper validates and commits.
+      - name: Validate resolver work
+        run: |
+          set -euo pipefail
+          bash scripts/validate_test_oracle_integrity.sh
+          make clean && make -j2
+          make clean && make SANITIZE=1 -j2
+          make clean && make -j2
+          make semantic-test
+          bash scripts/validate_golden_traces.sh
+      - name: Commit validated resolution
+        run: |
+          set -euo pipefail
+          git config user.name sf2-resolver-agent
+          git config user.email sf2-resolver-agent@users.noreply.github.com
+          find . -type f -name "*.d" -delete
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "agent: resolve evidence-backed SF2 divergence"
+          git push origin HEAD:main
+      - name: Close resolved issue
+        env: {GH_TOKEN: ${{ github.token }}
+        run: gh issue close "${{ inputs.issue_number }}" --repo "$GITHUB_REPOSITORY" --comment "Validated resolution committed to main; issue closed by Agent 3."
