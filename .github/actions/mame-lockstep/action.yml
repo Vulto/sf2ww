@@ -110,6 +110,7 @@ runs:
         test -n "$(find native_visual -name 'frame_*.ppm' -print -quit)"
         echo "NATIVE_OBJECTS_AT_1380"
         cat native_visual_objects.txt
+        python3 scripts/validate_visual_anchors.py --mame-dir mame_visual --native-dir native_visual
         bash scripts/compare_mame_port_numeric.sh mame_exec_attract.csv port_state_attract.csv
         python3 scripts/compare_visual_frames.py \
           --mame-dir mame_visual \
