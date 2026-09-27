@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "reference": {
+    "primary": "jotego/jtcores cores/cps1 and cores/cps15",
+    "hardware": "CPS1/CPS1.5 JTCPS RTL",
+    "secondary": "MAME CPS1 implementation and private-ROM traces"
+  },
+  "domains": {
+    "cpu": [
+      "pc",
+      "sr",
+      "d0",
+      "d1",
+      "d2",
+      "d3",
+      "d4",
+      "d5",
+      "d6",
+      "d7",
+      "a0",
+      "a1",
+      "a2",
+      "a3",
+      "a4",
+      "a5",
+      "a6",
+      "a7",
+      "cycles"
+    ],
+    "bus": [
+      "address",
+      "read_write",
+      "data",
+      "wait_cycles",
+      "dtack"
+    ],
+    "video_registers": [
+      "obj_base",
+      "scroll1_base",
+      "scroll2_base",
+      "scroll3_base",
+      "row_scroll_base",
+      "palette_base",
+      "layer_control",
+      "prio0",
+      "prio1",
+      "prio2",
+      "prio3",
+      "palette_pages",
+      "game_id",
+      "gfx_bank_offset",
+      "gfx_bank_mask"
+    ],
+    "scroll": [
+      "x",
+      "y",
+      "tilemap_address",
+      "tile_code",
+      "hflip",
+      "vflip",
+      "palette",
+      "group"
+    ],
+    "dma": [
+      "task",
+      "vram_address",
+      "source_value",
+      "destination_bank",
+      "scanline",
+      "completion"
+    ],
+    "objects": [
+      "table_index",
+      "code",
+      "attributes",
+      "x",
+      "y",
+      "bank",
+      "size",
+      "flip",
+      "line_address",
+      "rom_address",
+      "priority"
+    ],
+    "colmix": [
+      "obj_pixel",
+      "scroll1_pixel",
+      "scroll2_pixel",
+      "scroll3_pixel",
+      "layer_enable",
+      "priority_masks",
+      "selected_layer",
+      "palette_entry"
+    ],
+    "timing": [
+      "frame",
+      "scanline",
+      "vblank",
+      "hblank",
+      "cpu_enable_count",
+      "cpu_cycles",
+      "dma_cycles"
+    ],
+    "audio": [
+      "main_cpu_write",
+      "command",
+      "data",
+      "logical_cycle",
+      "sample_address",
+      "audio_state"
+    ]
+  },
+  "normalization": {
+    "exact": true,
+    "representation_exceptions": [
+      "fixed_point_width",
+      "address_width"
+    ],
+    "host_wall_clock": "diagnostic_only"
+  },
+  "scenarios": [
+    {
+      "id": "boot",
+      "input": "none",
+      "checkpoint": "first_stable_game_loop"
+    },
+    {
+      "id": "attract_start",
+      "input": "none",
+      "checkpoint": "every_logical_frame"
+    },
+    {
+      "id": "attract_building",
+      "input": "none",
+      "checkpoint": "every_scroll2_dma_and_frame"
+    },
+    {
+      "id": "title_transition",
+      "input": "none",
+      "checkpoint": "every_state_transition"
+    },
+    {
+      "id": "character_select",
+      "input": "fixed_inputs",
+      "checkpoint": "every_state_transition"
+    },
+    {
+      "id": "stage_init_all",
+      "input": "fixed_selection_vectors",
+      "checkpoint": "stage_ready"
+    },
+    {
+      "id": "movement_primitives",
+      "input": "fixed_input_scripts",
+      "checkpoint": "every_frame"
+    },
+    {
+      "id": "attacks",
+      "input": "fixed_input_scripts",
+      "checkpoint": "every_action_transition"
+    },
+    {
+      "id": "specials_projectiles",
+      "input": "fixed_input_scripts",
+      "checkpoint": "every_action_transition"
+    },
+    {
+      "id": "throws",
+      "input": "fixed_input_scripts",
+      "checkpoint": "every_action_transition"
+    },
+    {
+      "id": "combat_resolution",
+      "input": "fixed_input_scripts",
+      "checkpoint": "every_hit_block_damage_event"
+    },
+    {
+      "id": "round_match",
+      "input": "fixed_input_scripts",
+      "checkpoint": "every_round_transition"
+    },
+    {
+      "id": "audio",
+      "input": "fixed_input_scripts",
+      "checkpoint": "every_sound_command"
+    },
+    {
+      "id": "long_soak",
+      "input": "fixed_input_scripts",
+      "checkpoint": "periodic_full_snapshot"
+    }
+  ],
+  "acceptance": {
+    "primary": "numeric_state_and_event_equivalence",
+    "framebuffer": "secondary",
+    "first_divergence_required": true,
+    "threshold_policy": "no_relaxation_without_hardware_evidence"
+  }
+}
