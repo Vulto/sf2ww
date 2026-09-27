@@ -1149,11 +1149,19 @@ void gamemode_24I (void) {		// 7970
 
 
 void task_initmachine (void) {		// 639e
-	static const u16 data_645e[3]={ 
+	static const u16 data_645e[3]={
+ 
 		SL04 | TXTLIBA_VERSION_JAP,
 		SL04 | TXTLIBA_VERSION_USA,
 		SL04 | TXTLIBA_VERSION_ETC,
 	};
+	/*
+	 * sf2ua spends 107 game ticks in the reset/black-screen interval before
+	 * the first task_initmachine state transition. The native event loop
+	 * starts after the hardware reset work has already been performed, so
+	 * reproduce that externally visible interval explicitly.
+	 */
+	sf2sleep(107);
 	fadenwait1();
 	while (TRUE) {
 		switch(g.mode0) {
