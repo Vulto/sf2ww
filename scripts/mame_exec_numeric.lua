@@ -61,11 +61,11 @@ local function elapsed_time_ns()
 end
 
 local function sample()
+    local elapsed_ns = elapsed_time_ns()
+    local cycles = emu.attotime.from_nsec(elapsed_ns):as_ticks(10000000)
     local current = vector()
     if current ~= previous then
         seq = seq + 1
-        local elapsed_ns = elapsed_time_ns()
-        local cycles = emu.attotime.from_nsec(elapsed_ns):as_ticks(10000000)
         out:write(seq .. "," .. elapsed_ns .. "," .. cycles .. "," .. current .. "\n")
         out:flush()
         previous = current
