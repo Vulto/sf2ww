@@ -15,6 +15,8 @@
 #include "sf2types.h"
 
 extern char *g_code_roms;
+extern char *g_sound_roms;
+extern char *g_sample_roms;
 
 struct fistblue_tile_plane {
     int y1;
