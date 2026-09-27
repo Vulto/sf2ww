@@ -68,7 +68,10 @@ jobs:
           rm -f agent_smoke.csv agent_timing.csv allroms.bin sf2gfx.bin
 
       - name: Validate comparator timing
-        run: bash scripts/test_compare_state_csv.sh
+        run: |
+          bash scripts/test_compare_state_csv.sh
+          bash tests/test_compare_semantic_frames.sh
+          bash tests/test_compare_sound_events.sh
 
       - name: Validate golden traces
         run: bash scripts/validate_golden_traces.sh
