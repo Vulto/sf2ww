@@ -94,7 +94,7 @@ OBJECTS := $(SOURCES:.c=.o)
 DEPFILES := $(OBJECTS:.o=.d)
 INCLUDES := -I. -ISiennaBird -IRedHammer -IFistBlue -IFistBlue/ai -IFistBlue/actions -IFistBlue/avatars -IFistBlue/gfxdata -IFistBlue/scrolls -IFistBlue/tests -ISwiftBeam
 
-.PHONY: all clean test sanitize
+.PHONY: all clean test sanitize semantic-test
 
 all: $(TARGET)
 
