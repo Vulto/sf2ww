@@ -6,7 +6,7 @@ inputs:
     required: false
     default: "false"
   rom-root:
-    description: Private fixture root containing roms/, allroms.bin and sf2gfx.bin.
+    description: Private fixture root containing roms/, allroms.bin, sf2gfx.bin and CPS sound ROMs.
     required: true
   port-executable:
     description: Native port executable path.
@@ -33,6 +33,9 @@ runs:
         test -n "$(find "$ROM_ROOT/roms/sf2ua" -type f -print -quit)"
         test -f "$ROM_ROOT/allroms.bin"
         test -f "$ROM_ROOT/sf2gfx.bin"
+        test -f "$ROM_ROOT/sf2_09.bin"
+        test -f "$ROM_ROOT/sf2_18.bin"
+        test -f "$ROM_ROOT/sf2_19.bin"
 
     - name: Install Python test dependencies
       shell: bash
@@ -75,11 +78,12 @@ runs:
         SF2_REVERSE_TRACE_INSTRUCTIONS: 0
       run: |
         set -euo pipefail
-        rm -f reverse_frames.csv reverse_memory_reads.csv reverse_memory_writes.csv reverse_ram_changes.csv reverse_memory_map.csv reverse_manifest.csv reverse_registers.csv reverse_audiocpu_reads.csv reverse_audiocpu_writes.csv reverse_sound_commands.csv reverse_68000.tr reverse_z80.tr
+        rm -f reverse_frames.csv reverse_memory_reads.csv reverse_memory_writes.csv reverse_ram_changes.csv reverse_memory_map.csv reverse_manifest.csv reverse_registers.csv reverse_audiocpu_reads.csv reverse_audiocpu_writes.csv reverse_sound_commands.csv reverse_audio_chip_writes.csv reverse_68000.tr reverse_z80.tr
         xvfb-run -a bash scripts/run_mame_reverse_trace.sh
         test -s reverse_sound_commands.csv
         test -s reverse_audiocpu_reads.csv
         test -s reverse_audiocpu_writes.csv
+        test -s reverse_audio_chip_writes.csv
     - name: Run native port probes
       shell: bash
       env:
@@ -89,6 +93,9 @@ runs:
         set -euo pipefail
         cp "$ROM_ROOT/allroms.bin" allroms.bin
         cp "$ROM_ROOT/sf2gfx.bin" sf2gfx.bin
+        cp "$ROM_ROOT/sf2_09.bin" sf2_09.bin
+        cp "$ROM_ROOT/sf2_18.bin" sf2_18.bin
+        cp "$ROM_ROOT/sf2_19.bin" sf2_19.bin
         set +e
         SF2_MAX_FRAMES=900 SF2_STATE_LOG=port_state.csv SF2_TIMING_LOG=port_timing.csv timeout 30s xvfb-run -a "$PORT_EXECUTABLE" </dev/null
         status=$?
@@ -174,6 +181,7 @@ runs:
           mame_exec_attract.csv
           reverse_audiocpu_reads.csv
           reverse_sound_commands.csv
+          reverse_audio_chip_writes.csv
           reverse_frames.csv
           reverse_memory_reads.csv
           reverse_memory_writes.csv
