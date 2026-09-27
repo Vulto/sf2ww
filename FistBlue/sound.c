@@ -48,22 +48,19 @@ static void soundTraceOpen(void) {
 }
 
 static void soundTraceEvent(const char *event, int data) {
-	struct timespec value;
+	unsigned long long arcade_time_ns = (unsigned long long)g.tick * 16768000ULL;
+	unsigned long long arcade_cpu_cycles = (unsigned long long)g.tick * 167680ULL;
 	soundTraceOpen();
 	if (soundTrace == NULL) return;
-	clock_gettime(CLOCK_MONOTONIC, &value);
-	fprintf(soundTrace, "%u,%llu,%s,%d,%u\n",
-		(unsigned)(++soundTraceSequence),
-		(unsigned long long)value.tv_sec * 1000000000ull + (unsigned long long)value.tv_nsec,
+	fprintf(soundTrace, "%u,%llu,%llu,%s,%d,%u\\n",
+		(unsigned)(++soundTraceSequence), arcade_time_ns, arcade_cpu_cycles,
 		event, data, (unsigned)g.tick);
 	fflush(soundTrace);
 }
 
-
-
 void sound_cq_addto(short data) {	/* 62ac */
 	soundTraceEvent("command", data);
-	/* sound backend is implemented separately from the original command protocol. */
+	soundBackendEnqueue((unsigned short)data);
 }
 
 void sound_cq_1(short data) {	/* 629a */
@@ -93,7 +90,7 @@ void quirkysound(short data) {		// 6300
 }
 void queuesound(int data) {			// 62f2
 	soundTraceEvent("queue", data);
-	/* audio backend consumes the command stream. */
+	soundBackendEnqueue((unsigned short)data);
 }
 void setstagemusic(void) {
 	sound_cq_1( (u16 []){1,2,3,5,4,6,7,8,12,11,9,10,13,13,13}[g.CurrentStage] );
@@ -103,4 +100,13 @@ void setstagemusic(void) {
 void sound_cq_f7_ff(void) {
 	soundTraceEvent("f7ff", 0xf7ff);
 	soundBackendEnqueue(0xf7ffu);
+}
+
+void sound_tick(void) {
+	unsigned short data;
+	if (soundBackendCount == 0) return;
+	data = soundBackendQueue[soundBackendRead];
+	soundBackendRead = (soundBackendRead + 1u) % SOUND_BACKEND_QUEUE_LENGTH;
+	--soundBackendCount;
+	soundTraceEvent("drain", (int)data);
 }
