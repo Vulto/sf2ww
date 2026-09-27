@@ -75,7 +75,7 @@ end
 findInputFields()
 
 local P2 = 0xff86c6
-local BASE = 0xff0000
+local BASE = 0xff8000
 
 local function state_value(name)
     local entry = state[name]
