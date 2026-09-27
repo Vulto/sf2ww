@@ -11,12 +11,15 @@ local MAX_FRAMES = tonumber(os.getenv("SF2_VISUAL_MAX_FRAMES") or "12000")
 
 local frame = 0
 local last_mode = -1
+local mode_file = assert(io.open("visual_modes.csv", "w"))
+mode_file:write("frame,game_mode\n")
 
 local function sample()
     frame = frame + 1
     local mode = machine.devices[":maincpu"].spaces["program"]:read_u16(0xff0000)
     if mode ~= last_mode then
-        print(string.format("ATTRACT_MODE frame=%d mode=%d", frame, mode))
+        mode_file:write(string.format("%d,%d\\n", frame, mode))
+        mode_file:flush()
         last_mode = mode
     end
     if EVERY > 0 and (frame % EVERY) == 0 then
@@ -29,6 +32,7 @@ local function sample()
         end
     end
     if frame >= MAX_FRAMES then
+        mode_file:close()
         machine:exit()
     end
 end
