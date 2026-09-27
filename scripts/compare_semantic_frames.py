@@ -75,11 +75,25 @@ if len(portEvents) != len(mameRows):
     if len(portEvents) > len(mameRows):
         extraIndex = len(mameRows)
         extraRow = portEvents[extraIndex][1]
+        previousRow = portEvents[extraIndex - 1][1] if extraIndex > 0 else None
         print(
             "UNEXPECTED_EXTRA_PORT_TRANSITION "
             f"transition={extraIndex + 1} "
             f"port_time_ns={extraRow.get('arcade_time_ns', '?')}"
         )
+        if previousRow is not None:
+            print(
+                "LAST_MATCHING_TRANSITION "
+                f"transition={extraIndex} "
+                f"port_time_ns={previousRow.get('arcade_time_ns', '?')}"
+            )
+            for key in fields:
+                if key in IGNORE:
+                    continue
+                print(
+                    "EXTRA_PORT_FIELD "
+                    f"field={key} value={extraRow.get(key, '?')}"
+                )
     else:
         missingIndex = len(portEvents)
         missingRow = mameRows[missingIndex]
