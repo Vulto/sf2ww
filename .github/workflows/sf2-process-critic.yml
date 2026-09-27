@@ -47,5 +47,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ -s .agent/critic/recommendation.md ]; then
-            gh issue create --repo "$GITHUB_REPOSITORY" --title "Process critique: autonomous pipeline improvement" --body-file .agent/critic/recommendation.md
+            issue_url=$(gh issue create --repo "$GITHUB_REPOSITORY" --title "Process critique: autonomous pipeline improvement" --body-file .agent/critic/recommendation.md)
+            issue_number=$(basename "$issue_url")
+            gh workflow run sf2-issue-resolver.yml --repo "$GITHUB_REPOSITORY" --ref main -f issue_number="$issue_number"
           fi
