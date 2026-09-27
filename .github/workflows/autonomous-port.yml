@@ -209,6 +209,27 @@ jobs:
           set -euo pipefail
           git config user.name "sf2-autonomous-agent"
           git config user.email "sf2-autonomous-agent@users.noreply.github.com"
+
+          # Without the private original ROM, gameplay changes have no arcade oracle.
+          # Only validation infrastructure and documentation may advance in that mode.
+          if [ ! -d .agent/rom ]; then
+            invalid=0
+            while IFS= read -r path; do
+              case "$path" in
+                .github/*|scripts/*|docs/*|AGENTS.md|README.md|.gitignore|Makefile)
+                  ;;
+                *)
+                  echo "UNVALIDATED_GAMEPLAY_CHANGE_WITHOUT_ROM: $path" >&2
+                  invalid=1
+                  ;;
+              esac
+            done < <(git diff --name-only && git ls-files --others --exclude-standard)
+            if [ "$invalid" -ne 0 ]; then
+              echo "Real MAME ROM fixture is required before gameplay changes can enter main." >&2
+              exit 1
+            fi
+          fi
+
           # Dependency files are generated build artifacts and must never enter main.
           find . -type f -name "*.d" -delete
           git add -A
