@@ -26,18 +26,17 @@ jobs:
           sudo apt-get install -y build-essential freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev xvfb mame mame-tools git unzip jq
           make clean
           make -j2
-      - name: Materialize original private ROM
-        env:
-          SF2_ROM_REPO_TOKEN: ${{ secrets.SF2_ROM_REPO_TOKEN }}
-        run: |
-          set -euo pipefail
-          rm -rf .agent/private-rom
-          mkdir -p .agent/private-rom
-          test -n "$SF2_ROM_REPO_TOKEN"
-          curl --fail --location --retry 3 --silent --show-error \
-            -H "Authorization: Bearer $SF2_ROM_REPO_TOKEN" \
-            "https://raw.githubusercontent.com/Vulto/sf2wwrom/main/sf2ua.zip" \
-            -o .agent/private-rom/sf2ua.zip
+      - name: Checkout original private ROM
+        uses: actions/checkout@v4
+        with:
+          repository: Vulto/sf2wwrom
+          ref: main
+          token: ${{ secrets.SF2WWROM_TOKEN }}
+          path: .agent/private-rom
+          sparse-checkout: |
+            sf2ua.zip
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
       - name: Verify original private ROM
         run: |
           set -euo pipefail
