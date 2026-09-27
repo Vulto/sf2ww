@@ -58,7 +58,6 @@ jobs:
           test -s .agent/rom/allroms.bin
           test -s .agent/rom/sf2gfx.bin
           test -d .agent/rom/roms
-          sha256sum .agent/rom/rom.zip 2>/dev/null || true
           mame -listxml sf2ua >/dev/null
 
       - name: Build native port
