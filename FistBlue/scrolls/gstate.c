@@ -230,7 +230,7 @@ static void gstate_update_scroll2 (ScrollState *gs) {
     CP cp;
 
     g.CPS.Scroll2X = gs->position.x.part.integer;
-    g.CPS.Scroll2Y = gs->position.x.part.integer;
+    g.CPS.Scroll2Y = gs->position.y.part.integer;
     	
     temp = gs->position.x.part.integer & 0x10;
     temp ^= gs->x001e;
