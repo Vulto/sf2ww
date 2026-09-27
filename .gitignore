@@ -42,3 +42,6 @@ build-sanitize/
 .agent/reference/
 .agent/rom/
 *.d
+
+# Private original ROM fixture must never enter the repository
+.agent/private-rom/
