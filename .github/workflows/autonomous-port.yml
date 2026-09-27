@@ -174,7 +174,15 @@ jobs:
         id: changes
         run: |
           set -euo pipefail
+          set +e
           git diff --check
+          diff_status=$?
+          set -e
+          if [ "$diff_status" -ne 0 ]; then
+            echo "::error::git diff --check failed; refusing to classify workspace changes."
+            git diff --check || true
+            exit "$diff_status"
+          fi
           rm -f mame_state.csv mame_exec_numeric.csv port_state.csv port_timing.csv
           rm -f mame_exec_input.csv port_state_input.csv port_timing_input.csv
           rm -f mame_exec_attract.csv port_state_attract.csv port_timing_attract.csv
