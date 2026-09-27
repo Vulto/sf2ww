@@ -47,7 +47,7 @@ out:write("arcade_time_ns,arcade_cpu_cycles,pc,sr,d0,d1,d2,d3,d4,d5,d6,d7,a0,a1,
 local previous = nil
 local seq = 0
 local frame = 0
-local MAX_FRAMES = tonumber(os.getenv("SF2_NUMERIC_MAX_FRAMES") or "900")
+local MAX_FRAMES = tonumber(os.getenv("SF2_NUMERIC_MAX_FRAMES") or "12000")
 local base_seconds = nil
 local base_nsec = nil
 
@@ -71,7 +71,7 @@ local function sample()
         out:flush()
         previous = current
     end
-    if frame >= MAX_FRAMES or seq >= 1000 then
+    if frame >= MAX_FRAMES then
         out:close()
         machine:exit()
     end
