@@ -30,6 +30,7 @@ local manifestOut = open_file("reverse_manifest.csv")
 local audioReadOut = open_file("reverse_audiocpu_reads.csv")
 local audioWriteOut = open_file("reverse_audiocpu_writes.csv")
 local registersOut = open_file("reverse_registers.csv")
+local soundCommandOut = open_file("reverse_sound_commands.csv")
 
 frameOut:write("frame,arcade_time_ns,arcade_cpu_cycles,pc,sr,d0,d1,d2,d3,d4,d5,d6,d7,a0,a1,a2,a3,a4,a5,a6,a7,game_mode,game_tick,stage,round_cnt,time_bcd,time_ticks,fight_over,rng1,rng2\n")
 readOut:write("seq,arcade_time_ns,arcade_cpu_cycles,pc,sr,address,data,mem_mask\n")
@@ -40,6 +41,7 @@ ramOut:write("frame,arcade_time_ns,arcade_cpu_cycles,address,value\n")
 mapOut:write("kind,owner,space,address_start,address_end,mirror,mask,cswidth,lane_mask,handler_type,handler_name,tag,region,region_offset\n")
 manifestOut:write("key,value\n")
 registersOut:write("frame,arcade_time_ns,arcade_cpu_cycles,name,value\n")
+soundCommandOut:write("seq,arcade_time_ns,arcade_cpu_cycles,pc,sr,address,data,mem_mask\n")
 
 local function state_value(name)
     local entry = state[name]
@@ -64,6 +66,7 @@ end
 
 local audioReadSeq = 0
 local audioWriteSeq = 0
+local soundCommandSeq = 0
 local function writeMemoryMap()
     local entries = mem.map and mem.map.entries
     if entries ~= nil then
@@ -164,6 +167,12 @@ end)
 
 writeMemoryMap()
 
+mem:install_write_tap(0x800180, 0x800181, "sf2ww_reverse_sound_command", function(offset, data, memMask)
+    soundCommandSeq = soundCommandSeq + 1
+    soundCommandOut:write(string.format("%u,%u,%u,%u,%u,%u,%u,%u\n", soundCommandSeq, elapsed_time_ns(), cpu_cycles(), state_value("CURPC"), state_value("CURFLAGS"), offset, data, memMask))
+    soundCommandOut:flush()
+end)
+
 manifestOut:write(string.format("system,%s\n", machine.system.name))
 manifestOut:write(string.format("driver,%s\n", machine.system.description))
 manifestOut:write(string.format("maincpu_clock_hz,%d\n", CPU_HZ))
@@ -245,6 +254,7 @@ local function sample()
         mapOut:close()
         manifestOut:close()
         registersOut:close()
+        soundCommandOut:close()
         audioReadOut:close()
         audioWriteOut:close()
         machine:exit()
