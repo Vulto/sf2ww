@@ -334,7 +334,13 @@ static void log_state_frame(void) {
             (unsigned)g.Player2.AnimFlags,
             g.Player2.Energy,
             g.Player2.Move,
-            g.Player2.StandSquat);
+            g.Player2.StandSquat,
+            g.CPS.Scroll1X,
+            g.CPS.Scroll1Y,
+            g.CPS.Scroll2X,
+            g.CPS.Scroll2Y,
+            g.CPS.Scroll3X,
+            g.CPS.Scroll3Y);
     fflush(gStateLog);
 }
 
