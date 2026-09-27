@@ -28,7 +28,7 @@ jobs:
           repository: Vulto/sf2wwrom
           ref: ${{ github.ref_name }}
           path: .agent/private-rom
-          token: ${{ secrets.SF2WWROM_TOKEN }}
+          token: ${{ secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN }}
           fetch-depth: 1
 
       - name: Install toolchain and MAME
