@@ -47,4 +47,4 @@ NR==1 {
 }
 ' out="$tmp/port.csv" "$port"
 
-bash scripts/compare_state_csv.sh "$tmp/mame.csv" "$tmp/port.csv"
+python3 scripts/compare_semantic_frames.py "$tmp/mame.csv" "$tmp/port.csv"
