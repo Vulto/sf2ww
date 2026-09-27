@@ -144,13 +144,9 @@ static void sub_6704(void) {		// SF2 logo, spinning and scaling
 		obj->Scroll = SCROLL_3;
 		obj->XPI    = (SCREEN_WIDTH / 2);
 		obj->YPI    = 1956;
-		/*
-		 * The original sf2ua attract ROM leaves randSeed1/2 unchanged
-		 * throughout the title/logo sequence.  SubSel is therefore not
-		 * selected through sf2rand() here; doing so advances the game RNG
-		 * ~235 ms after boot and creates a real lockstep divergence.
-		 */
-		obj->SubSel = 2;
+		obj->SubSel = (char []) {
+			1,2,1,2,2,1,2,1,1,2,1,2,2,1,2,1
+		}[RAND16];
 	}
 }
 
