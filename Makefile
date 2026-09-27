@@ -110,6 +110,7 @@ test: $(TARGET) semantic-test
 
 semantic-test:
 	bash tests/test_compare_semantic_frames.sh
+	bash tests/test_compare_sound_events.sh
 
 sanitize:
 	$(MAKE) clean
