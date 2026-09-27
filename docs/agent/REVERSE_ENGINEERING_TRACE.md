@@ -15,6 +15,8 @@ It records:
 - `reverse_frames.csv`: frame timing, CPU timing, primary game-state values and state-machine mode;
 - `reverse_ram_changes.csv`: every byte changed in the 64 KiB main RAM between frame boundaries;
 - `reverse_memory_map.csv`: address-map entries, regions, shares and banks;
+- `reverse_audio_chip_writes.csv`: every Z80 write to the CPS YM2151, OKIM6295, sound-bank and OKI-pin control addresses with exact machine time and Z80 PC;
+- `reverse_sound_commands.csv`: main-CPU sound-latch writes;
 - `reverse_manifest.csv`: provenance and instrumentation configuration.
 
 The memory access records include the access address, data, mask, PC and arcade timing.
