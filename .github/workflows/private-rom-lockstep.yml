@@ -46,6 +46,9 @@ jobs:
           romZip="$(find .agent/private-rom -type f -name 'sf2ua.zip' -print -quit)"
           test -n "$romZip"
           cp "$romZip" .agent/rom/rom.zip
+          printf '%s  %s\n' \
+            "385d7a21b8e983e6aabccaf0f6a12d55fd991f08defc7bbd837f592c48eee156" \
+            ".agent/rom/rom.zip" | sha256sum -c -
           unzip -q -o .agent/rom/rom.zip -d .agent/rom/roms
           rm -f allroms.bin sf2gfx.bin
           ./bin/prepare-rom.sh .agent/rom/rom.zip
@@ -55,6 +58,8 @@ jobs:
           test -s .agent/rom/allroms.bin
           test -s .agent/rom/sf2gfx.bin
           test -d .agent/rom/roms
+          sha256sum .agent/rom/rom.zip 2>/dev/null || true
+          mame -listxml sf2ua >/dev/null
 
       - name: Build native port
         run: |
