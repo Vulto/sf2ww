@@ -72,7 +72,7 @@ runs:
         test -s port_state_input.csv
         test -s port_timing_input.csv
 
-    - name: Visual lockstep: MAME attract mode versus native framebuffer
+    - name: "Visual lockstep: MAME attract mode versus native framebuffer"
       shell: bash
       env:
         SF2_MAME_ROMPATH: ${{ inputs.rom-root }}/roms
