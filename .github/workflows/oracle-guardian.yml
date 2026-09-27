@@ -39,6 +39,8 @@ jobs:
         run: |
           set -euo pipefail
           test -s .agent/private-rom/sf2ua.zip
+          printf '%s  %s\n' "385d7a21b8e983e6aabccaf0f6a12d55fd991f08defc7bbd837f592c48eee156" .agent/private-rom/sf2ua.zip | sha256sum -c -
+          chmod -R a-w .agent/private-rom
           mkdir -p "$RUNNER_TEMP/sf2-rom/roms"
           cp .agent/private-rom/sf2ua.zip "$RUNNER_TEMP/sf2-rom/rom.zip"
           printf '%s  %s\n' "385d7a21b8e983e6aabccaf0f6a12d55fd991f08defc7bbd837f592c48eee156" "$RUNNER_TEMP/sf2-rom/rom.zip" | sha256sum -c -
