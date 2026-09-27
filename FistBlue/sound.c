@@ -27,6 +27,8 @@ static unsigned soundBackendRead;
 static unsigned soundBackendWrite;
 static unsigned soundBackendCount;
 
+static void soundTraceEvent(const char *event, int data);
+
 static void soundBackendEnqueue(unsigned short data) {
 	if (soundBackendCount == SOUND_BACKEND_QUEUE_LENGTH) {
 		soundTraceEvent("overflow", data);
