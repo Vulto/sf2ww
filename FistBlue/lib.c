@@ -489,7 +489,7 @@ static void sub_b06(void) {
 }
 	
 static void soundhook(void) {
-	/* todo: empty a word from soundqueue to sound system */
+    sound_tick();
 }
 
 
