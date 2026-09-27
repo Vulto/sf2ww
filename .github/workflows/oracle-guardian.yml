@@ -52,6 +52,9 @@ jobs:
           ./bin/prepare-rom.sh "$RUNNER_TEMP/sf2-rom/rom.zip"
           cp allroms.bin "$RUNNER_TEMP/sf2-rom/allroms.bin"
           cp sf2gfx.bin "$RUNNER_TEMP/sf2-rom/sf2gfx.bin"
+          cp sf2_09.bin "$RUNNER_TEMP/sf2-rom/sf2_09.bin"
+          cp sf2_18.bin "$RUNNER_TEMP/sf2-rom/sf2_18.bin"
+          cp sf2_19.bin "$RUNNER_TEMP/sf2-rom/sf2_19.bin"
           mame -rompath "$RUNNER_TEMP/sf2-rom/roms" -verifyroms sf2ua
       - name: Collect oracle evidence
         env:
