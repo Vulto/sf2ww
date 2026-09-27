@@ -304,7 +304,7 @@ static void log_state_frame(void) {
     fprintf(gStateLog,
             "%lu,%llu,%llu,%u,%u,%u,%u,%u,%u,%u,%u,%u,"
             "%d,%d,%d,%d,%d,%u,%d,%d,%d,"
-            "%d,%d,%d,%d,%d,%u,%d,%d,%d\n",
+            "%d,%d,%d,%d,%d,%u,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
             gStateFrame,
             (unsigned long long)((gStateFrame - 1u) * 16768000ULL),
             (unsigned long long)((gStateFrame - 1u) * 167680ULL),
