@@ -44,16 +44,29 @@ local function vector()
 end
 
 local out = assert(io.open("mame_exec_numeric.csv", "w"))
-out:write("seq,pc,d0,d1,a0,a1,p1_x,p1_y,p1_mode0,p1_mode1,p1_mode2,p1_anim,p1_energy,p1_move,p1_stand_squat,p2_x,p2_y,p2_mode0,p2_mode1,p2_mode2,p2_anim,p2_energy,p2_move,p2_stand_squat,stage,round_cnt,fight_over,rng1,rng2\n")
+out:write("seq,arcade_time_ns,arcade_cpu_cycles,pc,d0,d1,a0,a1,p1_x,p1_y,p1_mode0,p1_mode1,p1_mode2,p1_anim,p1_energy,p1_move,p1_stand_squat,p2_x,p2_y,p2_mode0,p2_mode1,p2_mode2,p2_anim,p2_energy,p2_move,p2_stand_squat,stage,round_cnt,fight_over,rng1,rng2\n")
 
 local previous = nil
 local seq = 0
+local base_seconds = nil
+local base_nsec = nil
+
+local function elapsed_time_ns()
+    local t = machine.time
+    if base_seconds == nil then
+        base_seconds = t.seconds
+        base_nsec = t.nsec
+    end
+    return (t.seconds - base_seconds) * 1000000000 + (t.nsec - base_nsec)
+end
 
 local function sample()
     local current = vector()
     if current ~= previous then
         seq = seq + 1
-        out:write(seq .. "," .. current .. "\n")
+        local elapsed_ns = elapsed_time_ns()
+        local cycles = emu.attotime.from_nsec(elapsed_ns):as_ticks(10000000)
+        out:write(seq .. "," .. elapsed_ns .. "," .. cycles .. "," .. current .. "\n")
         out:flush()
         previous = current
     end
