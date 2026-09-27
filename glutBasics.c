@@ -271,6 +271,46 @@ static long timespec_diff_ns(const struct timespec *end, const struct timespec *
            (end->tv_nsec - start->tv_nsec);
 }
 
+static void apply_lockstep_input(unsigned long frame) {
+    if (getenv("SF2_INPUT_TEST") == NULL) {
+        return;
+    }
+
+    gInputs.p10 = 0;
+    gInputs.p11 = 0;
+    gInputs.in0 = 0;
+
+    if (frame >= 30 && frame < 36) {
+        gInputs.in0 |= IPT_COIN1;
+    } else if (frame >= 90 && frame < 96) {
+        gInputs.in0 |= IPT_START1;
+    }
+
+    if (frame >= 120 && frame < 180) {
+        gInputs.p10 |= JOY_RIGHT;
+    } else if (frame >= 180 && frame < 240) {
+        gInputs.p10 |= JOY_LEFT;
+    } else if (frame >= 240 && frame < 300) {
+        gInputs.p10 |= JOY_DOWN;
+    } else if (frame >= 300 && frame < 360) {
+        gInputs.p10 |= JOY_UP;
+    }
+
+    if (frame >= 120 && frame < 126) {
+        gInputs.p10 |= BUTTON_A;
+    } else if (frame >= 200 && frame < 206) {
+        gInputs.p10 |= BUTTON_B;
+    } else if (frame >= 280 && frame < 286) {
+        gInputs.p10 |= BUTTON_C;
+    } else if (frame >= 360 && frame < 366) {
+        gInputs.p11 |= BUTTON_D >> 8;
+    } else if (frame >= 440 && frame < 446) {
+        gInputs.p11 |= BUTTON_E >> 8;
+    } else if (frame >= 520 && frame < 526) {
+        gInputs.p11 |= BUTTON_F >> 8;
+    }
+}
+
 void timerFunc(int value) {
     (void)value;
     struct timespec now;
@@ -292,6 +332,7 @@ void timerFunc(int value) {
 
     logic_start = now;
     ++gStateFrame;
+    apply_lockstep_input(gStateFrame);
     task_timer();
 
     if (clock_gettime(CLOCK_MONOTONIC, &logic_end) != 0) {
