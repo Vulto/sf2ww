@@ -54,6 +54,7 @@ static struct timespec gNextFrame;
 static FILE *gStateLog;
 static FILE *gTimingLog;
 static unsigned long gStateFrame;
+static unsigned long gMaxFrames;
 
 typedef struct {
    GLdouble x,y,z;
@@ -312,6 +313,18 @@ void timerFunc(int value) {
 
     glutPostRedisplay();
 
+    if (gMaxFrames != 0 && gStateFrame >= gMaxFrames) {
+        if (gStateLog != NULL) {
+            fclose(gStateLog);
+            gStateLog = NULL;
+        }
+        if (gTimingLog != NULL) {
+            fclose(gTimingLog);
+            gTimingLog = NULL;
+        }
+        exit(EXIT_SUCCESS);
+    }
+
     now = logic_end;
     do {
         gNextFrame.tv_nsec += CPS_FRAME_NS;
@@ -330,6 +343,17 @@ void timerFunc(int value) {
 }
 int main (int argc, const char * argv[])
 {
+    const char *max_frames = getenv("SF2_MAX_FRAMES");
+    if (max_frames != NULL && max_frames[0] != '\0') {
+        char *end = NULL;
+        unsigned long parsed = strtoul(max_frames, &end, 10);
+        if (*end != '\0') {
+            fprintf(stderr, "SF2_MAX_FRAMES must be an unsigned integer\n");
+            return EXIT_FAILURE;
+        }
+        gMaxFrames = parsed;
+    }
+
     load_cps_roms();
 
     {

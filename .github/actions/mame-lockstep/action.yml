@@ -52,10 +52,10 @@ runs:
         cp "$ROM_ROOT/allroms.bin" allroms.bin
         cp "$ROM_ROOT/sf2gfx.bin" sf2gfx.bin
         set +e
-        SF2_STATE_LOG=port_state.csv SF2_TIMING_LOG=port_timing.csv timeout 30s xvfb-run -a "$PORT_EXECUTABLE" </dev/null
+        SF2_MAX_FRAMES=900 SF2_STATE_LOG=port_state.csv SF2_TIMING_LOG=port_timing.csv timeout 30s xvfb-run -a "$PORT_EXECUTABLE" </dev/null
         status=$?
         set -e
-        if [ "$status" -ne 124 ]; then
+        if [ "$status" -ne 0 ]; then
           exit "$status"
         fi
         test -s port_state.csv
