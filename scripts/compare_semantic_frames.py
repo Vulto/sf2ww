@@ -33,6 +33,11 @@ def semantic(row, fields, source):
 mameFields, mameRows = load(sys.argv[1])
 portFields, portRows = load(sys.argv[2])
 
+if not mameFields:
+    raise SystemExit("MAME_HEADER_EMPTY")
+if not portFields:
+    raise SystemExit("PORT_HEADER_EMPTY")
+
 if mameFields != portFields and not set(mameFields).issubset(portFields):
     raise SystemExit(f"HEADER_MISMATCH mame={mameFields} port={portFields}")
 
@@ -48,6 +53,17 @@ for index, row in enumerate(portRows, 1):
 
 if not mameRows:
     raise SystemExit("MAME_TRACE_EMPTY")
+
+for source, rows in (("mame", mameRows), ("port", portRows)):
+    for rowIndex, row in enumerate(rows, 2):
+        for field in ("arcade_time_ns", "arcade_cpu_cycles"):
+            try:
+                int(row[field])
+            except (KeyError, TypeError, ValueError):
+                raise SystemExit(
+                    f"INVALID_ARCADE_TIME source={source} row={rowIndex} field={field} value={row.get(field, '?')}"
+                )
+
 if not portEvents:
     raise SystemExit("PORT_TRACE_HAS_NO_SEMANTIC_TRANSITIONS")
 
