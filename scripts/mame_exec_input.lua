@@ -19,7 +19,7 @@ local inputTokens = {
 local function findInputFields()
     for _, port in pairs(ioport.ports) do
         for _, field in pairs(port.fields) do
-            local token = field.type.token
+            local token = ioport:input_type_to_token(field.type, field.player)
             for _, wanted in ipairs(inputTokens) do
                 if token == wanted then
                     inputFields[wanted] = field
