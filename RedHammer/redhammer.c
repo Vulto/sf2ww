@@ -22,6 +22,7 @@
 
 char *g_code_roms = 0;
 char *g_sound_roms = 0;
+char *g_sample_roms = 0;
 char *g_gfx_roms = 0;
 
 /** use the combined 'allroms.bin' instead of separate hi/lo ROMs */
@@ -48,6 +49,8 @@ const char *code_rom_names[] = {
 #define ROM_PAIR_SIZE (CODE_ROM_SIZE * 2)
 /** the size of all the game's code ROMs, in bytes */
 #define ALL_CODE_SIZE (CODE_ROM_SIZE * 8)
+#define SOUND_ROM_SIZE 0x08000
+#define SAMPLE_ROM_SIZE 0x40000
 
 const char *gfx_rom_names[] = {
     "sf2_06.bin",
@@ -117,8 +120,50 @@ void load_cps_roms()
         puts("Can't allocate memory!");
         exit(EXIT_FAILURE);
     }
-}
 
+    if ((g_sound_roms = malloc(SOUND_ROM_SIZE)) == NULL) {
+        puts("Can't allocate sound ROM memory!");
+        exit(EXIT_FAILURE);
+    }
+    {
+        FILE *soundrom = fopen("sf2_09.bin", "rb");
+        if (soundrom == NULL) {
+            puts("Can't open sf2_09.bin");
+            exit(EXIT_FAILURE);
+        }
+        if (fread(g_sound_roms, 1, SOUND_ROM_SIZE, soundrom) != SOUND_ROM_SIZE) {
+            fprintf(stderr, "Invalid sf2_09.bin: expected %u bytes\\n", (unsigned)SOUND_ROM_SIZE);
+            fclose(soundrom);
+            exit(EXIT_FAILURE);
+        }
+        fclose(soundrom);
+    }
+
+    if ((g_sample_roms = malloc(SAMPLE_ROM_SIZE)) == NULL) {
+        puts("Can't allocate sample ROM memory!");
+        exit(EXIT_FAILURE);
+    }
+    {
+        FILE *sample18 = fopen("sf2_18.bin", "rb");
+        FILE *sample19 = fopen("sf2_19.bin", "rb");
+        if (sample18 == NULL || sample19 == NULL) {
+            puts("Can't open sf2_18.bin or sf2_19.bin");
+            if (sample18 != NULL) fclose(sample18);
+            if (sample19 != NULL) fclose(sample19);
+            exit(EXIT_FAILURE);
+        }
+        if (fread(g_sample_roms, 1, 0x20000, sample18) != 0x20000 ||
+            fread(g_sample_roms + 0x20000, 1, 0x20000, sample19) != 0x20000) {
+            fprintf(stderr, "Invalid sample ROMs: expected 0x20000 bytes each\\n");
+            fclose(sample18);
+            fclose(sample19);
+            exit(EXIT_FAILURE);
+        }
+        fclose(sample18);
+        fclose(sample19);
+    }
+}
+    
 #endif
 /** Print the CPS ROM address of a given pointer to the global data blob */
 void print_rom_offset(const char *message, const void *addr)
