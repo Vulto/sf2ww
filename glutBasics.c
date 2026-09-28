@@ -306,8 +306,8 @@ static void log_state_frame(void) {
             "%d,%d,%d,%d,%d,%u,%d,%d,%d,"
             "%d,%d,%d,%d,%d,%u,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
             gStateFrame,
-            (unsigned long long)((gStateFrame - 1u) * 16768000ULL),
-            (unsigned long long)((gStateFrame - 1u) * 167680ULL),
+            (unsigned long long)(gStateFrame * 16768000ULL),
+            (unsigned long long)(gStateFrame * 167680ULL),
             g.mode0,
             g.tick,
             (unsigned)g.Stage,
@@ -423,8 +423,8 @@ void timerFunc(int value) {
     if (gTimingLog != NULL) {
         fprintf(gTimingLog, "%lu,%llu,%llu,%ld,%ld\n",
                 gStateFrame,
-                (unsigned long long)((gStateFrame - 1u) * 16768000ULL),
-                (unsigned long long)((gStateFrame - 1u) * 167680ULL),
+                (unsigned long long)(gStateFrame * 16768000ULL),
+                (unsigned long long)(gStateFrame * 167680ULL),
                 host_logic_ns,
                 host_start_late_ns);
         fflush(gTimingLog);
