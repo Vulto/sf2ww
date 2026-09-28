@@ -86,7 +86,10 @@ jobs:
           rm -f allroms.bin sf2gfx.bin
           ./bin/prepare-rom.sh "$SF2_ROM_ROOT/rom.zip"
           cp allroms.bin "$SF2_ROM_ROOT/allroms.bin"
-          cp sf2gfx.bin "$SF2_ROM_ROOT/sf2gfx.bin"\n          cp sf2_09.bin "$SF2_ROM_ROOT/sf2_09.bin"\n          cp sf2_18.bin "$SF2_ROM_ROOT/sf2_18.bin"\n          cp sf2_19.bin "$SF2_ROM_ROOT/sf2_19.bin"
+          cp sf2gfx.bin "$SF2_ROM_ROOT/sf2gfx.bin"
+          cp sf2_09.bin "$SF2_ROM_ROOT/sf2_09.bin"
+          cp sf2_18.bin "$SF2_ROM_ROOT/sf2_18.bin"
+          cp sf2_19.bin "$SF2_ROM_ROOT/sf2_19.bin"
           rm -f allroms.bin sf2gfx.bin "$SF2_ROM_ROOT/rom.zip"
           test -s "$SF2_ROM_ROOT/allroms.bin"
           test -s "$SF2_ROM_ROOT/sf2gfx.bin"
@@ -305,7 +308,10 @@ jobs:
           rm -f allroms.bin sf2gfx.bin
           ./bin/prepare-rom.sh "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip"
           cp allroms.bin "$RUNNER_TEMP/sf2-lockstep-rom/allroms.bin"
-          cp sf2gfx.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2gfx.bin"\n          cp sf2_09.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2_09.bin"\n          cp sf2_18.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2_18.bin"\n          cp sf2_19.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2_19.bin"
+          cp sf2gfx.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2gfx.bin"
+          cp sf2_09.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2_09.bin"
+          cp sf2_18.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2_18.bin"
+          cp sf2_19.bin "$RUNNER_TEMP/sf2-lockstep-rom/sf2_19.bin"
           rm -f allroms.bin sf2gfx.bin "$RUNNER_TEMP/sf2-lockstep-rom/rom.zip"
           test -s "$RUNNER_TEMP/sf2-lockstep-rom/allroms.bin"
           test -s "$RUNNER_TEMP/sf2-lockstep-rom/sf2gfx.bin"
