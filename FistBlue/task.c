@@ -12,6 +12,7 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef SF2_UCONTEXT
 #include <stdlib.h>
@@ -34,6 +35,34 @@
 extern Game g;
 struct executive_t Exec;
 
+static FILE *gTaskTrace;
+static int gTaskTraceInit;
+
+static void task_trace_init(void)
+{
+    const char *path;
+    if (gTaskTraceInit) return;
+    gTaskTraceInit = 1;
+    path = getenv("SF2_TASK_TRACE");
+    if (path == NULL || path[0] == '\\0') return;
+    gTaskTrace = fopen(path, "w");
+    if (gTaskTrace != NULL) {
+        fprintf(gTaskTrace, "tick,event,task,status,timer,current_task\\n");
+        fflush(gTaskTrace);
+    }
+}
+
+static void task_trace_event(const char *event, int task_id)
+{
+    if (gTaskTrace == NULL) return;
+    fprintf(gTaskTrace, "%u,%s,%d,%u,%u,%d\\n",
+            (unsigned)g.tick, event, task_id,
+            task_id >= 0 && task_id < MAX_TASKS ? (unsigned)Exec.Tasks[task_id].status : 0u,
+            task_id >= 0 && task_id < MAX_TASKS ? (unsigned)Exec.Tasks[task_id].timer : 0u,
+            Exec.CurrentTask);
+    fflush(gTaskTrace);
+}
+
 #define handle_error(msg) \
 do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
@@ -44,7 +73,9 @@ static ucontext_t uctx_main;
 static void despatch_tasks(void);
 
 void task_timer(void){
+    task_trace_init();
     sf2_interrupt();
+    task_trace_event("interrupt", -1);
 	despatch_tasks();
 	if (g.x8a30) {
         /* the CPS just loops here, we instead just hit it three more times to emulate the speed-up */
@@ -277,6 +308,7 @@ DESPATCH_STARTAGAIN:
             if(Exec.Tasks[i].status == TASK_READY) {
                 Exec.Tasks[i].status = TASK_RUN;
             }
+            task_trace_event("dispatch", i);
 			if (Exec.Tasks[i].code == NULL) {
 				Exec.Tasks[i].status=0;
 				printf("!!!: NULL task %d\n", i);
