@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include "cps_audio.h"
 #include "../third_party/nuked_opm/opm.h"
 
