@@ -44,6 +44,7 @@ SOURCES := \
 	FistBlue/rules.c \
 	FistBlue/reverse_trace.c \
 	FistBlue/cps_audio.c \
+	third_party/nuked_opm/opm.c \
 	FistBlue/sm.c \
 	FistBlue/sound.c \
 	FistBlue/sprite.c \
