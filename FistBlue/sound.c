@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 extern Game g;
 
@@ -26,12 +27,14 @@ static unsigned short soundBackendQueue[SOUND_BACKEND_QUEUE_LENGTH];
 static unsigned soundBackendRead;
 static unsigned soundBackendWrite;
 static unsigned soundBackendCount;
+static unsigned soundBackendOverflowCount;
 
 static void soundTraceEvent(const char *event, int data);
 
 static void soundBackendEnqueue(unsigned short data) {
 	if (soundBackendCount == SOUND_BACKEND_QUEUE_LENGTH) {
 		soundTraceEvent("overflow", data);
+		++soundBackendOverflowCount;
 		return;
 	}
 	soundBackendQueue[soundBackendWrite] = data;
@@ -105,10 +108,17 @@ void sound_cq_f7_ff(void) {
 
 void sound_tick(void) {
 	unsigned short data;
+	int32_t left;
+	int32_t right;
 	cps_audio_clock_frame();
 	if (soundBackendCount == 0) return;
 	data = soundBackendQueue[soundBackendRead];
 	soundBackendRead = (soundBackendRead + 1u) % SOUND_BACKEND_QUEUE_LENGTH;
 	--soundBackendCount;
 	soundTraceEvent("drain", (int)data);
+	cps_audio_last_sample(&left, &right);
+	if (getenv("SF2_AUDIO_EVENT_LOG") != NULL && soundBackendOverflowCount != 0u) {
+		soundTraceEvent("overflow_count", (int)soundBackendOverflowCount);
+		soundBackendOverflowCount = 0u;
+	}
 }
