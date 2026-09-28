@@ -11,6 +11,7 @@
 
 #include "structs.h"
 #include "sound.h"
+#include "cps_audio.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -104,6 +105,7 @@ void sound_cq_f7_ff(void) {
 
 void sound_tick(void) {
 	unsigned short data;
+	cps_audio_clock_frame();
 	if (soundBackendCount == 0) return;
 	data = soundBackendQueue[soundBackendRead];
 	soundBackendRead = (soundBackendRead + 1u) % SOUND_BACKEND_QUEUE_LENGTH;
