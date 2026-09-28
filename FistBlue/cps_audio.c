@@ -18,6 +18,14 @@ void cps_audio_init(void)
     last_right = 0;
 }
 
+void cps_audio_reset(void)
+{
+    OPM_Reset(&ym2151, opm_flags_none);
+    initialized = 1;
+    last_left = 0;
+    last_right = 0;
+}
+
 void cps_audio_ym2151_write(uint8_t port, uint8_t data)
 {
     cps_audio_init();
