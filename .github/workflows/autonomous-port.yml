@@ -233,7 +233,7 @@ jobs:
               8. Implement the smallest root-cause correction in the native port. Never compensate timestamps or mask a mismatch.
               9. Add or strengthen a regression that demonstrates the old behavior fails and the corrected behavior passes.
               10. Never weaken an existing oracle. Do not remove assertions, increase tolerances, shorten observation windows, ignore errors, or replace real MAME evidence with synthetic fixtures.
-              11. Treat audio as a first-class target. The current port has unimplemented sound paths; trace MAME audio-command writes/CPU behavior and implement the native equivalent, then compare event sequence and timing.
+              11. Treat audio as a first-class target. Inspect the current native audio implementation and trace MAME audio-command writes/CPU behavior; fix any proven divergence and compare event sequence and timing.
               12. Run build, -Werror, sanitizer, smoke, semantic, visual, audio and real-MAME gates.
               13. If a test fails, investigate and fix the port or improve the observation method with an independently failing regression. Never modify a test merely to obtain PASS.
               14. Record evidence, root cause, changed files, regressions and remaining uncertainty in docs/agent/FINDINGS.md and update BACKLOG.md.
@@ -369,7 +369,7 @@ jobs:
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Continue autonomous iteration
-        if: always() && github.ref == 'refs/heads/main'
+        if: always() && (github.event_name != 'issues' || github.event.issue.title == 'AUTONOMOUS_AGENT_KICKOFF')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
