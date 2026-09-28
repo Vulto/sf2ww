@@ -2,6 +2,9 @@ name: Autonomous SF2 Port Agent
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 concurrency:
   group: sf2-autonomous-main
@@ -179,7 +182,7 @@ jobs:
           prompt: |
             You are the autonomous engineering agent for Vulto/sf2ww.
 
-            Mission: continue on main until the fixed arcade target is behaviorally reproduced by the native C/OpenGL port. Do not stop at a green build.
+            Mission: continue until the fixed arcade target is behaviorally reproduced by the native C/OpenGL port. Main is the integration target; helper agents, branches, issues and PRs are allowed when they accelerate diagnosis, but validated work must be consolidated into main. Do not stop at a green build.
 
             Read first:
               .agent/oracle/oracle_diagnostic.md
@@ -208,8 +211,8 @@ jobs:
               - Every fix requires an observed divergence, a falsifiable hypothesis and a regression.
               - Preserve integer/fixed-point semantics.
               - The real ROM fixture gate has already passed before you start. The fixture is outside the workspace at $SF2_ROM_ROOT and must never be replaced or regenerated. If it becomes unavailable, stop behavioral work and report the validation failure.
-              - Never create branches, force-push, weaken tests, or hide divergences.
-              - Do not commit or push; the wrapper validates and commits.
+              - You may create helper branches, issues and pull requests, and may delegate to specialized agents. All validated work must ultimately be consolidated into main.
+              - Never force-push or rewrite main. Do not bypass the validation gate. The autonomous wrapper owns commits/pushes to main; helper branches/PRs may contain their own commits.
 
             Autonomous iteration protocol:
               1. Read all persistent state, previous findings, and the pre-agent lockstep evidence files already present in the workspace before changing code.
