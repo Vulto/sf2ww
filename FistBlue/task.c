@@ -44,7 +44,7 @@ static void task_trace_init(void)
     if (gTaskTraceInit) return;
     gTaskTraceInit = 1;
     path = getenv("SF2_TASK_TRACE");
-    if (path == NULL || path[0] == '\\0') return;
+    if (path == NULL || path[0] == 0) return;
     gTaskTrace = fopen(path, "w");
     if (gTaskTrace != NULL) {
         fprintf(gTaskTrace, "tick,event,task,status,timer,current_task\\n");
@@ -160,6 +160,8 @@ void print_task_table(void) {
 #endif
 
 void sf2sleep (int duration) {		// see asm wrap_n_trap3
+    task_trace_init();
+    task_trace_event("sleep", Exec.CurrentTask);
     if(duration) {
         Exec.Tasks[Exec.CurrentTask].timer = duration;
         Exec.Tasks[Exec.CurrentTask].status = TASK_SLEEP; 
@@ -308,6 +310,7 @@ DESPATCH_STARTAGAIN:
             if(Exec.Tasks[i].status == TASK_READY) {
                 Exec.Tasks[i].status = TASK_RUN;
             }
+            task_trace_event("dispatch", i);
             task_trace_event("dispatch", i);
 			if (Exec.Tasks[i].code == NULL) {
 				Exec.Tasks[i].status=0;
