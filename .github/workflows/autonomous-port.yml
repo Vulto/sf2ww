@@ -62,7 +62,7 @@ jobs:
           repository: Vulto/sf2wwrom
           ref: main
           path: .agent/private-rom
-          token: ${{ secrets.SF2_ROM_REPO_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN || secrets.GITHUB_TOKEN }}
           sparse-checkout: |
             sf2ua.zip
           sparse-checkout-cone-mode: false
