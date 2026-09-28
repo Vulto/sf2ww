@@ -16,6 +16,8 @@ int main(void)
     cps_audio_last_sample(&left1, &right1);
 
     cps_audio_reset();
+    cps_audio_ym2151_write(0, 0x01);
+    cps_audio_ym2151_write(1, 0x00);
     cps_audio_clock_frame();
     cps_audio_last_sample(&left2, &right2);
 
