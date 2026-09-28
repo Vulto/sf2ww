@@ -23,5 +23,6 @@ int main(void)
 
     assert(left1 == left2);
     assert(right1 == right2);
+    assert(left1 != 0 || right1 != 0);
     return 0;
 }
