@@ -47,7 +47,7 @@ static void task_trace_init(void)
     if (path == NULL || path[0] == 0) return;
     gTaskTrace = fopen(path, "w");
     if (gTaskTrace != NULL) {
-        fprintf(gTaskTrace, "tick,event,task,status,timer,current_task\\n");
+        fprintf(gTaskTrace, "tick,event,task,status,timer,current_task\n");
         fflush(gTaskTrace);
     }
 }
@@ -310,7 +310,6 @@ DESPATCH_STARTAGAIN:
             if(Exec.Tasks[i].status == TASK_READY) {
                 Exec.Tasks[i].status = TASK_RUN;
             }
-            task_trace_event("dispatch", i);
             task_trace_event("dispatch", i);
 			if (Exec.Tasks[i].code == NULL) {
 				Exec.Tasks[i].status=0;
