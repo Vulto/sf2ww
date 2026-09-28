@@ -2,12 +2,14 @@
 #include "../third_party/nuked_opm/opm.h"
 
 #define YM2151_CLOCKS_PER_SAMPLE 64u
-#define YM2151_CLOCKS_PER_FRAME  (3579545u / 60u)
+#define YM2151_CLOCK_HZ 3579545u
+#define CPS_FRAME_HZ 60u
 
 static opm_t ym2151;
 static int32_t last_left;
 static int32_t last_right;
 static uint8_t initialized;
+static uint64_t frame_clock_remainder;
 
 void cps_audio_init(void)
 {
@@ -24,6 +26,7 @@ void cps_audio_reset(void)
     initialized = 1;
     last_left = 0;
     last_right = 0;
+    frame_clock_remainder = 0;
 }
 
 void cps_audio_ym2151_write(uint8_t port, uint8_t data)
@@ -34,13 +37,16 @@ void cps_audio_ym2151_write(uint8_t port, uint8_t data)
 
 void cps_audio_clock_frame(void)
 {
-    unsigned clocks = YM2151_CLOCKS_PER_FRAME;
+    unsigned clocks;
     int32_t output[2] = {0, 0};
     uint8_t sh1 = 0;
     uint8_t sh2 = 0;
     uint8_t so = 0;
 
     cps_audio_init();
+    frame_clock_remainder += YM2151_CLOCK_HZ;
+    clocks = (unsigned)(frame_clock_remainder / CPS_FRAME_HZ);
+    frame_clock_remainder %= CPS_FRAME_HZ;
     while (clocks >= YM2151_CLOCKS_PER_SAMPLE) {
         for (unsigned i = 0; i < YM2151_CLOCKS_PER_SAMPLE; ++i) {
             OPM_Clock(&ym2151, output, &sh1, &sh2, &so);
