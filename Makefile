@@ -104,6 +104,9 @@ all: $(TARGET)
 $(TARGET): $(OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
+third_party/nuked_opm/opm.o: third_party/nuked_opm/opm.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -Wno-unused-variable -Ithird_party/nuked_opm -c $< -o $@
+
 %.o: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
