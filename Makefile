@@ -43,6 +43,7 @@ SOURCES := \
 	FistBlue/reactmode.c \
 	FistBlue/rules.c \
 	FistBlue/reverse_trace.c \
+	FistBlue/cps_audio.c \
 	FistBlue/sm.c \
 	FistBlue/sound.c \
 	FistBlue/sprite.c \
@@ -111,6 +112,9 @@ test: $(TARGET) semantic-test
 semantic-test:
 	bash tests/test_compare_semantic_frames.sh
 	bash tests/test_compare_sound_events.sh
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) tests/test_cps_audio.c FistBlue/cps_audio.c third_party/nuked_opm/opm.c -o tests/test_cps_audio $(LDFLAGS) $(LDLIBS)
+	./tests/test_cps_audio
+	rm -f tests/test_cps_audio
 
 sanitize:
 	$(MAKE) clean
