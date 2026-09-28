@@ -52,7 +52,7 @@ static void soundTraceEvent(const char *event, int data) {
 	unsigned long long arcade_cpu_cycles = (unsigned long long)g.tick * 167680ULL;
 	soundTraceOpen();
 	if (soundTrace == NULL) return;
-	fprintf(soundTrace, "%u,%llu,%llu,%s,%d,%u\\n",
+	fprintf(soundTrace, "%u,%llu,%llu,%s,%d,%u\n",
 		(unsigned)(++soundTraceSequence), arcade_time_ns, arcade_cpu_cycles,
 		event, data, (unsigned)g.tick);
 	fflush(soundTrace);
