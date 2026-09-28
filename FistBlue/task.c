@@ -55,7 +55,7 @@ static void task_trace_init(void)
 static void task_trace_event(const char *event, int task_id)
 {
     if (gTaskTrace == NULL) return;
-    fprintf(gTaskTrace, "%u,%s,%d,%u,%u,%d\\n",
+    fprintf(gTaskTrace, "%u,%s,%d,%u,%u,%d\n",
             (unsigned)g.tick, event, task_id,
             task_id >= 0 && task_id < MAX_TASKS ? (unsigned)Exec.Tasks[task_id].status : 0u,
             task_id >= 0 && task_id < MAX_TASKS ? (unsigned)Exec.Tasks[task_id].timer : 0u,
