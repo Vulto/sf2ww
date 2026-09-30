@@ -11,6 +11,7 @@ static int32_t last_left;
 static int32_t last_right;
 static uint8_t initialized;
 static uint64_t frame_clock_remainder;
+static uint64_t sample_clock_remainder;
 
 void cps_audio_init(void)
 {
@@ -28,6 +29,7 @@ void cps_audio_reset(void)
     last_left = 0;
     last_right = 0;
     frame_clock_remainder = 0;
+    sample_clock_remainder = 0;
 }
 
 void cps_audio_ym2151_write(uint8_t port, uint8_t data)
@@ -39,6 +41,7 @@ void cps_audio_ym2151_write(uint8_t port, uint8_t data)
 void cps_audio_clock_frame(void)
 {
     unsigned clocks;
+    unsigned samples;
     int32_t output[2] = {0, 0};
     uint8_t sh1 = 0;
     uint8_t sh2 = 0;
@@ -48,13 +51,15 @@ void cps_audio_clock_frame(void)
     frame_clock_remainder += YM2151_CLOCK_HZ;
     clocks = (unsigned)(frame_clock_remainder / CPS_FRAME_HZ);
     frame_clock_remainder %= CPS_FRAME_HZ;
-    while (clocks >= YM2151_CLOCKS_PER_SAMPLE) {
+    sample_clock_remainder += clocks;
+    samples = (unsigned)(sample_clock_remainder / YM2151_CLOCKS_PER_SAMPLE);
+    sample_clock_remainder %= YM2151_CLOCKS_PER_SAMPLE;
+    for (unsigned s = 0; s < samples; ++s) {
         for (unsigned i = 0; i < YM2151_CLOCKS_PER_SAMPLE; ++i) {
             OPM_Clock(&ym2151, output, &sh1, &sh2, &so);
         }
         last_left = output[0];
         last_right = output[1];
-        clocks -= YM2151_CLOCKS_PER_SAMPLE;
     }
 }
 
