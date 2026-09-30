@@ -3,6 +3,7 @@
 #include "../third_party/nuked_opm/opm.h"
 
 #define YM2151_CLOCKS_PER_SAMPLE 64u
+#define YM2151_OUTPUT_WARMUP_SAMPLES 8u
 #define YM2151_CLOCK_HZ 3579545u
 #define CPS_FRAME_HZ 60u
 
