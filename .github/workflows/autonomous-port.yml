@@ -56,13 +56,23 @@ jobs:
           git -C .agent/reference/jtcps rev-parse HEAD | tee .agent/reference/JTCPS_COMMIT
           git -C .agent/reference/mame rev-parse HEAD | tee .agent/reference/MAME_COMMIT
 
+      - name: Verify private ROM credential
+        env:
+          Sf2RomToken: ${{ secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$Sf2RomToken" || {
+            echo "::error::Missing SF2WWROM_TOKEN or SF2_ROM_REPO_TOKEN; GITHUB_TOKEN cannot access Vulto/sf2wwrom."
+            exit 1
+          }
+
       - name: Checkout original private ROM fixture
         uses: actions/checkout@v4
         with:
           repository: Vulto/sf2wwrom
           ref: main
           path: .agent/private-rom
-          token: ${{ secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN }}
           sparse-checkout: |
             sf2ua.zip
           sparse-checkout-cone-mode: false
