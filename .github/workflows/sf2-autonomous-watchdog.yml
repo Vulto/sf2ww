@@ -2,8 +2,6 @@ name: SF2 Autonomous Watchdog
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "*/5 * * * *"
 
 concurrency:
   group: sf2-autonomous-watchdog
