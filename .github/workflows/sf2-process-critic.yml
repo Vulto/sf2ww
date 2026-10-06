@@ -1,8 +1,6 @@
 name: SF2 Process Critic
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "47 * * * *"
 concurrency:
   group: sf2-process-critic
   cancel-in-progress: false
