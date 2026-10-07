@@ -40,7 +40,9 @@ jobs:
           grep -F 'repository: Vulto/sf2wwrom' .github/workflows/oracle-guardian.yml
           grep -F 'secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN' .github/workflows/oracle-guardian.yml
           grep -F 'repository: Vulto/sf2wwrom' .github/workflows/private-rom-lockstep.yml
-          grep -F 'secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN' .github/workflows/private-rom-lockstep.yml
+          grep -F 'secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN || github.token' .github/workflows/private-rom-lockstep.yml
+          grep -F 'scripts/mame_sound_probe.lua' .github/actions/mame-lockstep/action.yml
+          grep -F 'compare_sound_events.py mame_sound_events.csv native_audio_events.csv' .github/actions/mame-lockstep/action.yml
 
       - name: Build
         run: |
