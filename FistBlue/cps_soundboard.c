@@ -157,9 +157,12 @@ void cps_soundboard_init(void)
     memset(gSoundBoard.Rom, 0xff, sizeof(gSoundBoard.Rom));
     if (!LoadRomFile("sf2_09.bin", gSoundBoard.Rom, 0x10000u)) {
         fprintf(stderr, "sound: unable to load sf2_09.bin\\n");
+        gSoundBoard.Ready = 0u;
+        gSoundBoard.Initialized = 1u;
         return;
     }
     memcpy(&gSoundBoard.Rom[0x10000], &gSoundBoard.Rom[0x8000], 0x8000u);
+    gSoundBoard.Ready = 1u;
 
     z80_init(&gSoundBoard.Cpu);
     gSoundBoard.Cpu.read_byte = SoundRead;
