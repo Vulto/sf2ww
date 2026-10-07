@@ -22,16 +22,6 @@ jobs:
           ref: ${{ inputs.port-ref }}
           fetch-depth: 0
 
-      - name: Verify private ROM credential
-        env:
-          Sf2RomToken: ${{ secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN }}
-        run: |
-          set -euo pipefail
-          test -n "$Sf2RomToken" || {
-            echo "::error::Missing SF2WWROM_TOKEN or SF2_ROM_REPO_TOKEN; GITHUB_TOKEN cannot access Vulto/sf2wwrom."
-            exit 1
-          }
-
       - name: Checkout private ROM repository
         uses: actions/checkout@v4
         with:
