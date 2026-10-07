@@ -18,7 +18,7 @@ mv "$TempDir/roms/sf2gfx.bin" "$RootDir/sf2gfx.bin"
 pick_sound() {
     for name in "$@"; do
         if [ -f "$TempDir/roms/$name" ]; then
-            printf '%s\\n' "$TempDir/roms/$name"
+            echo "$TempDir/roms/$name"
             return 0
         fi
     done
