@@ -73,7 +73,7 @@ jobs:
           set -euo pipefail
           truncate -s 1048576 allroms.bin
           truncate -s 6291456 sf2gfx.bin
-          truncate -s 32768 sf2_09.bin
+          truncate -s 65536 sf2_09.bin
           truncate -s 262144 sf2_18.bin
           truncate -s 262144 sf2_19.bin
           set +e
@@ -121,7 +121,7 @@ jobs:
         run: |
           truncate -s 1048576 allroms.bin
           truncate -s 6291456 sf2gfx.bin
-          truncate -s 32768 sf2_09.bin
+          truncate -s 65536 sf2_09.bin
           truncate -s 262144 sf2_18.bin
           truncate -s 262144 sf2_19.bin
           set +e
