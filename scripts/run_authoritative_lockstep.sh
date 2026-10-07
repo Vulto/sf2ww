@@ -16,7 +16,7 @@ test -s "$ROM_ROOT/sf2_18.bin"
 test -s "$ROM_ROOT/sf2_19.bin"
 test -x "$PORT_EXECUTABLE"
 
-export SF2_MAME_ROMPATH="$ROOT_DIR/$ROM_ROOT"
+export SF2_MAME_ROMPATH="$ROOT_DIR/$ROM_ROOT/roms"
 export MAME_BIN
 export SF2_MAME_SET="$MAME_SET"
 
