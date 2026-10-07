@@ -132,7 +132,7 @@ void cps_soundboard_write_event(uint8_t event, uint8_t data)
         event == 3u ? "oki_data" :
         event == 4u ? "bank" :
         event == 5u ? "oki_pin7" : "unknown",
-        data);
+        data, 0u);
 }
 
 void cps_soundboard_init(void)
@@ -177,7 +177,7 @@ static void SoundLatch(uint8_t *latch, uint8_t command)
     if (gSoundBoard.EventLog != NULL) {
         static uint64_t sequence;
         ++sequence;
-        fprintf(gSoundBoard.EventLog, "%llu,%llu,%llu,command,%u\\n",
+        fprintf(gSoundBoard.EventLog, "%llu,%llu,%llu,command,%u,0\\n",
             (unsigned long long)sequence,
             (unsigned long long)gSoundBoard.ArcadeTimeNs,
             (unsigned long long)gSoundBoard.Cpu.cyc,
