@@ -38,6 +38,17 @@ typedef struct {
 
 static SoundBoard gSoundBoard;
 
+static int LoadRomFile(const char *path, uint8_t *dst, size_t capacity)
+{
+    FILE *file = fopen(path, "rb");
+    size_t size;
+    if (file == NULL) return 0;
+    size = fread(dst, 1, capacity, file);
+    fclose(file);
+    return size == capacity;
+}
+
+
 static uint8_t SoundRead(void *userdata, uint16_t address)
 {
     SoundBoard *board = (SoundBoard *)userdata;
