@@ -7,6 +7,7 @@
  */
  
 #include <string.h>
+#include "FistBlue/cps_audio_host.h"
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -412,6 +413,7 @@ void timerFunc(int value) {
     ++gStateFrame;
     apply_lockstep_input(gStateFrame);
     task_timer();
+    cps_audio_host_pump();
 
     if (clock_gettime(CLOCK_MONOTONIC, &logic_end) != 0) {
         perror("clock_gettime");
@@ -539,6 +541,7 @@ int main (int argc, const char * argv[])
 
     init();					// standard GL init
     gfx_glut_init();
+    cps_audio_host_init();
     
     glutIgnoreKeyRepeat(TRUE);
 
