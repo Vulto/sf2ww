@@ -64,14 +64,8 @@ static uint8_t SoundRead(void *userdata, uint16_t address)
     if (address >= 0xd000u && address < 0xd000u + RAM_SIZE) {
         return board->Ram[address - 0xd000u];
     }
-    if (address == 0xf001u) return OPM_Read(&ym2151, 1u);
-    if (address == Z80_PORT_OKI) {
-        uint8_t status = 0;
-        for (unsigned voiceIndex = 0; voiceIndex < OKI_VOICES; ++voiceIndex) {
-            if (cps_audio_oki_voice_active(voiceIndex)) status |= (uint8_t)(1u << voiceIndex);
-        }
-        return status;
-    }
+    if (address == 0xf001u) return cps_audio_ym2151_status();
+    if (address == Z80_PORT_OKI) return cps_audio_oki_status();
     if (address == Z80_PORT_COMMAND) return board->Command;
     if (address == Z80_PORT_COMMAND) return board->Command;
     if (address == Z80_PORT_FADE) return board->FadeCommand;
