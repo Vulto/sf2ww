@@ -183,6 +183,13 @@ void cps_soundboard_reset(void)
     gSoundBoard.CycleRemainder = 0;
 }
 
+void cps_soundboard_fade(uint8_t command)
+{
+    cps_soundboard_init();
+    gSoundBoard.FadeCommand = command;
+    z80_gen_nmi(&gSoundBoard.Cpu);
+}
+
 void cps_soundboard_command(uint8_t command)
 {
     cps_soundboard_init();
