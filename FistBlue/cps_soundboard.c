@@ -32,6 +32,7 @@ typedef struct {
     uint64_t ArcadeTimeNs;
     uint8_t YmAddress;
     uint8_t Initialized;
+    uint8_t Ready;
     uint64_t CycleRemainder;
     FILE *EventLog;
 } SoundBoard;
@@ -174,6 +175,7 @@ void cps_soundboard_init(void)
 void cps_soundboard_reset(void)
 {
     cps_soundboard_init();
+    if (!gSoundBoard.Ready) return;
     z80_init(&gSoundBoard.Cpu);
     memset(gSoundBoard.Ram, 0, sizeof(gSoundBoard.Ram));
     gSoundBoard.Command = 0u;
@@ -186,6 +188,7 @@ void cps_soundboard_reset(void)
 void cps_soundboard_fade(uint8_t command)
 {
     cps_soundboard_init();
+    if (!gSoundBoard.Ready) return;
     gSoundBoard.FadeCommand = command;
     z80_gen_nmi(&gSoundBoard.Cpu);
 }
@@ -193,6 +196,7 @@ void cps_soundboard_fade(uint8_t command)
 void cps_soundboard_command(uint8_t command)
 {
     cps_soundboard_init();
+    if (!gSoundBoard.Ready) return;
     gSoundBoard.Command = command;
     z80_gen_nmi(&gSoundBoard.Cpu);
     if (gSoundBoard.EventLog != NULL) {
@@ -212,6 +216,7 @@ void cps_soundboard_clock_frame(void)
     uint64_t target;
 
     cps_soundboard_init();
+    if (!gSoundBoard.Ready) return;
     gSoundBoard.CycleRemainder += (uint64_t)Z80_CLOCK_HZ * FRAME_NS;
     target = gSoundBoard.CycleRemainder / 1000000000ULL;
     gSoundBoard.CycleRemainder %= 1000000000ULL;
