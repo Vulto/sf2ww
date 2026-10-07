@@ -61,10 +61,18 @@ static uint8_t SoundRead(void *userdata, uint16_t address)
         if (offset < sizeof(board->Rom)) return board->Rom[offset];
         return 0xffu;
     }
-    if (address >= 0xc000u && address < 0xc000u + RAM_SIZE) {
-        return board->Ram[address - 0xc000u];
+    if (address >= 0xd000u && address < 0xd000u + RAM_SIZE) {
+        return board->Ram[address - 0xd000u];
     }
-    if (address == Z80_PORT_OKI) return 0xf0u;
+    if (address == 0xf001u) return OPM_Read(&ym2151, 1u);
+    if (address == Z80_PORT_OKI) {
+        uint8_t status = 0;
+        for (unsigned voiceIndex = 0; voiceIndex < OKI_VOICES; ++voiceIndex) {
+            if (cps_audio_oki_voice_active(voiceIndex)) status |= (uint8_t)(1u << voiceIndex);
+        }
+        return status;
+    }
+    if (address == Z80_PORT_COMMAND) return board->Command;
     if (address == Z80_PORT_COMMAND) return board->Command;
     if (address == Z80_PORT_FADE) return board->FadeCommand;
     return 0xffu;
@@ -74,8 +82,8 @@ static void SoundWrite(void *userdata, uint16_t address, uint8_t value)
 {
     SoundBoard *board = (SoundBoard *)userdata;
 
-    if (address >= 0xc000u && address < 0xc000u + RAM_SIZE) {
-        board->Ram[address - 0xc000u] = value;
+    if (address >= 0xd000u && address < 0xd000u + RAM_SIZE) {
+        board->Ram[address - 0xd000u] = value;
         return;
     }
 
