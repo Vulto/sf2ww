@@ -41,7 +41,7 @@ local function record(cpuName, address, data, event)
     if seq % 128 == 0 then out:flush() end
 end
 
-mainmem:install_write_tap(0x800180, 0x800181, "sf2ww_sound_latch",
+mainmem:install_write_tap(0x800006, 0x800007, "sf2ww_sound_latch",
     function(offset, data, memMask)
         record("maincpu", offset, data & 0xff, "command")
     end)
