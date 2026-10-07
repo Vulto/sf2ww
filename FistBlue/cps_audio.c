@@ -97,7 +97,7 @@ void cps_audio_oki_write(uint8_t data)
                 start &= 0x3ffffu;
                 stop &= 0x3ffffu;
                 if (oki_loaded && start < stop && stop < sizeof(oki_rom)) {
-                    static const int volume[16] = {32,23,19,16,13,11,9,8,7,6,5,4,3,2,1,0};
+                    static const int volume[16] = {32,22,16,11,8,6,4,3,2,0,0,0,0,0,0,0};
                     oki_voice[voiceIndex].playing = 1u;
                     oki_voice[voiceIndex].sample = 0u;
                     oki_voice[voiceIndex].base_offset = start;
@@ -132,7 +132,7 @@ static int OkiNextSample(void)
             uint8_t byte = oki_rom[byteOffset & 0x3ffffu];
             int nibble = (voice->sample & 1u) ? (byte & 0x0fu) : (byte >> 4);
             int signal = OkiStep(nibble, &voice->predictor, &voice->step_index);
-            mix += signal * voice->volume;
+            mix += (signal * voice->volume) / 2;
             ++voice->sample;
             if (voice->sample >= voice->count) voice->playing = 0u;
         }
