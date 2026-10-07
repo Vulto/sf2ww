@@ -6,7 +6,7 @@ DEBUG ?= -g
 CPPFLAGS += -D_POSIX_C_SOURCE=200809L -MMD -MP
 CFLAGS += -std=$(CSTD) $(WARNINGS) $(OPT) $(DEBUG)
 LDFLAGS +=
-LDLIBS += -lGL -lGLU -lglut -lpthread -lm
+LDLIBS += -lGL -lGLU -lglut -lSDL2 -lpthread -lm
 
 ifeq ($(SANITIZE),1)
 CFLAGS += -fsanitize=address,undefined -fno-omit-frame-pointer -O1
@@ -44,6 +44,7 @@ SOURCES := \
 	FistBlue/rules.c \
 	FistBlue/reverse_trace.c \
 	FistBlue/cps_audio.c \
+	FistBlue/cps_audio_host.c \
 	FistBlue/cps_soundboard.c \
 	third_party/nuked_opm/opm.c \
 	third_party/superzazu_z80/z80.c \
