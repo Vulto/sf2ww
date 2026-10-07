@@ -29,6 +29,7 @@ typedef struct {
     uint8_t FadeCommand;
     uint8_t Bank;
     uint8_t OkiPin7;
+    uint64_t ArcadeTimeNs;
     uint8_t YmAddress;
     uint8_t Initialized;
     uint64_t CycleRemainder;
@@ -44,7 +45,7 @@ static uint8_t SoundRead(void *userdata, uint16_t address)
     if (address < ROM_FIXED_SIZE) return board->Rom[address];
     if (address < 0xc000u) {
         uint32_t offset = ROM_BANK_BASE +
-            ((uint32_t)(board->Bank & 7u) * ROM_BANK_SIZE) +
+            ((uint32_t)(board->Bank & 1u) * ROM_BANK_SIZE) +
             (uint32_t)(address - ROM_FIXED_SIZE);
         if (offset < sizeof(board->Rom)) return board->Rom[offset];
         return 0xffu;
@@ -135,7 +136,7 @@ void cps_soundboard_write_event(uint8_t event, uint8_t data)
     ++sequence;
     fprintf(gSoundBoard.EventLog, "%llu,%llu,%llu,%s,%u\n",
         (unsigned long long)sequence,
-        (unsigned long long)(sequence == 0 ? 0 : (sequence - 1) * FRAME_NS),
+        (unsigned long long)gSoundBoard.ArcadeTimeNs,
         (unsigned long long)gSoundBoard.Cpu.cyc,
         event == 1u ? "ym_address" :
         event == 2u ? "ym_data" :
@@ -150,10 +151,12 @@ void cps_soundboard_init(void)
     if (gSoundBoard.Initialized) return;
 
     memset(&gSoundBoard, 0, sizeof(gSoundBoard));
-    if (!LoadRomFile("sf2_09.bin", gSoundBoard.Rom, sizeof(gSoundBoard.Rom))) {
-        memset(gSoundBoard.Rom, 0xff, sizeof(gSoundBoard.Rom));
-        (void)LoadRomFile("sf2_09.bin", gSoundBoard.Rom, 0x10000u);
+    memset(gSoundBoard.Rom, 0xff, sizeof(gSoundBoard.Rom));
+    if (!LoadRomFile("sf2_09.bin", gSoundBoard.Rom, 0x10000u)) {
+        fprintf(stderr, "sound: unable to load sf2_09.bin\\n");
+        return;
     }
+    memcpy(&gSoundBoard.Rom[0x10000], &gSoundBoard.Rom[0x8000], 0x8000u);
 
     z80_init(&gSoundBoard.Cpu);
     gSoundBoard.Cpu.read_byte = SoundRead;
@@ -176,6 +179,22 @@ void cps_soundboard_reset(void)
     gSoundBoard.Bank = 0u;
     gSoundBoard.OkiPin7 = 1u;
     gSoundBoard.CycleRemainder = 0;
+}
+
+static void SoundLatch(uint8_t *latch, uint8_t command)
+{
+    *latch = command;
+    z80_gen_nmi(&gSoundBoard.Cpu);
+    if (gSoundBoard.EventLog != NULL) {
+        static uint64_t sequence;
+        ++sequence;
+        fprintf(gSoundBoard.EventLog, "%llu,%llu,%llu,command,%u\\n",
+            (unsigned long long)sequence,
+            (unsigned long long)gSoundBoard.ArcadeTimeNs,
+            (unsigned long long)gSoundBoard.Cpu.cyc,
+            command);
+        fflush(gSoundBoard.EventLog);
+    }
 }
 
 void cps_soundboard_command(uint8_t command)
@@ -203,6 +222,7 @@ void cps_soundboard_clock_frame(void)
     gSoundBoard.CycleRemainder += (uint64_t)Z80_CLOCK_HZ * FRAME_NS;
     target = gSoundBoard.CycleRemainder / 1000000000ULL;
     gSoundBoard.CycleRemainder %= 1000000000ULL;
+    gSoundBoard.ArcadeTimeNs += FRAME_NS;
 
     gSoundBoard.Cpu.cyc = 0;
     while (gSoundBoard.Cpu.cyc < target) {
