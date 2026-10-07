@@ -6,7 +6,7 @@ RootDir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 TempDir=$(mktemp -d)
 trap 'rm -rf "$TempDir"' EXIT
 
-unzip -q -o "$ArchivePath" -d "$TempDir/roms"
+unzip -q -j -o "$ArchivePath" -d "$TempDir/roms"
 (
   cd "$TempDir/roms"
   sh "$RootDir/bin/mt2-merge.sh"
