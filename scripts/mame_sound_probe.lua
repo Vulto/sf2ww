@@ -13,10 +13,16 @@ local CPU_HZ = 10000000
 local out = assert(io.open("mame_sound_events.csv", "w"))
 out:write("sequence,arcade_time_ns,arcade_cpu_cycles,cpu,address,data,event,pc\n")
 local seq = 0
+local base_seconds = nil
+local base_nsec = nil
 
 local function now_ns()
     local t = machine.time
-    return t.seconds * 1000000000 + t.nsec
+    if base_seconds == nil then
+        base_seconds = t.seconds
+        base_nsec = t.nsec
+    end
+    return (t.seconds - base_seconds) * 1000000000 + (t.nsec - base_nsec)
 end
 
 local function cycles()
