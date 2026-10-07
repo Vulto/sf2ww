@@ -65,9 +65,12 @@ runs:
         test -s mame_seed_probe.csv
         SF2_MAME_STATE_SCRIPT="scripts/mame_demo_probe.lua" xvfb-run -a bash scripts/run_mame_state.sh
         test -s mame_demo_probe.csv
+        SF2_SOUND_MAX_FRAMES=12000 SF2_MAME_STATE_SCRIPT="scripts/mame_sound_probe.lua" xvfb-run -a bash scripts/run_mame_state.sh
+        test -s mame_sound_events.csv
         cat mame_demo_probe.csv | head -5
         cat mame_demo_probe.csv | tail -20
         head -20 mame_seed_probe.csv
+        head -20 mame_sound_events.csv
 
     - name: Deep reverse-engineering trace
       if: inputs.deep-trace == 'true'
@@ -117,6 +120,7 @@ runs:
         test -s port_timing_input.csv
         SF2_AUDIO_EVENT_LOG=1 SF2_MAX_FRAMES=12000 timeout 230s xvfb-run -a "$PORT_EXECUTABLE" </dev/null >/tmp/sf2-native-audio.log 2>&1
         test -s native_audio_events.csv
+        python3 scripts/compare_sound_events.py mame_sound_events.csv native_audio_events.csv
 
     - name: "Visual lockstep: MAME attract mode versus native framebuffer"
       shell: bash
@@ -183,6 +187,7 @@ runs:
           port_timing.csv
           visual_comparison.csv
           mame_exec_attract.csv
+          mame_sound_events.csv
           reverse_audiocpu_reads.csv
           reverse_sound_commands.csv
           reverse_audio_chip_writes.csv
