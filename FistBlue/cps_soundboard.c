@@ -50,58 +50,41 @@ static uint8_t SoundRead(void *userdata, uint16_t address)
         if (offset < sizeof(board->Rom)) return board->Rom[offset];
         return 0xffu;
     }
-    if (address < 0xc000u + RAM_SIZE) return board->Ram[address - 0xc000u];
+    if (address >= 0xc000u && address < 0xc000u + RAM_SIZE) {
+        return board->Ram[address - 0xc000u];
+    }
+    if (address == Z80_PORT_OKI) return 0xf0u;
+    if (address == Z80_PORT_COMMAND) return board->Command;
+    if (address == Z80_PORT_FADE) return board->FadeCommand;
     return 0xffu;
 }
 
 static void SoundWrite(void *userdata, uint16_t address, uint8_t value)
 {
     SoundBoard *board = (SoundBoard *)userdata;
+
     if (address >= 0xc000u && address < 0xc000u + RAM_SIZE) {
         board->Ram[address - 0xc000u] = value;
+        return;
     }
-}
 
-static uint8_t SoundPortIn(z80 *cpu, uint8_t port)
-{
-    SoundBoard *board = (SoundBoard *)cpu->userdata;
-
-    switch ((uint16_t)port) {
-    case 0xf0u:
-        return 0u;
-    case 0xf2u:
-        return 0xf0u;
-    case 0xf8u:
-        return board->Command;
-    case 0xfau:
-        return board->FadeCommand;
-    default:
-        return 0xffu;
-    }
-}
-
-static void SoundPortOut(z80 *cpu, uint8_t port, uint8_t value)
-{
-    SoundBoard *board = (SoundBoard *)cpu->userdata;
-    uint16_t fullPort = (uint16_t)port | ((uint16_t)cpu->b << 8);
-
-    switch (fullPort & 0xffu) {
-    case 0xf0u:
+    switch (address) {
+    case Z80_PORT_YM_ADDRESS:
         board->YmAddress = value;
         cps_soundboard_write_event(1u, value);
         break;
-    case 0xf1u:
+    case Z80_PORT_YM_DATA:
         cps_audio_ym2151_write(board->YmAddress & 1u, value);
         cps_soundboard_write_event(2u, value);
         break;
-    case 0xf2u:
+    case Z80_PORT_OKI:
         cps_soundboard_write_event(3u, value);
         break;
-    case 0xf4u:
+    case Z80_PORT_BANK:
         board->Bank = value;
         cps_soundboard_write_event(4u, value);
         break;
-    case 0xf6u:
+    case Z80_PORT_OKI_PIN7:
         board->OkiPin7 = value & 1u;
         cps_soundboard_write_event(5u, board->OkiPin7);
         break;
@@ -110,14 +93,18 @@ static void SoundPortOut(z80 *cpu, uint8_t port, uint8_t value)
     }
 }
 
-static int LoadRomFile(const char *path, uint8_t *dst, size_t capacity)
+static uint8_t SoundPortIn(z80 *cpu, uint8_t port)
 {
-    FILE *file = fopen(path, "rb");
-    size_t size;
-    if (file == NULL) return 0;
-    size = fread(dst, 1, capacity, file);
-    fclose(file);
-    return size == capacity;
+    (void)cpu;
+    (void)port;
+    return 0xffu;
+}
+
+static void SoundPortOut(z80 *cpu, uint8_t port, uint8_t value)
+{
+    (void)cpu;
+    (void)port;
+    (void)value;
 }
 
 static void OpenEventLog(void)
