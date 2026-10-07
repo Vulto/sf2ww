@@ -7,6 +7,8 @@
 void cps_audio_init(void);
 void cps_audio_reset(void);
 void cps_audio_ym2151_write(uint8_t port, uint8_t data);
+uint8_t cps_audio_ym2151_status(void);
+uint8_t cps_audio_oki_status(void);
 void cps_audio_oki_write(uint8_t data);
 void cps_audio_oki_set_pin7(uint8_t pin7);
 void cps_audio_clock_frame(void);
