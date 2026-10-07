@@ -14,6 +14,7 @@
 #define OKI_PIN7_HIGH_DIVISOR 132u
 #define OKI_PIN7_LOW_DIVISOR 165u
 #define OKI_VOICES 4u
+#define PCM_RING_FRAMES 16384u
 
 static opm_t ym2151;
 static int32_t last_left;
@@ -35,6 +36,10 @@ static int oki_pending_sample = -1;
 static uint8_t oki_pin7 = 1;
 static uint64_t oki_sample_remainder;
 static int32_t last_oki;
+static int16_t pcm_ring[PCM_RING_FRAMES * 2u];
+static size_t pcm_read_index;
+static size_t pcm_write_index;
+static size_t pcm_count;
 
 void cps_audio_init(void);
 
@@ -212,8 +217,24 @@ void cps_audio_clock_frame(void)
         for (unsigned i = 0; i < YM2151_CLOCKS_PER_SAMPLE; ++i) {
             OPM_Clock(&ym2151, output, &sh1, &sh2, &so);
         }
-        last_left = output[0];
-        last_right = output[1];
+        {
+            int32_t mixed_left = output[0] + last_oki;
+            int32_t mixed_right = output[1] + last_oki;
+            if (mixed_left > 32767) mixed_left = 32767;
+            if (mixed_left < -32768) mixed_left = -32768;
+            if (mixed_right > 32767) mixed_right = 32767;
+            if (mixed_right < -32768) mixed_right = -32768;
+            last_left = mixed_left;
+            last_right = mixed_right;
+            pcm_ring[pcm_write_index * 2u] = (int16_t)mixed_left;
+            pcm_ring[pcm_write_index * 2u + 1u] = (int16_t)mixed_right;
+            pcm_write_index = (pcm_write_index + 1u) % PCM_RING_FRAMES;
+            if (pcm_count < PCM_RING_FRAMES) {
+                ++pcm_count;
+            } else {
+                pcm_read_index = (pcm_read_index + 1u) % PCM_RING_FRAMES;
+            }
+        }
     }
 }
 
@@ -222,4 +243,19 @@ void cps_audio_last_sample(int32_t *left, int32_t *right)
     cps_audio_init();
     if (left != NULL) *left = last_left;
     if (right != NULL) *right = last_right + last_oki;
+}
+
+
+size_t cps_audio_read_pcm(int16_t *dst, size_t max_frames)
+{
+    size_t count;
+    if (dst == NULL || max_frames == 0) return 0;
+    count = pcm_count < max_frames ? pcm_count : max_frames;
+    for (size_t i = 0; i < count; ++i) {
+        dst[i * 2u] = pcm_ring[pcm_read_index * 2u];
+        dst[i * 2u + 1u] = pcm_ring[pcm_read_index * 2u + 1u];
+        pcm_read_index = (pcm_read_index + 1u) % PCM_RING_FRAMES;
+    }
+    pcm_count -= count;
+    return count;
 }
