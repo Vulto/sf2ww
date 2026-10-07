@@ -53,19 +53,19 @@ runs:
       run: |
         set -euo pipefail
         rm -f mame_state.csv mame_exec_numeric.csv reverse_sound_commands.csv native_audio_events.csv
-        SF2_MAME_STATE_SCRIPT="scripts/mame_state_dump.lua" xvfb-run -a bash scripts/run_mame_state.sh
+        SF2_MAME_STATE_SCRIPT="$GITHUB_ACTION_PATH/scripts/mame_state_dump.lua" xvfb-run -a bash "$GITHUB_ACTION_PATH/scripts/run_mame_state.sh"
         test -s mame_state.csv
-        SF2_MAME_STATE_SCRIPT="scripts/mame_exec_numeric.lua" xvfb-run -a bash scripts/run_mame_state.sh
+        SF2_MAME_STATE_SCRIPT="$GITHUB_ACTION_PATH/scripts/mame_exec_numeric.lua" xvfb-run -a bash "$GITHUB_ACTION_PATH/scripts/run_mame_state.sh"
         test -s mame_exec_numeric.csv
-        SF2_MAME_STATE_SCRIPT="scripts/mame_exec_numeric_machineframe.lua" xvfb-run -a bash scripts/run_mame_state.sh
+        SF2_MAME_STATE_SCRIPT="$GITHUB_ACTION_PATH/scripts/mame_exec_numeric_machineframe.lua" xvfb-run -a bash "$GITHUB_ACTION_PATH/scripts/run_mame_state.sh"
         test -s mame_exec_numeric_machineframe.csv
-        SF2_MAME_STATE_SCRIPT="scripts/mame_exec_input.lua" xvfb-run -a bash scripts/run_mame_state.sh
+        SF2_MAME_STATE_SCRIPT="$GITHUB_ACTION_PATH/scripts/mame_exec_input.lua" xvfb-run -a bash "$GITHUB_ACTION_PATH/scripts/run_mame_state.sh"
         test -s mame_exec_input.csv
-        SF2_MAME_STATE_SCRIPT="scripts/mame_seed_probe.lua" xvfb-run -a bash scripts/run_mame_state.sh
+        SF2_MAME_STATE_SCRIPT="$GITHUB_ACTION_PATH/scripts/mame_seed_probe.lua" xvfb-run -a bash "$GITHUB_ACTION_PATH/scripts/run_mame_state.sh"
         test -s mame_seed_probe.csv
-        SF2_MAME_STATE_SCRIPT="scripts/mame_demo_probe.lua" xvfb-run -a bash scripts/run_mame_state.sh
+        SF2_MAME_STATE_SCRIPT="$GITHUB_ACTION_PATH/scripts/mame_demo_probe.lua" xvfb-run -a bash "$GITHUB_ACTION_PATH/scripts/run_mame_state.sh"
         test -s mame_demo_probe.csv
-        SF2_SOUND_MAX_FRAMES=12000 SF2_MAME_STATE_SCRIPT="scripts/mame_sound_probe.lua" xvfb-run -a bash scripts/run_mame_state.sh
+        SF2_SOUND_MAX_FRAMES=12000 SF2_MAME_STATE_SCRIPT="$GITHUB_ACTION_PATH/scripts/mame_sound_probe.lua" xvfb-run -a bash "$GITHUB_ACTION_PATH/scripts/run_mame_state.sh"
         test -s mame_sound_events.csv
         cat mame_demo_probe.csv | head -5
         cat mame_demo_probe.csv | tail -20
@@ -84,7 +84,7 @@ runs:
       run: |
         set -euo pipefail
         rm -f reverse_frames.csv reverse_memory_reads.csv reverse_memory_writes.csv reverse_ram_changes.csv reverse_memory_map.csv reverse_manifest.csv reverse_registers.csv reverse_audiocpu_reads.csv reverse_audiocpu_writes.csv reverse_sound_commands.csv reverse_audio_chip_writes.csv reverse_68000.tr reverse_z80.tr
-        xvfb-run -a bash scripts/run_mame_reverse_trace.sh
+        xvfb-run -a bash "$GITHUB_ACTION_PATH/scripts/run_mame_reverse_trace.sh"
         test -s reverse_sound_commands.csv
         test -s reverse_audiocpu_reads.csv
         test -s reverse_audiocpu_writes.csv
@@ -120,7 +120,7 @@ runs:
         test -s port_timing_input.csv
         SF2_AUDIO_EVENT_LOG=1 SF2_MAX_FRAMES=12000 timeout 230s xvfb-run -a "$PORT_EXECUTABLE" </dev/null >/tmp/sf2-native-audio.log 2>&1
         test -s native_audio_events.csv
-        python3 scripts/compare_sound_events.py mame_sound_events.csv native_audio_events.csv
+        python3 "$GITHUB_ACTION_PATH/scripts/compare_sound_events.py" mame_sound_events.csv native_audio_events.csv
 
     - name: "Visual lockstep: MAME attract mode versus native framebuffer"
       shell: bash
@@ -135,11 +135,11 @@ runs:
         rm -rf mame_visual native_visual
         mkdir -p mame_visual native_visual
         rm -f mame_exec_attract.csv port_state_attract.csv port_timing_attract.csv
-        SF2_NUMERIC_MAX_FRAMES=12000 SF2_MAME_STATE_SCRIPT="scripts/mame_exec_numeric.lua" \
-          xvfb-run -a bash scripts/run_mame_state.sh
+        SF2_NUMERIC_MAX_FRAMES=12000 SF2_MAME_STATE_SCRIPT="$GITHUB_ACTION_PATH/scripts/mame_exec_numeric.lua" \
+          xvfb-run -a bash "$GITHUB_ACTION_PATH/scripts/run_mame_state.sh"
         mv mame_exec_numeric.csv mame_exec_attract.csv
-        SF2_MAME_STATE_SCRIPT="scripts/mame_visual_dump.lua" SF2_VISUAL_DIR="$PWD/mame_visual" SF2_VISUAL_EVERY=60 SF2_VISUAL_MAX_FRAMES=12000 \
-          xvfb-run -a bash scripts/run_mame_state.sh \
+        SF2_MAME_STATE_SCRIPT="$GITHUB_ACTION_PATH/scripts/mame_visual_dump.lua" SF2_VISUAL_DIR="$PWD/mame_visual" SF2_VISUAL_EVERY=60 SF2_VISUAL_MAX_FRAMES=12000 \
+          xvfb-run -a bash "$GITHUB_ACTION_PATH/scripts/run_mame_state.sh" \
           >/tmp/sf2-mame-visual.log 2>&1
         test -n "$(find mame_visual -name 'frame_*.png' -print -quit)"
         echo "MAME_ATTRACT_MODE_TRANSITIONS"
@@ -157,9 +157,9 @@ runs:
         test -n "$(find native_visual -name 'frame_*.ppm' -print -quit)"
         echo "NATIVE_OBJECTS_AT_1380"
         cat native_visual_objects.txt
-        python3 scripts/validate_visual_anchors.py --mame-dir mame_visual --native-dir native_visual
-        bash scripts/compare_mame_port_numeric.sh mame_exec_attract.csv port_state_attract.csv
-        python3 scripts/compare_visual_frames.py \
+        python3 "$GITHUB_ACTION_PATH/scripts/validate_visual_anchors.py" --mame-dir mame_visual --native-dir native_visual
+        bash "$GITHUB_ACTION_PATH/scripts/compare_mame_port_numeric.sh" mame_exec_attract.csv port_state_attract.csv
+        python3 "$GITHUB_ACTION_PATH/scripts/compare_visual_frames.py" \
           --mame-dir mame_visual \
           --native-dir native_visual \
           --out visual_comparison.csv
@@ -168,11 +168,11 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        bash scripts/compare_timing_csv.sh mame_state.csv port_state.csv
-        bash scripts/compare_mame_port_numeric.sh mame_exec_numeric.csv port_state.csv
-        bash scripts/validate_host_timing.sh port_timing.csv
-        bash scripts/compare_mame_port_numeric.sh mame_exec_input.csv port_state_input.csv
-        bash scripts/validate_host_timing.sh port_timing_input.csv
+        bash "$GITHUB_ACTION_PATH/scripts/compare_timing_csv.sh" mame_state.csv port_state.csv
+        bash "$GITHUB_ACTION_PATH/scripts/compare_mame_port_numeric.sh" mame_exec_numeric.csv port_state.csv
+        bash "$GITHUB_ACTION_PATH/scripts/validate_host_timing.sh" port_timing.csv
+        bash "$GITHUB_ACTION_PATH/scripts/compare_mame_port_numeric.sh" mame_exec_input.csv port_state_input.csv
+        bash "$GITHUB_ACTION_PATH/scripts/validate_host_timing.sh" port_timing_input.csv
 
     - name: Upload comparison evidence
       if: always()
