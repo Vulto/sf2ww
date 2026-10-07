@@ -168,6 +168,7 @@ void cps_audio_init(void)
 
 void cps_audio_reset(void)
 {
+    if (!initialized) cps_audio_init();
     OPM_Reset(&ym2151, opm_flags_none);
     initialized = 1;
     last_left = 0;
