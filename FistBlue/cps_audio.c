@@ -85,7 +85,7 @@ void cps_audio_oki_write(uint8_t data)
     unsigned voiceMask;
     cps_audio_init();
     if (oki_pending_sample >= 0) {
-        voiceMask = (unsigned)(data >> 4);
+        voiceMask = (unsigned)((data >> 4) & 0x07u);
         for (unsigned voiceIndex = 0; voiceIndex < OKI_VOICES; ++voiceIndex, voiceMask >>= 1) {
             if ((voiceMask & 1u) == 0u || oki_voice[voiceIndex].playing) continue;
             {
@@ -115,7 +115,7 @@ void cps_audio_oki_write(uint8_t data)
         oki_pending_sample = data & 0x7fu;
         return;
     }
-    voiceMask = (unsigned)(data >> 3);
+    voiceMask = (unsigned)((data >> 3) & 0x0fu);
     for (unsigned voiceIndex = 0; voiceIndex < OKI_VOICES; ++voiceIndex, voiceMask >>= 1) {
         if (voiceMask & 1u) oki_voice[voiceIndex].playing = 0u;
     }
@@ -174,7 +174,17 @@ void cps_audio_init(void)
 void cps_audio_reset(void)
 {
     if (!initialized) cps_audio_init();
+    if (!initialized) cps_audio_init();
     OPM_Reset(&ym2151, opm_flags_none);
+    memset(oki_voice, 0, sizeof(oki_voice));
+    oki_pending_sample = -1;
+    oki_pin7 = 1;
+    oki_sample_remainder = 0;
+    last_oki = 0;
+    memset(pcm_ring, 0, sizeof(pcm_ring));
+    pcm_read_index = 0;
+    pcm_write_index = 0;
+    pcm_count = 0;
     initialized = 1;
     last_left = 0;
     last_right = 0;
@@ -242,7 +252,7 @@ void cps_audio_last_sample(int32_t *left, int32_t *right)
 {
     cps_audio_init();
     if (left != NULL) *left = last_left;
-    if (right != NULL) *right = last_right + last_oki;
+    if (right != NULL) *right = last_right;
 }
 
 
