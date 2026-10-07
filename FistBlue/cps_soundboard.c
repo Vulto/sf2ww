@@ -136,7 +136,7 @@ void cps_soundboard_write_event(uint8_t event, uint8_t data)
     static uint64_t sequence;
     if (gSoundBoard.EventLog == NULL) return;
     ++sequence;
-    fprintf(gSoundBoard.EventLog, "%llu,%llu,%llu,%s,%u\n",
+    fprintf(gSoundBoard.EventLog, "%llu,%llu,%llu,%s,%u,%u\n",
         (unsigned long long)sequence,
         (unsigned long long)gSoundBoard.ArcadeTimeNs,
         (unsigned long long)gSoundBoard.Cpu.cyc,
