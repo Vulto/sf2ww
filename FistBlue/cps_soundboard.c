@@ -181,12 +181,6 @@ void cps_soundboard_reset(void)
     gSoundBoard.CycleRemainder = 0;
 }
 
-static void SoundLatch(uint8_t *latch, uint8_t command)
-{
-    *latch = command;
-    z80_gen_nmi(&gSoundBoard.Cpu);
-}
-
 void cps_soundboard_command(uint8_t command)
 {
     cps_soundboard_init();
