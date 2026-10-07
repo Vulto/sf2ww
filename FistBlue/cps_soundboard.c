@@ -78,6 +78,7 @@ static void SoundWrite(void *userdata, uint16_t address, uint8_t value)
         cps_soundboard_write_event(2u, value);
         break;
     case Z80_PORT_OKI:
+        cps_audio_oki_write(value);
         cps_soundboard_write_event(3u, value);
         break;
     case Z80_PORT_BANK:
@@ -86,6 +87,7 @@ static void SoundWrite(void *userdata, uint16_t address, uint8_t value)
         break;
     case Z80_PORT_OKI_PIN7:
         board->OkiPin7 = value & 1u;
+        cps_audio_oki_set_pin7(board->OkiPin7);
         cps_soundboard_write_event(5u, board->OkiPin7);
         break;
     default:
