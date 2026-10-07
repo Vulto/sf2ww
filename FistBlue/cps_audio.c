@@ -192,6 +192,22 @@ void cps_audio_reset(void)
     sample_clock_remainder = 0;
 }
 
+uint8_t cps_audio_ym2151_status(void)
+{
+    cps_audio_init();
+    return OPM_Read(&ym2151, 1u);
+}
+
+uint8_t cps_audio_oki_status(void)
+{
+    uint8_t status = 0;
+    cps_audio_init();
+    for (unsigned voiceIndex = 0; voiceIndex < OKI_VOICES; ++voiceIndex) {
+        if (oki_voice[voiceIndex].playing) status |= (uint8_t)(1u << voiceIndex);
+    }
+    return status;
+}
+
 void cps_audio_ym2151_write(uint8_t port, uint8_t data)
 {
     cps_audio_init();
