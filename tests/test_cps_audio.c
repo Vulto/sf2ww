@@ -13,8 +13,9 @@ static void write_oki_fixture(void)
     rom[2] = 0x10;
     rom[3] = 0x00;
     rom[4] = 0x00;
-    rom[5] = 0x10;
+    rom[5] = 0x11;
     rom[0x10] = 0x7f;
+    rom[0x11] = 0x77;
 
     {
         FILE *f = fopen("sf2_18.bin", "wb");
