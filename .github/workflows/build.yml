@@ -43,6 +43,10 @@ jobs:
           grep -F 'secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN || github.token' .github/workflows/private-rom-lockstep.yml
           grep -F 'scripts/mame_sound_probe.lua' .github/actions/mame-lockstep/action.yml
           grep -F 'compare_sound_events.py mame_sound_events.csv native_audio_events.csv' .github/actions/mame-lockstep/action.yml
+          test -x scripts/run_authoritative_lockstep.sh
+          grep -F 'sf2_9.12a sf2_09.bin sf2_09.rom' bin/prepare-rom.sh
+          grep -F 'sf2_18.11c sf2_18.bin sf2_18.rom' bin/prepare-rom.sh
+          grep -F 'sf2_19.12c sf2_19.bin sf2_19.rom' bin/prepare-rom.sh
 
       - name: Build
         run: |
