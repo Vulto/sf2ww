@@ -26,7 +26,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev xvfb
+          sudo apt-get install -y build-essential freeglut3-dev libglu1-mesa-dev libgl1-mesa-dev libsdl2-dev xvfb
           gcc --version
           make --version
 
