@@ -12,6 +12,7 @@
 #include "structs.h"
 #include "sound.h"
 #include "cps_audio.h"
+#include "cps_soundboard.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -64,6 +65,7 @@ static void soundTraceEvent(const char *event, int data) {
 void sound_cq_addto(short data) {	/* 62ac */
 	soundTraceEvent("command", data);
 	soundBackendEnqueue((unsigned short)data);
+	cps_soundboard_command((uint8_t)data);
 }
 
 void sound_cq_1(short data) {	/* 629a */
@@ -94,6 +96,7 @@ void quirkysound(short data) {		// 6300
 void queuesound(int data) {			// 62f2
 	soundTraceEvent("queue", data);
 	soundBackendEnqueue((unsigned short)data);
+	cps_soundboard_command((uint8_t)data);
 }
 void setstagemusic(void) {
 	sound_cq_1( (u16 []){1,2,3,5,4,6,7,8,12,11,9,10,13,13,13}[g.CurrentStage] );
@@ -103,10 +106,12 @@ void setstagemusic(void) {
 void sound_cq_f7_ff(void) {
 	soundTraceEvent("f7ff", 0xf7ff);
 	soundBackendEnqueue(0xf7ffu);
+	cps_soundboard_fade(0xf7u);
 }
 
 void sound_tick(void) {
 	unsigned short data;
+	cps_soundboard_clock_frame();
 	cps_audio_clock_frame();
 	if (soundBackendCount == 0) return;
 	data = soundBackendQueue[soundBackendRead];
