@@ -174,16 +174,6 @@ static void SoundLatch(uint8_t *latch, uint8_t command)
 {
     *latch = command;
     z80_gen_nmi(&gSoundBoard.Cpu);
-    if (gSoundBoard.EventLog != NULL) {
-        static uint64_t sequence;
-        ++sequence;
-        fprintf(gSoundBoard.EventLog, "%llu,%llu,%llu,command,%u,0\\n",
-            (unsigned long long)sequence,
-            (unsigned long long)gSoundBoard.ArcadeTimeNs,
-            (unsigned long long)gSoundBoard.Cpu.cyc,
-            command);
-        fflush(gSoundBoard.EventLog);
-    }
 }
 
 void cps_soundboard_command(uint8_t command)
