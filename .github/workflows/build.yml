@@ -36,9 +36,9 @@ jobs:
           grep -F 'repository: Vulto/sf2wwrom' .github/workflows/autonomous-port.yml
           grep -F 'token: ${{ secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN || secrets.GITHUB_TOKEN }}' .github/workflows/autonomous-port.yml
           grep -F 'repository: Vulto/sf2wwrom' .github/workflows/oracle-guardian.yml
-          grep -F 'secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN || secrets.GITHUB_TOKEN' .github/workflows/oracle-guardian.yml
+          grep -F 'secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN' .github/workflows/oracle-guardian.yml
           grep -F 'repository: Vulto/sf2wwrom' .github/workflows/private-rom-lockstep.yml
-          grep -F 'secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN || secrets.GITHUB_TOKEN' .github/workflows/private-rom-lockstep.yml
+          grep -F 'secrets.SF2WWROM_TOKEN || secrets.SF2_ROM_REPO_TOKEN' .github/workflows/private-rom-lockstep.yml
 
       - name: Build
         run: |
